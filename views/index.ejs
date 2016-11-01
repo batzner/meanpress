@@ -1,0 +1,64 @@
+<html>
+
+<head>
+    <title>MLStuff - Machine Learning et al.</title>
+    <base href="/">
+
+    <link href="https://fonts.googleapis.com/css?family=Droid+Serif|Open+Sans+Condensed:300,700|Pacifico" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/stylesheets/bootstrap-reset.css" rel="stylesheet">
+    <link href="/stylesheets/style.css" rel="stylesheet">
+</head>
+
+<body ng-app="blog" ng-controller="MainCtrl">
+    <header>
+        <div class="brand">
+            <a href="#/">
+                <div id="logo-title">ML<span class="handwriting">stuff</span></div>
+                <div id="logo-subtitle">Machine Learning et al.</div>
+            </a>
+        </div>
+    </header>
+    <aside>
+        <div id="sidebar">
+
+            <!-- Sidebar -->
+            <ul class="sidebar-nav">
+                <li>
+                    <a class="active" href="#/">Blog</a>
+                </li>
+                <li>
+                    <a href="#/">Neural Net</a>
+                </li>
+                <li>
+                    <a href="#/">About</a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <section class="wrapper">
+        <div id="content" class="container-fluid">
+
+            <ui-view></ui-view>
+
+        </div>
+    </section>
+    <!-- /#page-content-wrapper -->
+    <!-- /#wrapper -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/javascripts/angularApp.js"></script>
+</body>
+
+</html>

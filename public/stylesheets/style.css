@@ -1,0 +1,94 @@
+body {
+    overflow-x: hidden;
+    font-size: 15px;
+    background: #f1f2f7;
+}
+
+a {
+    color: #000000;
+}
+
+a:hover, a:active, a:focus {
+    text-decoration: none;
+}
+
+a:hover {
+    color: #111111;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0;
+    font-family: 'Open Sans Condensed', sans-serif;
+    font-weight: bold;
+}
+
+p {
+    font-family: 'Droid Serif', serif;
+}
+
+.brand, #sidebar {
+    position: fixed;
+    width: 220px;
+    left: 0;
+    padding: 20px 30px;
+    font-family: 'Open Sans Condensed', sans-serif;
+}
+
+.brand {
+    top: 0;
+    height: 100px;
+    background: #222222;
+}
+
+#sidebar {
+    top: 100px;
+    bottom: 0px;
+    background: #222222;
+    padding-top: 40px;
+}
+
+.brand {
+    color: #eeeeee;
+}
+
+.brand a {
+    color: inherit;
+}
+
+.brand #logo-title {
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+.brand #logo-title .handwriting {
+    font-family: 'Pacifico', cursive;
+    font-weight: normal;
+    font-size: 0.8em;
+    margin-left: 4px;
+}
+
+.brand #logo-subtitle {
+    font-size: 1.1em;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav a {
+    text-transform: uppercase;
+    color: #bbbbbb;
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 2.5;
+}
+
+.sidebar-nav a.active, .sidebar-nav a:hover, .brand:hover {
+    color: #ffffff;
+}
+
+.wrapper {
+    margin-left: 220px;
+    padding: 20px 40px;
+}
