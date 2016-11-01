@@ -6,7 +6,7 @@ var Post = mongoose.model('Post');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index');
 });
 
 router.get('/api/posts', function(req, res, next) {
@@ -24,6 +24,11 @@ router.post('/api/posts', function(req, res, next) {
 
     res.json(post);
   });
+});
+
+// This route deals enables HTML5Mode by forwarding missing files to the index
+router.get('*', function(req, res) {
+    res.render('index');
 });
 
 module.exports = router;
