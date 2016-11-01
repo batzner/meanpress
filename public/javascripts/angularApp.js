@@ -21,10 +21,15 @@ app.config([
                 url: '/post/{id}',
                 templateUrl: '/templates/post.html',
                 controller: 'PostCtrl'
+            })
+            .state('add', {
+                url: '/add',
+                templateUrl: '/templates/add.html',
+                controller: 'AddPostCtrl'
             });
 
         $urlRouterProvider.otherwise('/');
-        // $locationProvider.html5Mode(true);
+        $locationProvider.html5Mode(true);
     }
 ]);
 
@@ -61,14 +66,6 @@ app.controller('MainCtrl', [
             return $(e).html();
         }
 
-        $scope.addPost = function() {
-            postsFactory.create({
-                title: $scope.title,
-                body: $scope.body,
-            });
-            $scope.title = '';
-            $scope.body = '';
-        };
     }
 ]);
 
@@ -78,5 +75,21 @@ app.controller('PostCtrl', [
     'postsFactory',
     function($scope, $stateParams, postsFactory) {
         $scope.post = postsFactory.posts[$stateParams.id];
+    }
+]);
+
+app.controller('AddPostCtrl', [
+    '$scope',
+    '$stateParams',
+    'postsFactory',
+    function($scope, $stateParams, postsFactory) {
+        $scope.addPost = function() {
+            postsFactory.create({
+                title: $scope.title,
+                body: $scope.body,
+            });
+            $scope.title = '';
+            $scope.body = '';
+        };
     }
 ]);
