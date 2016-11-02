@@ -10,17 +10,17 @@ app.config([
             .state('home', {
                 url: '/',
                 templateUrl: '/templates/home.html',
-                controller: 'MainCtrl',
-                resolve: {
-                    postsPromise: ['postsFactory', function(postsFactory) {
-                        return postsFactory.getAll();
-                    }]
-                }
+                controller: 'MainCtrl'
             })
             .state('post', {
                 url: '/post/{id}',
                 templateUrl: '/templates/post.html',
                 controller: 'PostCtrl'
+            })
+            .state('edit', {
+                url: '/post/{id}/edit',
+                templateUrl: '/templates/edit.html',
+                controller: 'EditPostCtrl'
             })
             .state('add', {
                 url: '/add',
@@ -79,6 +79,22 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
             console.log(response.data);
         });
     };
+
+    o.update = function(id, post) {
+        return $http.post('/api/posts/' + id, post, {
+            headers: {
+                Authorization: 'Bearer ' + authFactory.getToken()
+            }
+        }).then(function(response) {
+            o.posts[id] = response.data;
+        }, function(response) {
+            console.log(response.data);
+        });
+    }
+
+    // Make sure that all posts are present. This could also be ensured with a
+    // promise in the states using this factory.
+    o.getAll();
     return o;
 }]);
 
@@ -131,24 +147,64 @@ app.controller('MainCtrl', [
 app.controller('PostCtrl', [
     '$scope',
     '$stateParams',
+    '$location',
     'postsFactory',
-    function($scope, $stateParams, postsFactory) {
+    'authFactory',
+    function($scope, $stateParams, $location, postsFactory, authFactory) {
         $scope.post = postsFactory.posts[$stateParams.id];
+        // Expose the isLoggedIn method to the scope.
+        $scope.isLoggedIn = authFactory.isLoggedIn;
+        $scope.editUrl = $location.path()+'/edit';
     }
 ]);
 
 app.controller('AddPostCtrl', [
     '$scope',
     '$stateParams',
+    '$state',
     'postsFactory',
-    function($scope, $stateParams, postsFactory) {
-        $scope.addPost = function() {
-            postsFactory.create({
-                title: $scope.title,
-                body: '<div>' + $scope.body + '</div>',
-            });
-            $scope.title = '';
-            $scope.body = '';
+    function($scope, $stateParams, $state, postsFactory) {
+        $scope.form = {};
+        $scope.form.createdAt = new Date();
+        $scope.form.createdAt.setSeconds(0, 0);
+        $scope.form.submit = function() {
+            // The form object has all properties of a post object, so
+            // we can directly pass it to the post factory.
+            // Clone, so that emptying the form inputs does not affect our
+            // HTTP request in the post factory.
+            var post = angular.copy($scope.form);
+            postsFactory.create(post);
+
+            // Empty the form inputs.
+            $scope.form.title = '';
+            $scope.form.preview = '';
+            $scope.form.body = '';
+            $scope.form.slug = '';
+            $scope.form.metaDescription = '';
+            $scope.form.focusKeyword = '';
+
+            // Go home, because we don't know the id of the post
+            $state.go('home');
+        };
+    }
+]);
+
+app.controller('EditPostCtrl', [
+    '$scope',
+    '$stateParams',
+    '$location',
+    'postsFactory',
+    function($scope, $stateParams, $location, postsFactory) {
+        $scope.form = postsFactory.posts[$stateParams.id];
+        // Parse the date string to a Date for the form.
+        $scope.form.createdAt = new Date($scope.form.createdAt);
+        $scope.form.submit = function() {
+            // The form object has all properties of a post object, so
+            // we can directly pass it to the post factory.
+            postsFactory.update($stateParams.id, $scope.form);
+
+            // View the post
+            $location.path('/post/'+$stateParams.id);
         };
     }
 ]);

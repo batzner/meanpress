@@ -3,6 +3,13 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h1>{{post.title}}</a></h1>
+                <h5 ng-bind="post.createdAt | date:'longDate'"></h5>
+
+                <a ng-href="{{editUrl}}">
+                    <h5 ng-show="isLoggedIn()">
+                    <i class="fa fa-edit"></i> Edit
+                  </h5>
+                </a>
             </div>
             <div class="panel-body post-body" ng-bind-html="post.body"></div>
         </div>

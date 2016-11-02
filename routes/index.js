@@ -28,15 +28,15 @@ router.get('/', function(req, res, next) {
 
 router.get('/api/posts', function(req, res, next) {
     Post.find(function(err, posts) {
-        if (err) {
-            return next(err);
-        }
+        if (err) return next(err);
         res.json(posts);
     });
 });
 
+// Route for adding a post
 router.post('/api/posts', auth, function(req, res, next) {
     var post = new Post(req.body);
+    console.log(req.body);
 
     post.save(function(err, post) {
         if (err) {
@@ -44,6 +44,17 @@ router.post('/api/posts', auth, function(req, res, next) {
         }
         res.json(post);
     });
+});
+
+// Route for updating a post
+router.post('/api/posts/:id', auth, function(req, res, next) {
+    // Find the post to update
+    var query = {'_id':req.params.id};
+    var options = {upsert: true};
+    Post.findOneAndUpdate(query, req.body, options, function(err, post) {
+        if (err) return next(err);
+        res.json(post);
+    })
 });
 
 // Register route. Creates a user given a username and password
