@@ -1,3 +1,7 @@
+html, body {
+    height: 100%;
+}
+
 body {
     overflow-x: hidden;
     font-size: 15px;
@@ -11,10 +15,10 @@ a:hover, a:active, a:focus {
 a {
     color: #333333;
 }
+
 a:hover {
     color: #111111;
 }
-
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Open Sans Condensed', sans-serif;
@@ -24,6 +28,7 @@ h1, h2, h3, h4, h5, h6 {
 .post-body {
     font-family: 'Droid Serif', serif;
 }
+
 .post-body a {
     color: #888888;
 }
@@ -97,9 +102,21 @@ textarea {
     color: #ffffff;
 }
 
-.wrapper {
+.wrapper, footer {
     margin-left: 220px;
+}
+
+.wrapper {
     padding: 20px 40px;
+    min-height: 100%;
+}
+
+footer {
+  margin-top: -50px;
+    font-family: 'Droid Serif', serif;
+    text-align: center;
+    font-size: 0.85em;
+    color:#666;
 }
 
 .panel-default>.panel-heading {
@@ -115,5 +132,5 @@ textarea {
 }
 
 .panel-body {
-  padding: 20px;
+    padding: 20px;
 }

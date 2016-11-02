@@ -48,6 +48,10 @@ router.post('/api/posts', auth, function(req, res, next) {
 
 // Register route. Creates a user given a username and password
 router.post('/api/register', function(req, res, next) {
+    return res.status(400).json({
+        message: "Registering is currently not activated."
+    });
+
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({
             message: "Please fill out all fields"
