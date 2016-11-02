@@ -9,6 +9,11 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 require('./models/Posts');
 
+// Load Passport for authentication
+var passport = require('passport');
+require('./models/Users');
+require('./config/passport');
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
@@ -27,6 +32,9 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Initialise passport
+app.use(passport.initialize());
 
 app.use('/', routes);
 app.use('/users', users);
