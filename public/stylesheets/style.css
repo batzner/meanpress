@@ -4,7 +4,7 @@ html, body {
 
 body {
     overflow-x: hidden;
-    font-size: 15px;
+    font-size: 16px;
     background: #f1f2f7;
 }
 
@@ -21,12 +21,33 @@ a:hover {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Open Sans Condensed', sans-serif;
-    font-weight: bold;
+    font-family: "Oswald", sans-serif;
+    font-weight: 300;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+pre {
+    margin: 10px 0;
+}
+
+h1 {
+    margin-top: 2rem;
+    font-size: 2.4rem;
+}
+
+h2 {
+    margin-top: 20px;
+}
+
+h3 {
+    margin-top: 4rem;
+    font-size: 1.7rem;
 }
 
 .post-body {
-    font-family: 'Droid Serif', serif;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 300;
 }
 
 .post-body a {
@@ -42,7 +63,7 @@ textarea {
     width: 220px;
     left: 0;
     padding: 20px 30px;
-    font-family: 'Open Sans Condensed', sans-serif;
+    font-family: "Oswald", sans-serif;
 }
 
 .brand {
@@ -107,16 +128,19 @@ textarea {
 }
 
 .wrapper {
-    padding: 20px 40px;
+    padding-bottom: 70px;
+    padding-top:20px;
+    padding-left:40px;
+    padding-right:40px;
     min-height: 100%;
 }
 
 footer {
-  margin-top: -50px;
-    font-family: 'Droid Serif', serif;
+    margin-top: -50px;
+    font-family: 'Source Sans Pro', sans-serif;
     text-align: center;
     font-size: 0.85em;
-    color:#666;
+    color: #666;
 }
 
 .panel-default>.panel-heading {
