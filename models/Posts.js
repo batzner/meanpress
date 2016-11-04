@@ -8,7 +8,8 @@ var PostSchema = new mongoose.Schema({
     published: Boolean,
     slug: String,
     metaDescription: String,
-    focusKeyword: String
+    focusKeyword: String,
+    scripts: String
 });
 
 mongoose.model('Post', PostSchema);

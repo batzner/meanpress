@@ -1,4 +1,4 @@
-var app = angular.module('blog', ['ui.router', 'ngSanitize']);
+var app = angular.module('blog', ['ui.router', 'angularLoad']);
 
 app.config([
     '$stateProvider',
@@ -13,7 +13,7 @@ app.config([
                 controller: 'MainCtrl'
             })
             .state('post', {
-                url: '/post/{slug}',
+                url: '/post/{slug}/',
                 templateUrl: '/templates/post.html',
                 controller: 'PostCtrl'
             })
@@ -50,7 +50,7 @@ app.config([
                 }]
             });
 
-        $urlRouterProvider.otherwise('home');
+        $urlRouterProvider.otherwise('/');
         $locationProvider.html5Mode(true);
     }
 ]);
@@ -176,8 +176,12 @@ app.factory('authFactory', ['$http', '$window',
 
 app.controller('MainCtrl', [
     '$scope',
+    '$sce',
     'postsFactory',
-    function($scope, postsFactory) {
+    function($scope, $sce, postsFactory) {
+        $scope.toTrusted = function(htmlCode) {
+            return $sce.trustAsHtml(htmlCode);
+        }
         $scope.posts = postsFactory.posts;
     }
 ]);
@@ -187,18 +191,59 @@ app.controller('PostCtrl', [
     '$stateParams',
     '$location',
     '$state',
+    '$sce',
+    'angularLoad',
     'postsFactory',
     'authFactory',
-    function($scope, $stateParams, $location, $state, postsFactory, authFactory) {
+    function($scope, $stateParams, $location, $state, $sce, angularLoad, postsFactory, authFactory) {
+        $scope.toTrusted = function(htmlCode) {
+            return $sce.trustAsHtml(htmlCode);
+        }
+
         $scope.post = postsFactory.findPostBySlug($stateParams.slug);
         // Expose the isLoggedIn method to the scope.
         $scope.isLoggedIn = authFactory.isLoggedIn;
-        $scope.editUrl = $location.path() + '/edit';
+        $scope.editUrl = $location.path() + 'edit';
         $scope.deletePost = function() {
             postsFactory.delete($scope.post._id);
 
             $state.go('home');
         };
+
+        // Split by spaces and newlines
+        var scripts = $scope.post.scripts.replace(/\n/g, " ").split(" ");
+        scripts = scripts.map(function(script) {
+            return script.trim();
+        });
+        var css = scripts.filter(function(script) {
+            return script.endsWith('.css');
+        });
+        var javaScripts = scripts.filter(function(script) {
+            return !script.endsWith('.css');
+        });
+
+        // Load the css directly.
+        css.forEach(function(script) {
+            angularLoad.loadCSS(script).catch(function(err) {
+                console.error(err);
+            })
+        });
+
+        // Load the JavaScripts asynchronously but ordered, when the page is
+        // loaded.
+        function loadScript(index) {
+            if (index >= javaScripts.length) return;
+            angularLoad.loadScript(javaScripts[index]).then(function() {
+                // Script loaded succesfully load the next one.
+                loadScript(index + 1);
+            }).catch(function(err) {
+                // There was some error loading the script
+                console.error(err);
+            });
+        }
+        angular.element(document).ready(function() {
+            loadScript(0);
+        });
     }
 ]);
 
@@ -223,6 +268,7 @@ app.controller('AddPostCtrl', [
             $scope.form.title = '';
             $scope.form.preview = '';
             $scope.form.body = '';
+            $scope.form.scripts = '';
             $scope.form.slug = '';
             $scope.form.metaDescription = '';
             $scope.form.focusKeyword = '';
