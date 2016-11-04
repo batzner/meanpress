@@ -13,12 +13,12 @@ app.config([
                 controller: 'MainCtrl'
             })
             .state('post', {
-                url: '/post/{id}',
+                url: '/post/{slug}',
                 templateUrl: '/templates/post.html',
                 controller: 'PostCtrl'
             })
             .state('edit', {
-                url: '/post/{id}/edit',
+                url: '/post/{slug}/edit',
                 templateUrl: '/templates/edit.html',
                 controller: 'EditPostCtrl'
             })
@@ -98,10 +98,21 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
                 Authorization: 'Bearer ' + authFactory.getToken()
             }
         }).then(function(response) {
-            o.posts.splice(id, 1);
+            for (var i=0; i<o.posts.length; i++) {
+                if (o.posts[i]._id == id) o.posts.splice(i, 1);
+                return;
+            }
         }, function(response) {
             console.log(response.data);
         });
+    }
+
+    o.findPostBySlug = function(slug) {
+        for (var i=0; i<o.posts.length; i++) {
+            if (o.posts[i].slug == slug) return o.posts[i];
+        }
+        console.log('Could not find post by slug.');
+        return null;
     }
 
     // Make sure that all posts are present. This could also be ensured with a
@@ -164,12 +175,12 @@ app.controller('PostCtrl', [
     'postsFactory',
     'authFactory',
     function($scope, $stateParams, $location, $state, postsFactory, authFactory) {
-        $scope.post = postsFactory.posts[$stateParams.id];
+        $scope.post = postsFactory.findPostBySlug($stateParams.slug);
         // Expose the isLoggedIn method to the scope.
         $scope.isLoggedIn = authFactory.isLoggedIn;
         $scope.editUrl = $location.path()+'/edit';
         $scope.deletePost = function () {
-            postsFactory.delete($stateParams.id);
+            postsFactory.delete($scope.post._id);
 
             $state.go('home');
         };
@@ -213,16 +224,17 @@ app.controller('EditPostCtrl', [
     '$location',
     'postsFactory',
     function($scope, $stateParams, $location, postsFactory) {
-        $scope.form = postsFactory.posts[$stateParams.id];
+        var post = postsFactory.findPostBySlug($stateParams.slug);
+        $scope.form = post;
         // Parse the date string to a Date for the form.
         $scope.form.createdAt = new Date($scope.form.createdAt);
         $scope.form.submit = function() {
             // The form object has all properties of a post object, so
             // we can directly pass it to the post factory.
-            postsFactory.update($stateParams.id, $scope.form);
+            postsFactory.update(post._id, $scope.form);
 
             // View the post
-            $location.path('/post/'+$stateParams.id);
+            $location.path('/post/'+$scope.form.slug);
         };
     }
 ]);
