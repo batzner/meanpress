@@ -27,6 +27,13 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/api/posts', function(req, res, next) {
+    Post.find({published: true}, function(err, posts) {
+        if (err) return next(err);
+        res.json(posts);
+    });
+});
+
+router.get('/api/posts/all', auth, function(req, res, next) {
     Post.find(function(err, posts) {
         if (err) return next(err);
         res.json(posts);

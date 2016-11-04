@@ -61,7 +61,16 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
     };
 
     o.getAll = function() {
-        return $http.get('/api/posts').then(function(response) {
+        var url = 'api/posts';
+        var headers = {};
+        if (authFactory.isLoggedIn()) {
+            url = 'api/posts/all';
+            headers.Authorization = 'Bearer ' + authFactory.getToken();
+        }
+
+        return $http.get(url, {
+            headers: headers
+        }).then(function(response) {
             angular.copy(response.data, o.posts);
         }, function(response) {
             console.log(response.data);
@@ -93,12 +102,12 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
     }
 
     o.delete = function(id) {
-        return $http.delete('/api/posts/'+id, {
+        return $http.delete('/api/posts/' + id, {
             headers: {
                 Authorization: 'Bearer ' + authFactory.getToken()
             }
         }).then(function(response) {
-            for (var i=0; i<o.posts.length; i++) {
+            for (var i = 0; i < o.posts.length; i++) {
                 if (o.posts[i]._id == id) o.posts.splice(i, 1);
                 return;
             }
@@ -108,7 +117,7 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
     }
 
     o.findPostBySlug = function(slug) {
-        for (var i=0; i<o.posts.length; i++) {
+        for (var i = 0; i < o.posts.length; i++) {
             if (o.posts[i].slug == slug) return o.posts[i];
         }
         console.log('Could not find post by slug.');
@@ -121,43 +130,49 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
     return o;
 }]);
 
-app.factory('authFactory', ['$http', '$window', function($http, $window) {
-    var auth = {};
-    auth.saveToken = function(token) {
-        $window.localStorage['auth-token'] = token;
-    };
-    auth.getToken = function() {
-        return $window.localStorage['auth-token'];
-    };
-    auth.isLoggedIn = function() {
-        var token = auth.getToken();
+app.factory('authFactory', ['$http', '$window',
+    function($http, $window) {
+        var auth = {};
+        auth.saveToken = function(token) {
+            $window.localStorage['auth-token'] = token;
+        };
+        auth.getToken = function() {
+            return $window.localStorage['auth-token'];
+        };
+        auth.isLoggedIn = function() {
+            var token = auth.getToken();
 
-        if (token) {
-            // The payload will be base64'd after the first . in the token
-            var payload = JSON.parse($window.atob(token.split('.')[1]));
+            if (token) {
+                // The payload will be base64'd after the first . in the token
+                var payload = JSON.parse($window.atob(token.split('.')[1]));
 
-            return payload.exp > Date.now() / 1000;
-        } else {
-            return false;
-        }
-    };
+                return payload.exp > Date.now() / 1000;
+            } else {
+                return false;
+            }
+        };
 
-    // Call the API endpoints and update the token
-    auth.register = function(user) {
-        return $http.post('/api/register', user).then(function(response) {
-            auth.saveToken(response.data.token);
-        });
-    };
-    auth.login = function(user) {
-        return $http.post('/api/login', user).then(function(response) {
-            auth.saveToken(response.data.token);
-        });
-    };
-    auth.logout = function() {
-        $window.localStorage.removeItem('auth-token');
-    };
-    return auth;
-}]);
+        // Call the API endpoints and update the token
+        auth.register = function(user) {
+            return $http.post('/api/register', user).then(function(response) {
+                auth.saveToken(response.data.token);
+            });
+        };
+        auth.login = function(user) {
+            return $http.post('/api/login', user).then(function(response) {
+                auth.saveToken(response.data.token);
+                // Update the page to show unpublished posts as well.
+                $window.location.href = '/';
+            });
+        };
+        auth.logout = function() {
+            $window.localStorage.removeItem('auth-token');
+            // Update the page to hide unpublished posts.
+            $window.location.reload();
+        };
+        return auth;
+    }
+]);
 
 app.controller('MainCtrl', [
     '$scope',
@@ -178,8 +193,8 @@ app.controller('PostCtrl', [
         $scope.post = postsFactory.findPostBySlug($stateParams.slug);
         // Expose the isLoggedIn method to the scope.
         $scope.isLoggedIn = authFactory.isLoggedIn;
-        $scope.editUrl = $location.path()+'/edit';
-        $scope.deletePost = function () {
+        $scope.editUrl = $location.path() + '/edit';
+        $scope.deletePost = function() {
             postsFactory.delete($scope.post._id);
 
             $state.go('home');
@@ -234,7 +249,7 @@ app.controller('EditPostCtrl', [
             postsFactory.update(post._id, $scope.form);
 
             // View the post
-            $location.path('/post/'+$scope.form.slug);
+            $location.path('/post/' + $scope.form.slug);
         };
     }
 ]);
