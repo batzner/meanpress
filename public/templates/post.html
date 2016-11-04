@@ -2,14 +2,20 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h1>{{post.title}}</a></h1>
-                <h5 ng-bind="post.createdAt | date:'longDate'"></h5>
+                <div class="headings">
+                    <h1>{{post.title}}</a></h1>
+                    <h5 ng-bind="post.createdAt | date:'longDate'"></h5>
+                </div>
 
-                <a ng-href="{{editUrl}}">
-                    <h5 ng-show="isLoggedIn()">
-                    <i class="fa fa-edit"></i> Edit
-                  </h5>
-                </a>
+                <div class="tools-menu">
+                    <a ng-href="{{editUrl}}">
+                        <span ng-show="isLoggedIn()"><i class="fa fa-edit"></i> Edit</span>
+                    </a>
+
+                    <a ng-click="deletePost()">
+                        <span ng-show="isLoggedIn()"><i class="fa fa-remove"></i> Delete</span>
+                    </a>
+                </div>
             </div>
             <div class="panel-body post-body" ng-bind-html="post.body"></div>
         </div>

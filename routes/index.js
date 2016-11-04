@@ -57,6 +57,16 @@ router.post('/api/posts/:id', auth, function(req, res, next) {
     })
 });
 
+// Route for deleting a post
+router.delete('/api/posts/:id', auth, function(req, res, next) {
+    // Find the post to update
+    var query = {'_id':req.params.id};
+    Post.remove(query, function(err, post) {
+        if (err) return next(err);
+        res.json({message: 'Successfully deleted'});
+    })
+});
+
 // Register route. Creates a user given a username and password
 router.post('/api/register', function(req, res, next) {
     return res.status(400).json({

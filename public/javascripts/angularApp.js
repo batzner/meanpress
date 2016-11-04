@@ -92,6 +92,18 @@ app.factory('postsFactory', ['$http', 'authFactory', function($http, authFactory
         });
     }
 
+    o.delete = function(id) {
+        return $http.delete('/api/posts/'+id, {
+            headers: {
+                Authorization: 'Bearer ' + authFactory.getToken()
+            }
+        }).then(function(response) {
+            o.posts.splice(id, 1);
+        }, function(response) {
+            console.log(response.data);
+        });
+    }
+
     // Make sure that all posts are present. This could also be ensured with a
     // promise in the states using this factory.
     o.getAll();
@@ -148,13 +160,19 @@ app.controller('PostCtrl', [
     '$scope',
     '$stateParams',
     '$location',
+    '$state',
     'postsFactory',
     'authFactory',
-    function($scope, $stateParams, $location, postsFactory, authFactory) {
+    function($scope, $stateParams, $location, $state, postsFactory, authFactory) {
         $scope.post = postsFactory.posts[$stateParams.id];
         // Expose the isLoggedIn method to the scope.
         $scope.isLoggedIn = authFactory.isLoggedIn;
         $scope.editUrl = $location.path()+'/edit';
+        $scope.deletePost = function () {
+            postsFactory.delete($stateParams.id);
+
+            $state.go('home');
+        };
     }
 ]);
 
