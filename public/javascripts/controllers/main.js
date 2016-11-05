@@ -1,12 +1,17 @@
 angular.module('mlstuff.controllers').controller('MainCtrl', [
     '$scope',
     '$sce',
+    'angularLoad',
     'postsFactory',
-    function($scope, $sce, postsFactory) {
+    function($scope, $sce, angularLoad, postsFactory) {
         $scope.toTrusted = function(htmlCode) {
             return $sce.trustAsHtml(htmlCode);
         }
         $scope.posts = postsFactory.posts;
+        // Load the css of all posts
+        $scope.posts.forEach(function (post) {
+            post.loadCSS(angularLoad);
+        })
     }
 ]);
 

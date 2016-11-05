@@ -15,18 +15,22 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', 'authFactor
             headers: headers
         }).then(function(response) {
             angular.copy(response.data, o.posts);
+            o.posts = o.posts.map(function (postData) {
+                return $.extend(new Post(), postData);
+            });
         }, function(response) {
             console.log(response.data);
         });
     }
 
-    o.create = function(post) {
-        return $http.post('/api/posts', post, {
+    o.create = function(postData) {
+        return $http.post('/api/posts', postData, {
             headers: {
                 Authorization: 'Bearer ' + authFactory.getToken()
             }
         }).then(function(response) {
-            o.posts.push(response.data);
+            var post = $.extend(new Post(), response.data);
+            o.posts.push(post);
         }, function(response) {
             console.log(response.data);
         });
@@ -38,7 +42,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', 'authFactor
                 Authorization: 'Bearer ' + authFactory.getToken()
             }
         }).then(function(response) {
-            o.posts[id] = response.data;
+            var post = $.extend(new Post(), response.data);
+            o.posts[id] = post;
         }, function(response) {
             console.log(response.data);
         });

@@ -21,40 +21,11 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
 
             $state.go('home');
         };
-
-        // Split by spaces and newlines
-        var scripts = $scope.post.scripts.replace(/\n/g, " ").split(" ");
-        scripts = scripts.map(function(script) {
-            return script.trim();
-        });
-        var css = scripts.filter(function(script) {
-            return script.endsWith('.css');
-        });
-        var javaScripts = scripts.filter(function(script) {
-            return !script.endsWith('.css');
-        });
-
         // Load the css directly.
-        css.forEach(function(script) {
-            angularLoad.loadCSS(script).catch(function(err) {
-                console.error(err);
-            })
-        });
-
-        // Load the JavaScripts asynchronously but ordered, when the page is
-        // loaded.
-        function loadScript(index) {
-            if (index >= javaScripts.length) return;
-            angularLoad.loadScript(javaScripts[index]).then(function() {
-                // Script loaded succesfully load the next one.
-                loadScript(index + 1);
-            }).catch(function(err) {
-                // There was some error loading the script
-                console.error(err);
-            });
-        }
+        $scope.post.loadCSS(angularLoad);
+        // Load the JavaScripts when the page is loaded.
         angular.element(document).ready(function() {
-            loadScript(0);
+            $scope.post.loadJavaScripts(angularLoad);
         });
     }
 ]);
