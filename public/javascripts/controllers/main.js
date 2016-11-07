@@ -46,10 +46,15 @@ angular.module('mlstuff.controllers').controller('AuthCtrl', [
 
 app.controller('NavCtrl', [
     '$scope',
+    '$state',
     'authFactory',
-    function($scope, authFactory) {
+    function($scope, $state, authFactory) {
         $scope.isLoggedIn = authFactory.isLoggedIn;
         $scope.currentUser = authFactory.currentUser;
         $scope.logout = authFactory.logout;
+        $scope.getClass = function (activeNavItem) {
+            // Check, if the given nav item is the current state's nav item.
+            return ($state.current.navItem === activeNavItem) ? 'active' : '';
+        }
     }
 ]);

@@ -15,22 +15,31 @@ app.config([
             .state('home', {
                 url: '/',
                 templateUrl: '/templates/home.html',
-                controller: 'MainCtrl'
+                controller: 'MainCtrl',
+                navItem: 'blog'
             })
             .state('post', {
                 url: '/post/{slug}/',
                 templateUrl: '/templates/post.html',
-                controller: 'PostCtrl'
+                controller: 'PostCtrl',
+                navItem: 'blog'
             })
             .state('edit', {
                 url: '/post/{slug}/edit',
                 templateUrl: '/templates/edit.html',
-                controller: 'EditPostCtrl'
+                controller: 'EditPostCtrl',
+                navItem: 'blog'
             })
             .state('add', {
                 url: '/add',
                 templateUrl: '/templates/add.html',
-                controller: 'AddPostCtrl'
+                controller: 'AddPostCtrl',
+                navItem: 'add'
+            })
+            .state('about', {
+                url: '/about',
+                templateUrl: '/templates/about.html',
+                navItem: 'about'
             })
             .state('login', {
                 url: '/login',

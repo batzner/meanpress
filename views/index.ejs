@@ -45,16 +45,16 @@
             <!-- Sidebar -->
             <ul class="sidebar-nav">
                 <li>
-                    <a class="active" href="/"><i class="fa fa-home"></i>Blog</a>
+                    <a ng-class="getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
+                    <a ng-class="getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
                 </li>
                 <li>
-                    <a href="#"><i class="fa fa-user"></i>About</a>
+                    <a ng-class="getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
                 </li>
                 <li ng-show="isLoggedIn()">
-                    <a href="add"><i class="fa fa-plus"></i>Add Post</a>
+                    <a ng-class="getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
                 </li>
                 <li ng-show="isLoggedIn()">
                     <a href="" ng-click="logout()"><i class="fa fa-sign-out"></i>Logout</a>
