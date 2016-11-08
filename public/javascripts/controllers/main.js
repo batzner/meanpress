@@ -44,7 +44,7 @@ angular.module('mlstuff.controllers').controller('AuthCtrl', [
     }
 ]);
 
-app.controller('NavCtrl', [
+angular.module('mlstuff.controllers').controller('NavCtrl', [
     '$scope',
     '$state',
     'authFactory',

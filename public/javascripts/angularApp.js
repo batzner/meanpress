@@ -1,4 +1,4 @@
-var app = angular.module('mlstuff', ['ui.router', 'angularLoad', 'mlstuff.controllers', 'mlstuff.services']);
+var app = angular.module('mlstuff', ['ui.router', 'angularLoad', 'angularCSS', 'mlstuff.controllers', 'mlstuff.services']);
 
 // Create modules for controller definitions in controllers/ and factory
 // definitions in factories/.
@@ -39,7 +39,9 @@ app.config([
             .state('about', {
                 url: '/about',
                 templateUrl: '/templates/about.html',
-                navItem: 'about'
+                controller: 'AboutCtrl',
+                navItem: 'about',
+                css: 'stylesheets/about.css'
             })
             .state('login', {
                 url: '/login',

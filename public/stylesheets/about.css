@@ -1,0 +1,75 @@
+.profile {
+    padding-bottom: 40px !important;
+}
+
+.profile img {
+    float: left;
+    margin-right: 30px;
+}
+
+h1, h2, h3 {
+    text-transform: none;
+    font-family: inherit;
+    letter-spacing: inherit;
+    font-weight: 700;
+}
+
+.profile h1 {
+    font-size: 3rem;
+    margin-top: 20px !important;
+}
+
+.profile h2, .heading h2  {
+    margin-top: 0;
+}
+
+.heading h2 {
+    margin-bottom: 4px;
+    font-size: 1.8rem;
+}
+
+.cv-section {
+    border-bottom: 1px solid #eee;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+}
+
+.cv-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.cv-section h1:first-child {
+    margin-top: 20px;
+}
+
+.cv-item {
+    padding-right: 20px;
+    margin: 20px 0;
+}
+
+.heading {
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.heading:after {
+    clear: both;
+}
+
+.heading .info a {
+    margin-left: 10px;
+}
+
+.detail {
+    display:none;
+}
+
+.technologies {
+    list-style: none;
+    padding-left: 0;
+}
+
+.technologies li>strong{
+    margin-right: 8px;
+}

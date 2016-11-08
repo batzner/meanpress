@@ -6,6 +6,8 @@ body {
     overflow-x: hidden;
     font-size: 16px;
     background: #f1f2f7;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 300;
 }
 
 a:hover, a:active, a:focus {
@@ -38,20 +40,25 @@ h1 {
 }
 
 h2 {
-    margin-top: 20px;
+    margin-top: 1.7rem;
+    font-size: 2.1rem;
 }
 
 h3 {
-    margin-top: 4rem;
+    margin-top: 1.4rem;
     font-size: 1.7rem;
 }
 
-.post-body {
-    font-family: 'Source Sans Pro', sans-serif;
-    font-weight: 300;
+button {
+    background: none;
+    border: none;
 }
 
-.post-body a {
+button:focus {
+    outline: none;
+}
+
+button, .post-body a {
     color: #888888;
 }
 
