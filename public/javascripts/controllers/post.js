@@ -23,9 +23,12 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
         };
         // Load the css directly.
         $scope.post.loadCSS(angularLoad);
-        // Load the JavaScripts when the page is loaded.
+        
         angular.element(document).ready(function() {
+            // Load the JavaScripts when the page is loaded.
             $scope.post.loadJavaScripts(angularLoad);
+            // wrap tables to make them responsive.
+            $('table').wrap("<div class='table-container'></div>");
         });
     }
 ]);
