@@ -6,12 +6,22 @@ angular.module('mlstuff.controllers').controller('MainCtrl', [
     function($scope, $sce, angularLoad, postsFactory) {
         $scope.toTrusted = function(htmlCode) {
             return $sce.trustAsHtml(htmlCode);
-        }
-        $scope.posts = postsFactory.posts;
-        // Load the css of all posts
-        $scope.posts.forEach(function (post) {
-            post.loadCSS(angularLoad);
-        })
+        };
+
+        // Define the posts for the scope and also what happens if they get updated
+        var onPostsUpdated = function () {
+            $scope.posts = postsFactory.getPublishedPosts();
+            // Load the css of all posts
+            $scope.posts.forEach(function (post) {
+                post.loadCSS(angularLoad);
+            });
+        };
+
+        // Fetch the posts for the first time
+        onPostsUpdated();
+
+        // Listen to changes to the posts
+        $scope.$on('posts:updated', onPostsUpdated);
     }
 ]);
 
@@ -26,9 +36,9 @@ angular.module('mlstuff.controllers').controller('AuthCtrl', [
             if (response.data && response.data.message) {
                 $scope.error = response.data.message;
             } else {
-                response.statusText;
+                console.log(response);
             }
-        }
+        };
 
         $scope.register = function() {
             authFactory.register($scope.user).then(function(response) {

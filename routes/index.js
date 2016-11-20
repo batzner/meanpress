@@ -1,3 +1,5 @@
+var REGISTERING_ENABLED = false;
+
 var express = require('express');
 var mongoose = require('mongoose');
 var passport = require('passport');
@@ -6,6 +8,7 @@ var jwt = require('express-jwt');
 var router = express.Router();
 
 var Post = mongoose.model('Post');
+var PostVersion = mongoose.model('PostVersion');
 var User = mongoose.model('User');
 
 // Authentication middleware
@@ -27,7 +30,9 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/api/posts', function(req, res, next) {
-    Post.find({published: true}, function(err, posts) {
+    Post.find({
+        publishedVersion: {$ne: null}
+    }, function(err, posts) {
         if (err) return next(err);
         res.json(posts);
     });
@@ -42,8 +47,12 @@ router.get('/api/posts/all', auth, function(req, res, next) {
 
 // Route for adding a post
 router.post('/api/posts', auth, function(req, res, next) {
-    var post = new Post(req.body);
     console.log(req.body);
+    var post = new Post();
+    var postVersion = new PostVersion(req.body);
+    post.id = mongoose.Types.ObjectId();
+    postVersion.id = mongoose.Types.ObjectId();
+    post.versions = [postVersion];
 
     post.save(function(err, post) {
         if (err) {
@@ -53,12 +62,35 @@ router.post('/api/posts', auth, function(req, res, next) {
     });
 });
 
-// Route for updating a post
-router.post('/api/posts/:id', auth, function(req, res, next) {
+// Route for adding a post version
+router.post('/api/posts/:id/version', auth, function(req, res, next) {
+    // Create the post
+    var postVersion = new PostVersion(req.body);
+
     // Find the post to update
-    var query = {'_id':req.params.id};
-    var options = {upsert: true};
-    Post.findOneAndUpdate(query, req.body, options, function(err, post) {
+    var query = {
+        'id': mongoose.Types.ObjectId(req.params.id)
+    };
+    Post.findOne(query, function(err, post) {
+        if (err) return next(err);
+        // Update the post and send the updated version.
+        post.versions.push(postVersion);
+        post.save(function(err, post) {
+            if (err) {
+                return next(err);
+            }
+            res.json(post);
+        });
+    })
+});
+
+// Route for updating a post
+router.put('/api/posts/:id', auth, function(req, res, next) {
+    // Find the post to update
+    var query = {
+        'id': mongoose.Types.ObjectId(req.params.id)
+    };
+    Post.findOneAndUpdate(query, req.body, function(err, post) {
         if (err) return next(err);
         res.json(post);
     })
@@ -67,18 +99,24 @@ router.post('/api/posts/:id', auth, function(req, res, next) {
 // Route for deleting a post
 router.delete('/api/posts/:id', auth, function(req, res, next) {
     // Find the post to update
-    var query = {'_id':req.params.id};
+    var query = {
+        'id': mongoose.Types.ObjectId(req.params.id)
+    };
     Post.remove(query, function(err, post) {
         if (err) return next(err);
-        res.json({message: 'Successfully deleted'});
+        res.json({
+            message: 'Successfully deleted'
+        });
     })
 });
 
 // Register route. Creates a user given a username and password
 router.post('/api/register', function(req, res, next) {
-    return res.status(400).json({
-        message: "Registering is currently not activated."
-    });
+    if (!REGISTERING_ENABLED) {
+        return res.status(400).json({
+            message: "Registering is currently not activated."
+        });
+    }
 
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({

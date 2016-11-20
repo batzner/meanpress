@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 // Load the models
 var mongoose = require('mongoose');
+require('./models/PostVersion');
 require('./models/Posts');
 
 // Load Passport for authentication
