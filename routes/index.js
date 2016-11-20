@@ -31,34 +31,36 @@ router.get('/', function(req, res, next) {
 
 router.get('/api/posts', function(req, res, next) {
     Post.find({
-        publishedVersion: {$ne: null}
-    }, function(err, posts) {
-        if (err) return next(err);
-        res.json(posts);
-    });
+            publishedVersion: {$ne: null}
+        })
+        .populate('publishedVersion versions')
+        .exec(function(err, posts) {
+            if (err) return next(err);
+            res.json(posts);
+        });
 });
 
 router.get('/api/posts/all', auth, function(req, res, next) {
-    Post.find(function(err, posts) {
-        if (err) return next(err);
-        res.json(posts);
-    });
+    Post.find().populate('publishedVersion versions')
+        .exec(function(err, posts) {
+            if (err) return next(err);
+            res.json(posts);
+        });
 });
 
 // Route for adding a post
 router.post('/api/posts', auth, function(req, res, next) {
-    console.log(req.body);
     var post = new Post();
     var postVersion = new PostVersion(req.body);
-    post.id = mongoose.Types.ObjectId();
-    postVersion.id = mongoose.Types.ObjectId();
     post.versions = [postVersion];
 
-    post.save(function(err, post) {
-        if (err) {
-            return next(err);
-        }
-        res.json(post);
+    // Save the post and the version
+    postVersion.save(function(err, postVersion) {
+        if (err) return next(err);
+        post.save(function(err, post) {
+            if (err) return next(err);
+            res.json(post);
+        });
     });
 });
 
@@ -88,12 +90,17 @@ router.post('/api/posts/:id/version', auth, function(req, res, next) {
 router.put('/api/posts/:id', auth, function(req, res, next) {
     // Find the post to update
     var query = {
-        'id': mongoose.Types.ObjectId(req.params.id)
+        '_id': mongoose.Types.ObjectId(req.params.id)
     };
-    Post.findOneAndUpdate(query, req.body, function(err, post) {
-        if (err) return next(err);
-        res.json(post);
-    })
+    Post.findOneAndUpdate(query, req.body).exec();
+
+    // Return the updated post. We can't do this in findOneAndUpdate, because it does not populate the fields correctly.
+    Post.find(query)
+        .populate('publishedVersion versions')
+        .exec(function(err, post) {
+            if (err) return next(err);
+            res.json(post);
+        });
 });
 
 // Route for deleting a post

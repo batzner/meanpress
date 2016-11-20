@@ -54,7 +54,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 o.posts = {};
                 response.data.forEach(function (post) {
                     // Create a new post and set it in the dict
-                    o.posts[post._id] = $.extend(new Post(), post);
+                    o.posts[post._id] = new Post(post);
                 });
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
@@ -71,7 +71,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
             }).then(function (response) {
                 console.log(response);
                 // Create a new post and set it in the dict
-                var post = $.extend(new Post(), response.data);
+                var post = new Post(response.data);
                 o.posts[post._id] = post;
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
@@ -89,8 +89,9 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                     Authorization: 'Bearer ' + authFactory.getToken()
                 }
             }).then(function (response) {
+                console.log(response);
                 // Update the post
-                o.posts[id] = $.extend(new Post(), response.data);
+                o.posts[post._id] = new Post(response.data);
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
 

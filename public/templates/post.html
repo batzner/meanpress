@@ -3,9 +3,9 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="headings">
-                    <h1>{{post.title}}</a></h1>
-                    <h5 ng-bind="post.createdAt | date:'longDate'"></h5>
-                    <h5 ng-hide="post.published">Unpublished</h5>
+                    <h1>{{postVersion.title}}</a></h1>
+                    <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
+                    <h5 ng-hide="postVersion.published">Unpublished</h5>
                 </div>
 
                 <div class="tools-menu">
@@ -18,7 +18,7 @@
                     </a>
                 </div>
             </div>
-            <div class="panel-body post-body" ng-bind-html="toTrusted(post.body)"></div>
+            <div class="panel-body post-body" ng-bind-html="toTrusted(postVersion.body)"></div>
         </div>
     </div>
 </div>

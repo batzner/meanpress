@@ -12,21 +12,22 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
             return $sce.trustAsHtml(htmlCode);
         };
 
-        $scope.post = postsFactory.findPostBySlug($stateParams.slug).getDisplayVersion();
+        var post = postsFactory.findPostBySlug($stateParams.slug);
+        $scope.postVersion = post.getDisplayVersion();
         // Expose the isLoggedIn method to the scope.
         $scope.isLoggedIn = authFactory.isLoggedIn;
         $scope.editUrl = $location.path() + 'edit';
         $scope.deletePost = function() {
-            postsFactory.delete($scope.post.id);
+            postsFactory.delete(post.id);
 
             $state.go('home');
         };
         // Load the css directly.
-        $scope.post.loadCSS(angularLoad);
+        $scope.postVersion.loadCss(angularLoad);
 
         angular.element(document).ready(function() {
             // Load the JavaScripts when the page is loaded.
-            $scope.post.loadJavaScripts(angularLoad);
+            $scope.postVersion.loadJs(angularLoad);
             // wrap tables to make them responsive.
             $('table').wrap("<div class='table-container'></div>");
         });

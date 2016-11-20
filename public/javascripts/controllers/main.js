@@ -11,10 +11,6 @@ angular.module('mlstuff.controllers').controller('MainCtrl', [
         // Define the posts for the scope and also what happens if they get updated
         var onPostsUpdated = function () {
             $scope.posts = postsFactory.getPublishedPosts();
-            // Load the css of all posts
-            $scope.posts.forEach(function (post) {
-                post.loadCSS(angularLoad);
-            });
         };
 
         // Fetch the posts for the first time
