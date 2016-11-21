@@ -17,11 +17,7 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
         // Expose the isLoggedIn method to the scope.
         $scope.isLoggedIn = authFactory.isLoggedIn;
         $scope.editUrl = $location.path() + 'edit';
-        $scope.deletePost = function() {
-            postsFactory.delete(post.id);
 
-            $state.go('home');
-        };
         // Load the css directly.
         $scope.postVersion.loadCss(angularLoad);
 
@@ -31,6 +27,12 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
             // wrap tables to make them responsive.
             $('table').wrap("<div class='table-container'></div>");
         });
+
+        $scope.deletePost = function() {
+            postsFactory.delete(post).then(function () {
+                $state.go('home');
+            });
+        };
     }
 ]);
 

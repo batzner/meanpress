@@ -55,8 +55,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 });
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
-            }, function (response) {
-                console.log(response.data);
+            }).catch(function (error) {
+                console.log(error.data);
             });
         };
 
@@ -75,13 +75,13 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
 
                 // Return the created post to be usable in promises
                 return post;
-            }, function (response) {
-                throw new Error('Creating the post failed.' + response.data);
+            }).catch(function (error) {
+                throw new Error('Creating the post failed.' + error.data);
             });
         };
 
         o.addVersion = function (post, version) {
-            return $http.post('/api/posts/'+post._id +'/version', version, {
+            return $http.post('/api/posts/' + post._id + '/version', version, {
                 headers: {
                     Authorization: 'Bearer ' + authFactory.getToken()
                 }
@@ -94,8 +94,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
 
                 // Return the updated post to be usable in promises
                 return post;
-            }, function (response) {
-                throw new Error('Updating the post failed.' + response.data);
+            }).catch(function (error) {
+                throw new Error('Adding a version failed.' + error.data);
             });
         };
 
@@ -113,8 +113,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
 
                 // Return the updated post to be usable in promises
                 return post;
-            }, function (response) {
-                throw new Error('Updating the post failed.' + response.data);
+            }).catch(function (error) {
+                throw new Error('Updating the post failed.' + error.data);
             });
         };
 
@@ -124,12 +124,13 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                     Authorization: 'Bearer ' + authFactory.getToken()
                 }
             }).then(function (response) {
-                for (var i = 0; i < o.posts.length; i++) {
-                    if (o.posts[i].id == id) o.posts.splice(i, 1);
-                    return;
-                }
-            }, function (response) {
-                console.log(response.data);
+                // TODO: Check the response
+                delete o.posts[post._id];
+
+                // Broadcast the update
+                $rootScope.$broadcast('posts:updated', o.posts);
+            }).catch(function (error) {
+                console.log(error.data);
             });
         };
 
