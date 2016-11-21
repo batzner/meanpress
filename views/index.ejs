@@ -24,80 +24,82 @@
 
     <link href="https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300|Pacifico" rel="stylesheet">
 
-    <link href="/lib/stylesheets/bootstrap.min.css" rel="stylesheet">
-    <link href="/lib/stylesheets/font-awesome.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
     <link href="/stylesheets/bootstrap-reset.css" rel="stylesheet">
     <link href="/stylesheets/style.css" rel="stylesheet">
 
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
 </head>
 
 <body ng-app="mlstuff" ng-controller="MainCtrl">
-    <header>
-        <div class="brand">
-            <a href="/">
-                <div id="logo-title">ML<span class="handwriting">stuff</span></div>
-                <div id="logo-subtitle">Machine Learning et al.</div>
-            </a>
-        </div>
-    </header>
-    <aside>
-        <div id="sidebar" ng-controller="NavCtrl">
+<header>
+    <div class="brand">
+        <a href="/">
+            <div id="logo-title">ML<span class="handwriting">stuff</span></div>
+            <div id="logo-subtitle">Machine Learning et al.</div>
+        </a>
+    </div>
+</header>
+<aside>
+    <div id="sidebar" ng-controller="NavCtrl">
 
-            <!-- Sidebar -->
-            <ul class="sidebar-nav">
-                <li>
-                    <a ng-class="getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
-                </li>
-                <li>
-                    <a ng-class="getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
-                </li>
-                <li>
-                    <a ng-class="getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
-                </li>
-                <li ng-show="isLoggedIn()">
-                    <a ng-class="getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
-                </li>
-                <li ng-show="isLoggedIn()">
-                    <a href="" ng-click="logout()"><i class="fa fa-sign-out"></i>Logout</a>
-                </li>
-            </ul>
-        </div>
-    </aside>
-    <!-- /#sidebar-wrapper -->
+        <!-- Sidebar -->
+        <ul class="sidebar-nav">
+            <li>
+                <a ng-class="getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
+            </li>
+            <li>
+                <a ng-class="getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
+            </li>
+            <li>
+                <a ng-class="getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
+            </li>
+            <li ng-show="isLoggedIn()">
+                <a ng-class="getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
+            </li>
+            <li ng-show="isLoggedIn()">
+                <a href="" ng-click="logout()"><i class="fa fa-sign-out"></i>Logout</a>
+            </li>
+        </ul>
+    </div>
+</aside>
+<!-- /#sidebar-wrapper -->
 
-    <!-- Page Content -->
-    <section class="wrapper">
-        <div id="content" class="container-fluid">
+<!-- Page Content -->
+<section class="wrapper">
+    <div id="content" class="container-fluid">
 
-            <ui-view></ui-view>
+        <ui-view></ui-view>
 
-        </div>
-    </section>
-    <footer class="footer">Powered by a simple CMS built on the MEAN stack.</footer>
-    <!-- /#page-content-wrapper -->
-    <!-- /#wrapper -->
+    </div>
+</section>
+<footer class="footer">Powered by a simple CMS built on the MEAN stack.</footer>
+<!-- /#page-content-wrapper -->
+<!-- /#wrapper -->
 
-    <script src="/lib/javascripts/angular.min.js"></script>
-    <script src="/lib/javascripts/angular-ui-router.min.js"></script>>
-    <script src="/lib/javascripts/angular-sanitize.min.js"></script>
-    <script src="/lib/javascripts/angular-load.min.js"></script>
-    <script src="/lib/javascripts/angular-css.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.8/angular-sanitize.min.js"></script>
+<script src="/lib/javascripts/angular-load.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-css/1.0.8/angular-css.js"></script>
 
-    <!-- jQuery -->
-    <script src="/lib/javascripts/jquery.min.js"></script>
+<!-- jQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 
-    <!-- Bootstrap Core JavaScript -->
-    <script src="/lib/javascripts/bootstrap.min.js"></script>
+<!-- Bootstrap Core JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <script src="/javascripts/util.js"></script>
-    <script src="/javascripts/models/Post.js"></script>
-    <script src="/javascripts/models/PostVersion.js"></script>
-    <script src="/javascripts/angularApp.js"></script>
-    <script src="/javascripts/controllers/main.js"></script>
-    <script src="/javascripts/controllers/post.js"></script>
-    <script src="/javascripts/controllers/about.js"></script>
-    <script src="/javascripts/services/auth.js"></script>
-    <script src="/javascripts/services/post.js"></script>
+<script src="/javascripts/util.js"></script>
+<script src="/javascripts/models/Post.js"></script>
+<script src="/javascripts/models/PostVersion.js"></script>
+<script src="/javascripts/angularApp.js"></script>
+<script src="/javascripts/controllers/main.js"></script>
+<script src="/javascripts/controllers/post.js"></script>
+<script src="/javascripts/controllers/about.js"></script>
+<script src="/javascripts/services/auth.js"></script>
+<script src="/javascripts/services/post.js"></script>
 
 </body>
 
