@@ -10,7 +10,9 @@ angular.module('mlstuff.controllers').controller('MainCtrl', [
 
         // Define the posts for the scope and also what happens if they get updated
         var onPostsUpdated = function () {
-            $scope.posts = postsFactory.getPublishedPosts();
+            $scope.postVersions = postsFactory.getSortedPosts().map(function (post) {
+                return post.getDisplayVersion();
+            });
         };
 
         // Fetch the posts for the first time

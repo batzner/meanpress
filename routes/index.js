@@ -17,7 +17,7 @@ var auth = jwt({
 });
 
 // route middleware that will happen on every request
-router.use(function(req, res, next) {
+router.use(function (req, res, next) {
     // log each request to the console
     console.log(req.method, req.url);
     // continue doing what we were doing and go to the route
@@ -25,39 +25,39 @@ router.use(function(req, res, next) {
 });
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
     res.render('index');
 });
 
-router.get('/api/posts', function(req, res, next) {
+router.get('/api/posts', function (req, res, next) {
     Post.find({
-            publishedVersion: {$ne: null}
-        })
+        publishedVersion: {$ne: null}
+    })
         .populate('publishedVersion versions')
-        .exec(function(err, posts) {
+        .exec(function (err, posts) {
             if (err) return next(err);
             res.json(posts);
         });
 });
 
-router.get('/api/posts/all', auth, function(req, res, next) {
+router.get('/api/posts/all', auth, function (req, res, next) {
     Post.find().populate('publishedVersion versions')
-        .exec(function(err, posts) {
+        .exec(function (err, posts) {
             if (err) return next(err);
             res.json(posts);
         });
 });
 
 // Route for adding a post
-router.post('/api/posts', auth, function(req, res, next) {
+router.post('/api/posts', auth, function (req, res, next) {
     var post = new Post();
     var postVersion = new PostVersion(req.body);
     post.versions = [postVersion];
 
     // Save the post and the version
-    postVersion.save(function(err, postVersion) {
+    postVersion.save(function (err, postVersion) {
         if (err) return next(err);
-        post.save(function(err, post) {
+        post.save(function (err, post) {
             if (err) return next(err);
             res.json(post);
         });
@@ -65,29 +65,31 @@ router.post('/api/posts', auth, function(req, res, next) {
 });
 
 // Route for adding a post version
-router.post('/api/posts/:id/version', auth, function(req, res, next) {
-    // Create the post
+router.post('/api/posts/:id/version', auth, function (req, res, next) {
+    // Create the post version
     var postVersion = new PostVersion(req.body);
+    postVersion._id = new mongoose.Types.ObjectId();
 
-    // Find the post to update
-    var query = {
-        'id': mongoose.Types.ObjectId(req.params.id)
-    };
-    Post.findOne(query, function(err, post) {
-        if (err) return next(err);
-        // Update the post and send the updated version.
-        post.versions.push(postVersion);
-        post.save(function(err, post) {
-            if (err) {
-                return next(err);
-            }
+    postVersion.save()
+        .then(function (postVersion) {
+            // Find the post to update
+            return Post.findOne({'_id': mongoose.Types.ObjectId(req.params.id)});
+        }).then(function (post) {
+            // Update the post
+            post.versions.push(postVersion);
+            return post.save();
+        }).then(function (post) {
+            // Get the updated post with populated fields
+            return Post.populate(post, 'publishedVersion versions');
+        }).then(function (post) {
             res.json(post);
+        }).catch(function (err) {
+            next(err);
         });
-    })
 });
 
 // Route for updating a post
-router.put('/api/posts/:id', auth, function(req, res, next) {
+router.put('/api/posts/:id', auth, function (req, res, next) {
     // Find the post to update
     var query = {
         '_id': mongoose.Types.ObjectId(req.params.id)
@@ -95,21 +97,21 @@ router.put('/api/posts/:id', auth, function(req, res, next) {
     Post.findOneAndUpdate(query, req.body).exec();
 
     // Return the updated post. We can't do this in findOneAndUpdate, because it does not populate the fields correctly.
-    Post.find(query)
+    Post.findOne(query)
         .populate('publishedVersion versions')
-        .exec(function(err, post) {
+        .exec(function (err, post) {
             if (err) return next(err);
             res.json(post);
         });
 });
 
 // Route for deleting a post
-router.delete('/api/posts/:id', auth, function(req, res, next) {
+router.delete('/api/posts/:id', auth, function (req, res, next) {
     // Find the post to update
     var query = {
-        'id': mongoose.Types.ObjectId(req.params.id)
+        '_id': mongoose.Types.ObjectId(req.params.id)
     };
-    Post.remove(query, function(err, post) {
+    Post.remove(query, function (err, post) {
         if (err) return next(err);
         res.json({
             message: 'Successfully deleted'
@@ -118,7 +120,7 @@ router.delete('/api/posts/:id', auth, function(req, res, next) {
 });
 
 // Register route. Creates a user given a username and password
-router.post('/api/register', function(req, res, next) {
+router.post('/api/register', function (req, res, next) {
     if (!REGISTERING_ENABLED) {
         return res.status(400).json({
             message: "Registering is currently not activated."
@@ -134,7 +136,7 @@ router.post('/api/register', function(req, res, next) {
     var user = new User();
     user.username = req.body.username;
     user.setPassword(req.body.password);
-    user.save(function(err) {
+    user.save(function (err) {
         if (err) {
             return next(err);
         }
@@ -145,14 +147,14 @@ router.post('/api/register', function(req, res, next) {
 });
 
 // Login route. Authenticates the user and returns a token
-router.post('/api/login', function(req, res, next) {
+router.post('/api/login', function (req, res, next) {
     if (!req.body.username || !req.body.password) {
         return res.status(400).json({
             message: "Please fill out all fields"
         });
     }
 
-    passport.authenticate('local', function(err, user, info) {
+    passport.authenticate('local', function (err, user, info) {
         if (err) {
             return next(err);
         }
@@ -167,7 +169,7 @@ router.post('/api/login', function(req, res, next) {
 });
 
 // This route deals enables HTML5Mode by forwarding missing files to the index
-router.get('*', function(req, res) {
+router.get('*', function (req, res) {
     res.render('index');
 });
 

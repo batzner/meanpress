@@ -34,25 +34,39 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
     }
 ]);
 
-angular.module('mlstuff.controllers').controller('AddPostCtrl', [
+angular.module('mlstuff.controllers').controller('EditPostCtrl', [
     '$scope',
     '$stateParams',
     '$state',
     '$log',
     'postsFactory',
     function($scope, $stateParams, $state, $log, postsFactory) {
-        $scope.form = {
-            // TODO: make this an empty object
-            title: 'asdf',
-            preview: 'asdf',
-            body: 'asdf',
-            slug: 'asdf',
-            metaDescription: 'asdf',
-            focusKeyword: 'asdf'
-        };
-        $scope.form.createdAt = new Date();
+        // If we edit an existing post, load the post
+        var post = $stateParams.slug ? postsFactory.findPostBySlug($stateParams.slug) : null;
+
+        // Prefill the form with the post values / defaults
+        if (post) {
+            $scope.form = post.getCurrentVersion();
+
+            // Use the post's created at instead of the post version's date
+            $scope.form.createdAt = new Date(post.createdAt);
+        } else {
+            $scope.form = {
+                // TODO: make this an empty object
+                title: 'asdf',
+                preview: 'asdf',
+                body: 'asdf',
+                slug: 'asdf',
+                metaDescription: 'asdf',
+                focusKeyword: 'asdf'
+            };
+            $scope.form.createdAt = new Date();
+        }
+
+        // Form cosmetics
         $scope.form.createdAt.setSeconds(0, 0);
 
+        // Validating function that calls another function only if the form is valid
         $scope.submit = function(methodName){
             if($scope.form.element.$valid){
                 $scope[methodName]();
@@ -60,45 +74,38 @@ angular.module('mlstuff.controllers').controller('AddPostCtrl', [
         };
 
         $scope.save = function () {
-            // The form object has all properties of a post object, so we can directly pass it to the post factory.
-            // Clone, so that emptying the form inputs does not affect our HTTP request in the post factory.
-            var postData = angular.copy($scope.form);
-            postsFactory.create(postData);
+            if (post) {
+                // Add a new post version
+                postsFactory.addVersion(post, $scope.form);
+            } else {
+                // Create a new post
+                postsFactory.create($scope.form).then(function (post) {
+                    // Change the state to the edit state
+                    $state.go('edit', {slug: post.getCurrentVersion().slug});
+                });
+            }
         };
 
         $scope.publish = function() {
-            // The form object has all properties of a post object, so we can directly pass it to the post factory.
-            // Clone, so that emptying the form inputs does not affect our HTTP request in the post factory.
-            var postData = angular.copy($scope.form);
-            postsFactory.create(postData).then(function (post) {
+            // Update the post and store the promise
+            var promise = null;
+            if (post) {
+                // Add a new post version
+                promise = postsFactory.addVersion(post, $scope.form);
+            } else {
+                // Create a new post
+                promise = postsFactory.create($scope.form);
+            }
+
+            // Publish the post and view it
+            promise.then(function (post) {
                 // Publish the post
-                post.publishedVersion = post.versions[0];
+                post.publishedVersion = post.getCurrentVersion();
                 postsFactory.update(post);
 
                 // View the post
                 $state.go('post', {slug: post.publishedVersion.slug});
             }).catch($log.error);
-        };
-    }
-]);
-
-angular.module('mlstuff.controllers').controller('EditPostCtrl', [
-    '$scope',
-    '$stateParams',
-    '$location',
-    'postsFactory',
-    function($scope, $stateParams, $location, postsFactory) {
-        var post = postsFactory.findPostBySlug($stateParams.slug);
-        $scope.form = post;
-        // Parse the date string to a Date for the form.
-        $scope.form.createdAt = new Date($scope.form.createdAt);
-        $scope.form.submit = function() {
-            // The form object has all properties of a post object, so
-            // we can directly pass it to the post factory.
-            postsFactory.update(post.id, $scope.form);
-
-            // View the post
-            $location.path('/post/' + $scope.form.slug);
         };
     }
 ]);

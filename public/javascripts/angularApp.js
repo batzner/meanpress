@@ -33,7 +33,7 @@ app.config([
             .state('add', {
                 url: '/add',
                 templateUrl: '/templates/add.html',
-                controller: 'AddPostCtrl',
+                controller: 'EditPostCtrl',
                 navItem: 'add'
             })
             .state('about', {

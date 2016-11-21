@@ -10,7 +10,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
 
         o.findPostBySlug = function (slug) {
             var result = null;
-            Object.values(o.posts).some(function(post) {
+            Object.values(o.posts).some(function (post) {
                 // Check, if any of the versions contained the slug
                 var containsSlug = function (version) {
                     return version.slug == slug;
@@ -26,12 +26,9 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
             return result;
         };
 
-        o.getPublishedPosts = function () {
-            // Return all publishd posts in descending order (by creation date)
-            return Object.values(o.posts).filter(function (post) {
-                // Make sure, the published version is set.
-                return post.publishedVersion;
-            }).sort(function (first, second) {
+        o.getSortedPosts = function () {
+            // Return all posts in descending order (by creation date)
+            return Object.values(o.posts).sort(function (first, second) {
                 // Sort the posts by creation date (descending). For this, negate the natural ordering.
                 return -(first.createdAt - second.createdAt);
             });
@@ -63,8 +60,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
             });
         };
 
-        o.create = function (postData) {
-            return $http.post('/api/posts', postData, {
+        o.create = function (postVersion) {
+            return $http.post('/api/posts', postVersion, {
                 headers: {
                     Authorization: 'Bearer ' + authFactory.getToken()
                 }
@@ -80,6 +77,25 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 return post;
             }, function (response) {
                 throw new Error('Creating the post failed.' + response.data);
+            });
+        };
+
+        o.addVersion = function (post, version) {
+            return $http.post('/api/posts/'+post._id +'/version', version, {
+                headers: {
+                    Authorization: 'Bearer ' + authFactory.getToken()
+                }
+            }).then(function (response) {
+                console.log(response);
+                // Update the post
+                o.posts[post._id] = new Post(response.data);
+                // Broadcast the update
+                $rootScope.$broadcast('posts:updated', o.posts);
+
+                // Return the updated post to be usable in promises
+                return post;
+            }, function (response) {
+                throw new Error('Updating the post failed.' + response.data);
             });
         };
 
