@@ -88,7 +88,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
             }).then(function (response) {
                 console.log(response);
                 // Update the post
-                o.posts[post._id] = new Post(response.data);
+                post = new Post(response.data);
+                o.posts[post._id] = post;
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
 
@@ -107,7 +108,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
             }).then(function (response) {
                 console.log(response);
                 // Update the post
-                o.posts[post._id] = new Post(response.data);
+                post = new Post(response.data);
+                o.posts[post._id] = post;
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
 

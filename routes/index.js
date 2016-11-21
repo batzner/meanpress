@@ -94,14 +94,14 @@ router.put('/api/posts/:id', auth, function (req, res, next) {
     var query = {
         '_id': mongoose.Types.ObjectId(req.params.id)
     };
-    Post.findOneAndUpdate(query, req.body).exec();
-
-    // Return the updated post. We can't do this in findOneAndUpdate, because it does not populate the fields correctly.
-    Post.findOne(query)
-        .populate('publishedVersion versions')
-        .exec(function (err, post) {
-            if (err) return next(err);
+    Post.findOneAndUpdate(query, req.body)
+        .then(function (post) {
+            // Get the updated post with populated fields
+            return Post.populate(post, 'publishedVersion versions');
+        }).then(function (post) {
             res.json(post);
+        }).catch(function (err) {
+            next(err);
         });
 });
 

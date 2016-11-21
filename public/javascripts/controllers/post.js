@@ -103,8 +103,8 @@ angular.module('mlstuff.controllers').controller('EditPostCtrl', [
             promise.then(function (post) {
                 // Publish the post
                 post.publishedVersion = post.getCurrentVersion();
-                postsFactory.update(post);
-
+                return postsFactory.update(post);
+            }).then(function (post){
                 // View the post
                 $state.go('post', {slug: post.publishedVersion.slug});
             }).catch($log.error);
