@@ -94,7 +94,7 @@ router.put('/api/posts/:id', auth, function (req, res, next) {
     var query = {
         '_id': mongoose.Types.ObjectId(req.params.id)
     };
-    Post.findOneAndUpdate(query, req.body)
+    Post.findOneAndUpdate(query, req.body, {'new': true})
         .then(function (post) {
             // Get the updated post with populated fields
             return Post.populate(post, 'publishedVersion versions');

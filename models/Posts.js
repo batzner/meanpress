@@ -1,3 +1,7 @@
+/**
+ * Definition of the mongoose schema for posts.
+ */
+
 var mongoose = require('mongoose');
 var PostVersionSchema = mongoose.model('PostVersion').schema;
 

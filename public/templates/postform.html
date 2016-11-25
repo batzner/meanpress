@@ -1,4 +1,4 @@
-<form name="form.element">
+<form name="form.element" ng-model="post">
     <div class="form-group">
         <label for="title">Title</label>
         <input ng-model="form.title" type="text" class="form-control" id="title" required>
@@ -29,5 +29,5 @@
     </div>
     <button ng-click="submit('publish')" class="btn btn-primary">Publish</button>
     <button ng-click="submit('save')" class="btn btn-default">Save</button>
-    <button ng-click="submit('unpublish')" class="btn btn-danger pull-right">Unpublish</button>
+    <button ng-click="submit('unpublish')" ng-show="" class="btn btn-danger pull-right">Unpublish</button>
 </form>

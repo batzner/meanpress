@@ -5,7 +5,7 @@
                 <div class="headings">
                     <h1>{{postVersion.title}}</a></h1>
                     <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
-                    <h5 ng-hide="postVersion.published">Unpublished</h5>
+                    <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
                 </div>
 
                 <div class="tools-menu">

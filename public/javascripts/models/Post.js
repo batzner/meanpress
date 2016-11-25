@@ -35,14 +35,6 @@ Post.prototype = {
     },
     getDisplayVersion: function () {
         // Returns the published version or the current version, if none is published
-        // Set, if the version is published
-        if (this.publishedVersion) {
-            this.publishedVersion.published = true;
-            return this.publishedVersion;
-        } else {
-            var result = this.getCurrentVersion();
-            result.published = false;
-            return result;
-        }
+        return this.publishedVersion ? this.publishedVersion : this.getCurrentVersion();
     }
 };

@@ -41,6 +41,10 @@ PostVersion.prototype = {
         this.loadCss(angularLoad);
         this.loadJs(angularLoad);
     },
+    isPublished: function () {
+        // TODO: Check if corresponding post contains this one as published version
+        return true;
+    },
 
     // BUG: This is only for copy pasting
     getScripts: function() {
