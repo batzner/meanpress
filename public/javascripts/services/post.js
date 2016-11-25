@@ -2,43 +2,32 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
     function ($http, $rootScope, authFactory) {
 
         // Create an object which represents the factory
-        var o = {
-            posts: {} // Dictionary mapping uuid (string) to post object
+        const o = {
+            posts: new Map() // Dictionary mapping uuid (string) to post object
         };
 
         // HELPER METHODS
 
+        o.getPosts = function () {
+            return Array.from(this.posts.values());
+        };
+
         o.findPostBySlug = function (slug) {
-            var result = null;
-            Object.values(o.posts).some(function (post) {
-                // Check, if any of the versions contained the slug
-                var containsSlug = function (version) {
-                    return version.slug == slug;
-                };
-                if (post.versions.some(containsSlug)) {
-                    // Overwrite the result and exit
-                    result = post;
-                    return true;
-                }
-                return false;
-            });
+            const result = this.getPosts().find(post => post.matchesSlug(slug));
             if (!result) console.log('Could not find post by slug.');
             return result;
         };
 
         o.getSortedPosts = function () {
             // Return all posts in descending order (by creation date)
-            return Object.values(o.posts).sort(function (first, second) {
-                // Sort the posts by creation date (descending). For this, negate the natural ordering.
-                return -(first.createdAt - second.createdAt);
-            });
+            return this.getPosts().sort((first, second) => -(first.createdAt - second.createdAt));
         };
 
         // API CALLING METHODS
 
         o.fetchAll = function () {
-            var url = 'api/posts';
-            var headers = {};
+            let url = 'api/posts';
+            let headers = {};
             if (authFactory.isLoggedIn()) {
                 url = 'api/posts/all';
                 headers.Authorization = 'Bearer ' + authFactory.getToken();
@@ -48,10 +37,11 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 headers: headers
             }).then(function (response) {
                 // Update the posts
-                o.posts = {};
-                response.data.forEach(function (post) {
+                o.posts = new Map();
+                response.data.forEach(function (postData) {
                     // Create a new post and set it in the dict
-                    o.posts[post._id] = new Post(post);
+                    let post = new Post(postData.data);
+                    o.posts.set(post._id, post);
                 });
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
@@ -68,8 +58,8 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
             }).then(function (response) {
                 console.log(response);
                 // Create a new post and set it in the dict
-                var post = new Post(response.data);
-                o.posts[post._id] = post;
+                let post = new Post(response.data);
+                o.posts.set(post._id, post);
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
 
@@ -89,7 +79,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 console.log(response);
                 // Update the post
                 post = new Post(response.data);
-                o.posts[post._id] = post;
+                o.posts.set(post._id, post);
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
 
@@ -109,7 +99,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 console.log(response);
                 // Update the post
                 post = new Post(response.data);
-                o.posts[post._id] = post;
+                o.posts.set(post._id, post);
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);
 
@@ -127,7 +117,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
                 }
             }).then(function (response) {
                 // TODO: Check the response
-                delete o.posts[post._id];
+                o.posts.delete(post._id);
 
                 // Broadcast the update
                 $rootScope.$broadcast('posts:updated', o.posts);

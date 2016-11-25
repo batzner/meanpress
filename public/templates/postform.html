@@ -27,7 +27,8 @@
         <label for="focusKeyword">Focus Keyword</label>
         <input ng-model="form.focusKeyword" type="text" class="form-control" id="focusKeyword" required>
     </div>
-    <button ng-click="submit('publish')" class="btn btn-primary">Publish</button>
+    <button ng-click="submit('publish')" class="btn btn-success pull-right">Publish</button>
+    <button ng-click="submit('preview')" class="btn btn-primary">Preview</button>
     <button ng-click="submit('save')" class="btn btn-default">Save</button>
-    <button ng-click="submit('unpublish')" ng-show="" class="btn btn-danger pull-right">Unpublish</button>
+    <button ng-click="submit('unpublish')" ng-show="post.getCurrentVersion().isPublished()" class="btn btn-danger pull-right">Unpublish</button>
 </form>

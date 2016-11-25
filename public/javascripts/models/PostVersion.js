@@ -1,4 +1,4 @@
-var PostVersion = function(data) {
+let PostVersion = function(data) {
     data = data || {};
     this._id = data._id || null;
     this.title = data.title || '';
@@ -24,7 +24,7 @@ PostVersion.prototype = {
     },
     loadJs: function(angularLoad) {
         // Load the JavaScripts asynchronously but ordered
-        var that = this;
+        let that = this;
         function loadScript(index) {
             if (index >= that.jsIncludes.length) return;
             angularLoad.loadScript(that.jsIncludes[index]).then(function() {
@@ -48,8 +48,8 @@ PostVersion.prototype = {
 
     // BUG: This is only for copy pasting
     getScripts: function() {
-        // Split by spaces and newlines
-        var scripts = this.scripts.replace(/\n/g, " ").split(" ");
+        // Split by spaces and newline
+        let scripts = this.scripts.replace(/\n/g, " ").split(" ");
         return scripts.map(function(script) {
             return script.trim();
         });

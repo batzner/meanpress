@@ -36,5 +36,9 @@ Post.prototype = {
     getDisplayVersion: function () {
         // Returns the published version or the current version, if none is published
         return this.publishedVersion ? this.publishedVersion : this.getCurrentVersion();
+    },
+    matchesSlug: function(slug) {
+        // Check, if this posts matches a given slug
+        return this.versions.some(v => v.slug == slug);
     }
 };

@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-var PostVersionSchema = new mongoose.Schema(
+const PostVersionSchema = new mongoose.Schema(
     {
         title: String,
         preview: String,

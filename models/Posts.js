@@ -2,10 +2,10 @@
  * Definition of the mongoose schema for posts.
  */
 
-var mongoose = require('mongoose');
-var PostVersionSchema = mongoose.model('PostVersion').schema;
+const mongoose = require('mongoose');
+const PostVersionSchema = mongoose.model('PostVersion').schema;
 
-var PostSchema = new mongoose.Schema(
+const PostSchema = new mongoose.Schema(
     {
         versions: [{
             type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +20,7 @@ var PostSchema = new mongoose.Schema(
     }
 );
 
-// Add middleware to cascade-delete the post versions before deleting the post
+// Add middleware to cascade-deconste the post versions before deconsting the post
 PostSchema.pre('remove', function(next) {
     PostVersionSchema.remove({ post: this._id }).exec();
     next();
