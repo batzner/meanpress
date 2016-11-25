@@ -1,3 +1,8 @@
+/**
+ * Defines controllers to view and edit / add a single post.
+ */
+
+// Controller to view a post
 angular.module('mlstuff.controllers').controller('PostCtrl', [
     '$scope',
     '$stateParams',
@@ -6,16 +11,9 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
     '$sce',
     'angularLoad',
     'postsFactory',
-    'authFactory',
-    function($scope, $stateParams, $location, $state, $sce, angularLoad, postsFactory, authFactory) {
-        $scope.toTrusted = function(htmlCode) {
-            return $sce.trustAsHtml(htmlCode);
-        };
-
-        var post = postsFactory.findPostBySlug($stateParams.slug);
+    function($scope, $stateParams, $location, $state, $sce, angularLoad, postsFactory) {
+        const post = postsFactory.findPostBySlug($stateParams.slug);
         $scope.postVersion = post.getDisplayVersion();
-        // Expose the isLoggedIn method to the scope.
-        $scope.isLoggedIn = authFactory.isLoggedIn;
         $scope.editUrl = $location.path() + 'edit';
 
         // Load the css directly.
@@ -36,6 +34,7 @@ angular.module('mlstuff.controllers').controller('PostCtrl', [
     }
 ]);
 
+// Controller to edit or add a post
 angular.module('mlstuff.controllers').controller('EditPostCtrl', [
     '$scope',
     '$stateParams',
@@ -44,10 +43,11 @@ angular.module('mlstuff.controllers').controller('EditPostCtrl', [
     'postsFactory',
     function($scope, $stateParams, $state, $log, postsFactory) {
         // If we edit an existing post, load the post
-        var post = $stateParams.slug ? postsFactory.findPostBySlug($stateParams.slug) : null;
+        const post = $stateParams.slug ? postsFactory.findPostBySlug($stateParams.slug) : null;
 
         // Prefill the form with the post values / defaults
         if (post) {
+            // TODO: Ensure that editing the $scope.form does not update the post's current version
             $scope.form = post.getCurrentVersion();
 
             // Use the post's created at instead of the post version's date
@@ -75,32 +75,28 @@ angular.module('mlstuff.controllers').controller('EditPostCtrl', [
             }
         };
 
-        $scope.save = function () {
-            if (post) {
-                // Add a new post version
-                postsFactory.addVersion(post, $scope.form);
-            } else {
-                // Create a new post
-                postsFactory.create($scope.form).then(function (post) {
-                    // Change the state to the edit state
-                    $state.go('edit', {slug: post.getCurrentVersion().slug});
-                });
-            }
+        // Either add a version or create the post. This function returns a promise used by save, publish and preview
+        let savePost = () => post ? postsFactory.addVersion(post, $scope.form) : postsFactory.create($scope.form);
+
+        $scope.save = function() {
+            // Save the post and change the url
+            savePost().then(function (post) {
+                // Change the state to the edit state
+                $state.go('edit', {slug: post.getCurrentVersion().slug});
+            }).catch($log.error);
+        };
+
+        $scope.preview = function() {
+            // Save the post and view it without publishing
+            savePost().then(function (post){
+                // View the post
+                $state.go('post', {slug: post.publishedVersion.slug});
+            }).catch($log.error);
         };
 
         $scope.publish = function() {
-            // Update the post and store the promise
-            var promise = null;
-            if (post) {
-                // Add a new post version
-                promise = postsFactory.addVersion(post, $scope.form);
-            } else {
-                // Create a new post
-                promise = postsFactory.create($scope.form);
-            }
-
-            // Publish the post and view it
-            promise.then(function (post) {
+            // Save the post, view it and publish it
+            savePost().then(function (post) {
                 // Publish the post
                 post.publishedVersion = post.getCurrentVersion();
                 return postsFactory.update(post);
@@ -108,6 +104,10 @@ angular.module('mlstuff.controllers').controller('EditPostCtrl', [
                 // View the post
                 $state.go('post', {slug: post.publishedVersion.slug});
             }).catch($log.error);
+        };
+
+        $scope.unpublish = function() {
+            // TODO: Don't save the post, but update it to unpublished
         };
     }
 ]);
