@@ -1,3 +1,7 @@
+/**
+ * Definition of the mongoose schema for posts.
+ */
+
 const mongoose = require('mongoose');
 
 const PostVersionSchema = new mongoose.Schema(
@@ -8,11 +12,11 @@ const PostVersionSchema = new mongoose.Schema(
         slug: String,
         metaDescription: String,
         focusKeyword: String,
-        jsIncludes: [{ type: String }],
-        cssIncludes: [{ type: String }],
-        post: { type: mongoose.Schema.Types.ObjectId, ref: 'Post'}
-    },{
-        timestamps: true
+        jsIncludes: [{type: String}],
+        cssIncludes: [{type: String}],
+        post: {type: mongoose.Schema.Types.ObjectId, ref: 'Post'}
+    }, {
+        timestamps: true // Will add createdAt and modifiedAt fields, which get set and updated automatically.
     }
 );
 

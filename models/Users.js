@@ -1,3 +1,7 @@
+/**
+ * Definition of the mongoose schema for users. Also defines methods to call on a user object for authentication.
+ */
+
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
@@ -12,7 +16,6 @@ const UserSchema = new mongoose.Schema({
     salt: String
 });
 
-
 UserSchema.methods.setPassword = function(password) {
     this.salt = crypto.randomBytes(16).toString('hex');
     this.hash = crypto.pbkdf2Sync(password, this.salt, 1000, 64).toString('hex');
@@ -23,9 +26,12 @@ UserSchema.methods.validPassword = function(password) {
     return this.hash === hash;
 };
 
+
+/**
+ * Generates a JSON web token with an expiration of 60 days.
+ * @returns {*}
+ */
 UserSchema.methods.generateJWT = function() {
-    // Generate a jsonwebtoken
-    // set expiration to 60 days
     const today = new Date();
     const exp = new Date(today);
     exp.setDate(today.getDate() + 60);

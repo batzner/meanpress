@@ -15,14 +15,15 @@ const PostSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'PostVersion'
         }
-    },{
-        timestamps: true
+    }, {
+        timestamps: true // Will add createdAt and modifiedAt fields, which get set and updated automatically.
     }
 );
 
-// Add middleware to cascade-deconste the post versions before deconsting the post
-PostSchema.pre('remove', function(next) {
-    PostVersionSchema.remove({ post: this._id }).exec();
+// Add middleware to cascade-delete the post versions before deleting the post
+// TODO: This needs to be tested.
+PostSchema.pre('remove', function (next) {
+    PostVersionSchema.remove({post: this._id}).exec();
     next();
 });
 
