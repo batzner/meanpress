@@ -30,9 +30,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/api/posts', function (req, res, next) {
-    Post.find({
-        publishedVersion: {$ne: null}
-    })
+    Post.find({publishedVersion: {$ne: null}})
         .populate('publishedVersion versions')
         .exec(function (err, posts) {
             if (err) return next(err);
@@ -75,17 +73,17 @@ router.post('/api/posts/:id/version', auth, function (req, res, next) {
             // Find the post to update
             return Post.findOne({'_id': mongoose.Types.ObjectId(req.params.id)});
         }).then(function (post) {
-            // Update the post
-            post.versions.push(postVersion);
-            return post.save();
-        }).then(function (post) {
-            // Get the updated post with populated fields
-            return Post.populate(post, 'publishedVersion versions');
-        }).then(function (post) {
-            res.json(post);
-        }).catch(function (err) {
-            next(err);
-        });
+        // Update the post
+        post.versions.push(postVersion);
+        return post.save();
+    }).then(function (post) {
+        // Get the updated post with populated fields
+        return Post.populate(post, 'publishedVersion versions');
+    }).then(function (post) {
+        res.json(post);
+    }).catch(function (err) {
+        next(err);
+    });
 });
 
 // Route for updating a post
@@ -99,10 +97,10 @@ router.put('/api/posts/:id', auth, function (req, res, next) {
             // Get the updated post with populated fields
             return Post.populate(post, 'publishedVersion versions');
         }).then(function (post) {
-            res.json(post);
-        }).catch(function (err) {
-            next(err);
-        });
+        res.json(post);
+    }).catch(function (err) {
+        next(err);
+    });
 });
 
 // Route for deleting a post

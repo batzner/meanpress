@@ -1,135 +1,119 @@
-angular.module('mlstuff.services').factory('PostService', ['$http', '$rootScope', '$log',
-    'AuthService',
-    function ($http, $rootScope, $log, AuthService) {
+/**
+ * This service is the interface to the API endpoints for getting and setting posts.
+ */
 
-        // Create an object which represents the factory
-        const o = {
-            posts: new Map() // Dictionary mapping uuid (string) to post object
-        };
+class PostService extends InjectionReceiver {
 
-        // HELPER METHODS
+    // Tell angular our injections
+    static get $inject() {
+        return ['$http', '$rootScope', '$log', 'AuthService'];
+    }
 
-        o.getPosts = function () {
-            return Array.from(this.posts.values());
-        };
+    constructor(...injections) {
+        super(...injections);
+        this.posts = new Map(); // Dictionary mapping uuid (string) to post object
 
-        o.findPostBySlug = function (slug) {
-            const result = this.getPosts().find(post => post.matchesSlug(slug));
-            if (!result) console.log('Could not find post by slug.');
-            return result;
-        };
+        this.fetchAll();
+    }
 
-        o.getSortedPosts = function () {
-            // Return all posts in descending order (by creation date)
-            return this.getPosts().sort((first, second) => -(first.createdAt - second.createdAt));
-        };
+    // HELPER METHODS
 
-        // API CALLING METHODS
+    getPosts() {
+        return Array.from(this.posts.values());
+    }
 
-        o.fetchAll = function () {
-            let url = 'api/posts';
-            let headers = {};
-            if (AuthService.isLoggedIn()) {
-                url = 'api/posts/all';
-                headers.Authorization = 'Bearer ' + AuthService.token;
+    findPostBySlug(slug) {
+        const result = this.getPosts().find(post => post.matchesSlug(slug));
+        if (!result) console.log('Could not find post by slug.');
+        return result;
+    }
+
+    getSortedPosts() {
+        // Return all posts in descending order (by creation date)
+        return this.getPosts().sort((first, second) => -(first.createdAt - second.createdAt));
+    }
+
+    updatePostLocally(postData, broadcastUpdate = true) {
+        const post = new Post(postData);
+        this.posts.set(post._id, post);
+
+        if (broadcastUpdate) this.$rootScope.$broadcast('posts:updated', this.posts);
+        return post;
+    }
+
+    /**
+     * Call the API to modify a post. The called endpoint needs to return a post as data in the
+     * response. This function also updates the posts list with the updated post. It returns a
+     * promise.
+     * @param {function} method Needs to be $http.post or $http.put
+     * @param {string} url URL to call
+     * @param {Object} data Object to pass in the request as data
+     * @returns {Promise.<Post>}
+     */
+    callPostModification(method, url, data) {
+        return method(url, data, {
+            headers: {
+                Authorization: 'Bearer ' + this.AuthService.token
             }
+        }).then(response => {
+            // Return the created post to be usable in promises
+            return this.updatePostLocally(response.data);
+        }).catch(this.$log.error);
+    }
 
-            return $http.get(url, {
-                headers: headers
-            }).then(function (response) {
-                $log.debug('Fetched all posts. Count: '+response.data.length);
-                // Update the posts
-                o.posts = new Map();
-                response.data.forEach(function (postData) {
-                    // Create a new post and set it in the dict
-                    let post = new Post(postData);
-                    o.posts.set(post._id, post);
-                });
-                // Broadcast the update
-                $rootScope.$broadcast('posts:updated', o.posts);
-            }).catch(function (error) {
-                console.log(error.data);
-            });
-        };
+    // API CALLING METHODS
 
-        o.create = function (postVersion) {
-            return $http.post('/api/posts', postVersion, {
-                headers: {
-                    Authorization: 'Bearer ' + AuthService.token
-                }
-            }).then(function (response) {
-                console.log(response);
-                // Create a new post and set it in the dict
-                let post = new Post(response.data);
-                o.posts.set(post._id, post);
-                // Broadcast the update
-                $rootScope.$broadcast('posts:updated', o.posts);
+    fetchAll() {
+        // Construct the request
+        let url = 'api/posts';
+        let headers = {};
+        if (this.AuthService.isLoggedIn()) {
+            url = 'api/posts/all';
+            headers.Authorization = 'Bearer ' + this.AuthService.token;
+        }
 
-                // Return the created post to be usable in promises
-                return post;
-            }).catch(function (error) {
-                throw new Error('Creating the post failed.' + error.data);
-            });
-        };
+        return this.$http.get(url, {
+            headers: headers
+        }).then(response => {
+            this.$log.debug('Fetched all posts. Count: ' + response.data.length);
 
-        o.addVersion = function (post, version) {
-            return $http.post('/api/posts/' + post._id + '/version', version, {
-                headers: {
-                    Authorization: 'Bearer ' + AuthService.token
-                }
-            }).then(function (response) {
-                console.log(response);
-                // Update the post
-                post = new Post(response.data);
-                o.posts.set(post._id, post);
-                // Broadcast the update
-                $rootScope.$broadcast('posts:updated', o.posts);
+            // Update the posts
+            this.posts = new Map();
+            response.data.forEach(postData => this.updatePost(postData, false));
 
-                // Return the updated post to be usable in promises
-                return post;
-            }).catch(function (error) {
-                throw new Error('Adding a version failed.' + error.data);
-            });
-        };
+            // Broadcast the update
+            this.$rootScope.$broadcast('posts:updated', this.posts);
+        }).catch(this.$log.error);
+    }
 
-        o.update = function (post) {
-            return $http.put('/api/posts/' + post._id, post, {
-                headers: {
-                    Authorization: 'Bearer ' + AuthService.token
-                }
-            }).then(function (response) {
-                console.log(response);
-                // Update the post
-                post = new Post(response.data);
-                o.posts.set(post._id, post);
-                // Broadcast the update
-                $rootScope.$broadcast('posts:updated', o.posts);
+    createPost(postVersion) {
+        const url = '/api/posts';
+        return this.callPostModification(this.$http.post, url, postVersion);
+    }
 
-                // Return the updated post to be usable in promises
-                return post;
-            }).catch(function (error) {
-                throw new Error('Updating the post failed.' + error.data);
-            });
-        };
+    createPostVersion(post, version) {
+        const url = '/api/posts/' + post._id + '/version';
+        return this.callPostModification(this.$http.post, url, version);
+    }
 
-        o.delete = function (post) {
-            return $http.delete('/api/posts/' + post._id, {
-                headers: {
-                    Authorization: 'Bearer ' + AuthService.token
-                }
-            }).then(function (response) {
-                // TODO: Check the response
-                o.posts.delete(post._id);
+    updatePost(post) {
+        const url = '/api/posts/' + post._id;
+        return this.callPostModification(this.$http.put, url, post);
+    }
 
-                // Broadcast the update
-                $rootScope.$broadcast('posts:updated', o.posts);
-            }).catch(function (error) {
-                console.log(error.data);
-            });
-        };
+    deletePost(post) {
+        return $http.delete('/api/posts/' + post._id, {
+            headers: {
+                Authorization: 'Bearer ' + this.AuthService.token
+            }
+        }).then(response => {
+            // TODO: Check the response
+            this.posts.delete(post._id);
 
-        // Make sure that all posts are present. This could also be ensured with a
-        // promise in the states using this factory.
-        o.fetchAll();
-        return o;
-    }]);
+            // Broadcast the update
+            $rootScope.$broadcast('posts:updated', this.posts);
+        }).catch(this.$log.error);
+    }
+}
+
+angular.module('mlstuff.services').service('PostService', PostService);
