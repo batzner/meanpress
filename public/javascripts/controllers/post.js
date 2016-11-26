@@ -3,57 +3,76 @@
  */
 
 // Controller to view a post
-angular.module('mlstuff.controllers').controller('PostCtrl', [
-    '$scope',
-    '$stateParams',
-    '$location',
-    '$state',
-    '$sce',
-    'angularLoad',
-    'postsFactory',
-    function($scope, $stateParams, $location, $state, $sce, angularLoad, postsFactory) {
-        const post = postsFactory.findPostBySlug($stateParams.slug);
-        $scope.postVersion = post.getDisplayVersion();
-        $scope.editUrl = $location.path() + 'edit';
+class PostCtrl extends InjectionReceiver {
 
+    static get $inject() {
+        return ['$scope', '$stateParams', '$location', '$state', '$sce', 'angularLoad',
+            'PostService'];
+    }
+
+    constructor(...injections) {
+        super(...injections); // Set the injections on this.
+
+        this.post = this.PostService.findPostBySlug(this.$stateParams.slug);
+
+        // Set the variables on the scope
+        this.$scope.postVersion = this.post.getDisplayVersion();
+        this.$scope.editUrl = this.$location.path() + 'edit';
+
+        this.loadScripts();
+    }
+
+    deletePost() {
+        this.PostService.delete(this.post).then(() => this.$state.go('home'));
+    }
+
+    loadScripts() {
+        // TODO: Put this into the PostVersion model?
         // Load the css directly.
-        $scope.postVersion.loadCss(angularLoad);
+        this.$scope.postVersion.loadCss(this.angularLoad);
 
-        angular.element(document).ready(function() {
+        // TODO: Change to $document
+        angular.element(document).ready(() => {
             // Load the JavaScripts when the page is loaded.
-            $scope.postVersion.loadJs(angularLoad);
+            this.$scope.postVersion.loadJs(this.angularLoad);
+
             // wrap tables to make them responsive.
+            // TODO: Should this go in here? Not rather in MainCtrl?
             $('table').wrap("<div class='table-container'></div>");
         });
-
-        $scope.deletePost = function() {
-            postsFactory.delete(post).then(function () {
-                $state.go('home');
-            });
-        };
     }
-]);
+}
+
+angular.module('mlstuff.controllers').controller('PostCtrl', PostCtrl);
 
 // Controller to edit or add a post
-angular.module('mlstuff.controllers').controller('EditPostCtrl', [
-    '$scope',
-    '$stateParams',
-    '$state',
-    '$log',
-    'postsFactory',
-    function($scope, $stateParams, $state, $log, postsFactory) {
-        // If we edit an existing post, load the post
-        const post = $stateParams.slug ? postsFactory.findPostBySlug($stateParams.slug) : null;
+class EditPostCtrl extends InjectionReceiver {
 
+    static get $inject() {
+        return ['$scope', '$stateParams', '$state', '$log', 'PostService'];
+    }
+
+    constructor(...injections) {
+        super(...injections); // Set the injections on this.
+
+        // If we edit an existing post, load the post
+        const slug = this.$stateParams.slug;
+        this.post = slug ? this.PostService.findPostBySlug(slug) : null;
+
+        // Fill the template
+        this.fillForm();
+    }
+
+    fillForm() {
         // Prefill the form with the post values / defaults
-        if (post) {
+        if (this.post) {
             // TODO: Ensure that editing the $scope.form does not update the post's current version
-            $scope.form = post.getCurrentVersion();
+            this.$scope.form = this.post.getCurrentVersion();
 
             // Use the post's created at instead of the post version's date
-            $scope.form.createdAt = new Date(post.createdAt);
+            this.$scope.form.createdAt = new Date(post.createdAt);
         } else {
-            $scope.form = {
+            this.$scope.form = {
                 // TODO: make this an empty object
                 title: 'asdf',
                 preview: 'asdf',
@@ -62,52 +81,61 @@ angular.module('mlstuff.controllers').controller('EditPostCtrl', [
                 metaDescription: 'asdf',
                 focusKeyword: 'asdf'
             };
-            $scope.form.createdAt = new Date();
+            this.$scope.form.createdAt = new Date();
         }
 
         // Form cosmetics
-        $scope.form.createdAt.setSeconds(0, 0);
-
-        // Validating function that calls another function only if the form is valid
-        $scope.submit = function(methodName){
-            if($scope.form.element.$valid){
-                $scope[methodName]();
-            }
-        };
-
-        // Either add a version or create the post. This function returns a promise used by save, publish and preview
-        let savePost = () => post ? postsFactory.addVersion(post, $scope.form) : postsFactory.create($scope.form);
-
-        $scope.save = function() {
-            // Save the post and change the url
-            savePost().then(function (post) {
-                // Change the state to the edit state
-                $state.go('edit', {slug: post.getCurrentVersion().slug});
-            }).catch($log.error);
-        };
-
-        $scope.preview = function() {
-            // Save the post and view it without publishing
-            savePost().then(function (post){
-                // View the post
-                $state.go('post', {slug: post.publishedVersion.slug});
-            }).catch($log.error);
-        };
-
-        $scope.publish = function() {
-            // Save the post, view it and publish it
-            savePost().then(function (post) {
-                // Publish the post
-                post.publishedVersion = post.getCurrentVersion();
-                return postsFactory.update(post);
-            }).then(function (post){
-                // View the post
-                $state.go('post', {slug: post.publishedVersion.slug});
-            }).catch($log.error);
-        };
-
-        $scope.unpublish = function() {
-            // TODO: Don't save the post, but update it to unpublished
-        };
+        this.$scope.form.createdAt.setSeconds(0, 0);
     }
-]);
+
+    // Validating function that calls another function only if the form is valid
+    submit(methodName) {
+        if (this.$scope.form.element.$valid) {
+            this[methodName]();
+        }
+    }
+
+    savePost() {
+        // Either add a version or create the post. This function returns a promise used by
+        // save, publish and preview.
+        if (this.post) {
+            return this.PostService.addVersion(this.post, this.$scope.form)
+        } else {
+            return this.PostService.create(this.$scope.form);
+        }
+    }
+
+    save() {
+        // Save the post and change the url
+        this.savePost().then(post => {
+            // Change the state to the edit state
+            this.$state.go('edit', {slug: post.getCurrentVersion().slug});
+        }).catch(this.$log.error);
+    }
+
+    preview() {
+        // Save the post and view it without publishing
+        this.savePost().then(post => {
+            // View the post
+            this.$state.go('post', {slug: post.publishedVersion.slug});
+        }).catch(this.$log.error);
+    }
+
+    publish() {
+        // Save the post, view it and publish it
+        this.savePost().then(post => {
+            // Publish the post
+            post.publishedVersion = post.getCurrentVersion();
+            return this.PostService.update(post);
+        }).then(post => {
+            // View the post
+            this.$state.go('post', {slug: post.publishedVersion.slug});
+        }).catch(this.$log.error);
+    }
+
+    unpublish() {
+        // TODO: Don't save the post, but update it to unpublished
+    }
+}
+
+angular.module('mlstuff.controllers').controller('EditPostCtrl', EditPostCtrl);

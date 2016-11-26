@@ -10,15 +10,15 @@
 
                 <div class="tools-menu">
                     <a ng-href="{{editUrl}}">
-                        <span ng-show="isLoggedIn()"><i class="fa fa-edit"></i> Edit</span>
+                        <span ng-show="main.isLoggedIn()"><i class="fa fa-edit"></i> Edit</span>
                     </a>
 
-                    <a ng-click="deletePost()">
-                        <span ng-show="isLoggedIn()"><i class="fa fa-remove"></i> Delete</span>
+                    <a ng-click="controller.deletePost()">
+                        <span ng-show="main.isLoggedIn()"><i class="fa fa-remove"></i> Delete</span>
                     </a>
                 </div>
             </div>
-            <div class="panel-body post-body" ng-bind-html="toTrusted(postVersion.body)"></div>
+            <div class="panel-body post-body" ng-bind-html="main.toTrusted(postVersion.body)"></div>
         </div>
     </div>
 </div>

@@ -8,7 +8,7 @@
                 <div ng-show="error" class="alert alert-danger">
                     <span>{{ error }}</span>
                 </div>
-                <form ng-submit="register()">
+                <form ng-submit="controller.register()">
                     <div class="form-group">
                         <input type="text" class="form-control" placeholder="Username" ng-model="user.username"></input>
                     </div>

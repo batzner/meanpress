@@ -33,7 +33,7 @@
     </script>
 </head>
 
-<body ng-app="mlstuff" ng-controller="MainCtrl">
+<body ng-app="mlstuff" ng-controller="MainCtrl as main">
 <header>
     <div class="brand">
         <a href="/">
@@ -43,24 +43,24 @@
     </div>
 </header>
 <aside>
-    <div id="sidebar" ng-controller="NavCtrl">
+    <div id="sidebar" ng-controller="NavCtrl as nav">
 
         <!-- Sidebar -->
         <ul class="sidebar-nav">
             <li>
-                <a ng-class="getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
+                <a ng-class="nav.getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
             </li>
             <li>
-                <a ng-class="getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
+                <a ng-class="nav.getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
             </li>
             <li>
-                <a ng-class="getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
+                <a ng-class="nav.getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
             </li>
-            <li ng-show="isLoggedIn()">
-                <a ng-class="getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
+            <li ng-show="main.isLoggedIn()">
+                <a ng-class="nav.getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
             </li>
-            <li ng-show="isLoggedIn()">
-                <a href="" ng-click="logout()"><i class="fa fa-sign-out"></i>Logout</a>
+            <li ng-show="main.isLoggedIn()">
+                <a href="" ng-click="nav.logout()"><i class="fa fa-sign-out"></i>Logout</a>
             </li>
         </ul>
     </div>
@@ -75,7 +75,7 @@
 
     </div>
 </section>
-<footer class="footer">Powered by a simple CMS built on the MEAN stack.</footer>
+<footer class="footer">Powered by a simple CMS built on the MEAN stack. <a href="https://github.com/batzner/meanpress">Fork it on <i class="fa fa-github" aria-hidden="true"></i></a></footer>
 <!-- /#page-content-wrapper -->
 <!-- /#wrapper -->
 
@@ -91,13 +91,15 @@
 <!-- Bootstrap Core JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<script src="/javascripts/util.js"></script>
 <script src="/javascripts/models/Post.js"></script>
 <script src="/javascripts/models/PostVersion.js"></script>
 <script src="/javascripts/angularApp.js"></script>
+<script src="/javascripts/common/util.js"></script>
+<script src="/javascripts/controllers/about.js"></script>
+<script src="/javascripts/controllers/auth.js"></script>
+<script src="/javascripts/controllers/home.js"></script>
 <script src="/javascripts/controllers/main.js"></script>
 <script src="/javascripts/controllers/post.js"></script>
-<script src="/javascripts/controllers/about.js"></script>
 <script src="/javascripts/services/auth.js"></script>
 <script src="/javascripts/services/post.js"></script>
 

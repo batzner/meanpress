@@ -7,7 +7,7 @@
                     <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
                     <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
                 </div>
-                <div class="panel-body post-body"  ng-bind-html="toTrusted(postVersion.preview)"></div>
+                <div class="panel-body post-body"  ng-bind-html="main.toTrusted(postVersion.preview)"></div>
             </div>
         </div>
     </div>

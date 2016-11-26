@@ -1,5 +1,6 @@
-angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope', 'authFactory',
-    function ($http, $rootScope, authFactory) {
+angular.module('mlstuff.services').factory('PostService', ['$http', '$rootScope', '$log',
+    'AuthService',
+    function ($http, $rootScope, $log, AuthService) {
 
         // Create an object which represents the factory
         const o = {
@@ -28,19 +29,20 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
         o.fetchAll = function () {
             let url = 'api/posts';
             let headers = {};
-            if (authFactory.isLoggedIn()) {
+            if (AuthService.isLoggedIn()) {
                 url = 'api/posts/all';
-                headers.Authorization = 'Bearer ' + authFactory.getToken();
+                headers.Authorization = 'Bearer ' + AuthService.token;
             }
 
             return $http.get(url, {
                 headers: headers
             }).then(function (response) {
+                $log.debug('Fetched all posts. Count: '+response.data.length);
                 // Update the posts
                 o.posts = new Map();
                 response.data.forEach(function (postData) {
                     // Create a new post and set it in the dict
-                    let post = new Post(postData.data);
+                    let post = new Post(postData);
                     o.posts.set(post._id, post);
                 });
                 // Broadcast the update
@@ -53,7 +55,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
         o.create = function (postVersion) {
             return $http.post('/api/posts', postVersion, {
                 headers: {
-                    Authorization: 'Bearer ' + authFactory.getToken()
+                    Authorization: 'Bearer ' + AuthService.token
                 }
             }).then(function (response) {
                 console.log(response);
@@ -73,7 +75,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
         o.addVersion = function (post, version) {
             return $http.post('/api/posts/' + post._id + '/version', version, {
                 headers: {
-                    Authorization: 'Bearer ' + authFactory.getToken()
+                    Authorization: 'Bearer ' + AuthService.token
                 }
             }).then(function (response) {
                 console.log(response);
@@ -93,7 +95,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
         o.update = function (post) {
             return $http.put('/api/posts/' + post._id, post, {
                 headers: {
-                    Authorization: 'Bearer ' + authFactory.getToken()
+                    Authorization: 'Bearer ' + AuthService.token
                 }
             }).then(function (response) {
                 console.log(response);
@@ -113,7 +115,7 @@ angular.module('mlstuff.services').factory('postsFactory', ['$http', '$rootScope
         o.delete = function (post) {
             return $http.delete('/api/posts/' + post._id, {
                 headers: {
-                    Authorization: 'Bearer ' + authFactory.getToken()
+                    Authorization: 'Bearer ' + AuthService.token
                 }
             }).then(function (response) {
                 // TODO: Check the response

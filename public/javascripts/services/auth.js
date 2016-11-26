@@ -3,19 +3,15 @@
  * https://thinkster.io/mean-stack-tutorial for details.
  */
 
-class AuthService {
+class AuthService extends InjectionReceiver{
 
     // Tell angular our injections
     static get $inject() {
-        return ["$http", "$window"];
+        return ['$http', '$window'];
     }
 
     constructor(...injections) {
-        injections.forEach((injection, index) => {
-            // Make the injection accessible in the object
-            const injectionName = AuthService.$inject[index];
-            this[injectionName] = injection;
-        });
+        super(...injections);
     }
 
     get token() {
@@ -39,24 +35,24 @@ class AuthService {
     register(user) {
         // Call the API endpoint and update the token on success
         return this.$http.post('/api/register', user).then(response => {
-            saveToken(response.data.token);
+            this.token = response.data.token;
         });
     }
 
     login(user) {
         // Call the API endpoint and update the token on success
         return this.$http.post('/api/login', user).then(response => {
-            saveToken(response.data.token);
+            this.token = response.data.token;
             // Update the page to show unpublished posts as well.
-            $window.location.href = '/';
+            this.$window.location.href = '/';
         });
     }
 
     logout() {
-        this.token = undefined;
+        delete this.$window.localStorage['auth-token'];
         // Update the page to hide unpublished posts.
         this.$window.location.reload();
     }
 }
 
-angular.module('mlstuff.services').service('authFactory', AuthService);
+angular.module('mlstuff.services').service('AuthService', AuthService);

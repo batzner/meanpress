@@ -2,33 +2,32 @@
  * Defines a controller for the login and register page.
  */
 
-angular.module('mlstuff.controllers').controller('AuthCtrl', [
-    '$scope',
-    '$state',
-    'authFactory',
-    function($scope, $state, authFactory) {
-        $scope.user = {};
+class AuthCtrl extends InjectionReceiver {
 
-        // Function to display potential error messages. We don't log here, as this is an expected use case (for example
-        // for wrong credentials). Logging other errors is done in the authFactory.
-        let onError = function(response) {
-            if (response.data && response.data.message) {
-                $scope.error = response.data.message;
-            }
-        };
-
-        $scope.register = function() {
-            // Call the backend to register. Go home if succeeded.
-            authFactory.register($scope.user).then(function(response) {
-                $state.go('home');
-            }, onError);
-        };
-
-        $scope.login = function() {
-            // Call the backend to login. Go home on succeeded.
-            authFactory.login($scope.user).then(function(response) {
-                $state.go('home');
-            }, onError);
-        };
+    static get $inject() {
+        return ['$scope', '$state', 'AuthService'];
     }
-]);
+
+    constructor(...injections) {
+        super(...injections); // Set the injections on this.
+    }
+
+    onError(response) {
+        // Display the error in the template's error box
+        if (response.data && response.data.message) {
+            this.$scope.error = response.data.message;
+        }
+    }
+
+    register() {
+        // Call the backend to register. Go home if succeeded.
+        this.AuthService.register(this.$scope.user).then(() => $state.go('home'), this.onError);
+    }
+
+    login() {
+        // Call the backend to login. Go home if succeeded.
+        this.AuthService.login(this.$scope.user).then(() => $state.go('home'), this.onError);
+    }
+}
+
+angular.module('mlstuff.controllers').controller('AuthCtrl', AuthCtrl);

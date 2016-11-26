@@ -44,3 +44,4 @@ jspm_packages
 # CUSTOM
 .idea
 public/lib
+dist

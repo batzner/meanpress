@@ -1,69 +1,67 @@
-var app = angular.module('mlstuff', ['ui.router', 'angularLoad', 'angularCSS', 'mlstuff.controllers', 'mlstuff.services']);
+const app = angular.module('mlstuff', ['ui.router', 'angularLoad', 'angularCSS',
+    'mlstuff.controllers', 'mlstuff.services']);
 
-// Create modules for controller definitions in controllers/ and factory
-// definitions in factories/.
+// Create modules for controller definitions in controllers/ and service definitions in services/.
 angular.module('mlstuff.controllers', []);
 angular.module('mlstuff.services', []);
+
+// Function for restricted states.
+const onEnterRestricted = ['$state', 'AuthService', ($state, authService) => {
+    // Detect if the user is already logged in before entering the state
+    if (authService.isLoggedIn()) {
+        $state.go('home');
+    }
+}];
 
 app.config([
     '$stateProvider',
     '$urlRouterProvider',
     '$locationProvider',
-    function($stateProvider, $urlRouterProvider, $locationProvider) {
+    function ($stateProvider, $urlRouterProvider, $locationProvider) {
 
         $stateProvider
             .state('home', {
                 url: '/',
                 templateUrl: '/templates/home.html',
-                controller: 'MainCtrl',
+                controller: 'HomeCtrl as controller',
                 navItem: 'blog'
             })
             .state('post', {
                 url: '/post/{slug}/',
                 templateUrl: '/templates/post.html',
-                controller: 'PostCtrl',
+                controller: 'PostCtrl as controller',
                 navItem: 'blog'
             })
             .state('edit', {
                 url: '/post/{slug}/edit',
                 templateUrl: '/templates/edit.html',
-                controller: 'EditPostCtrl',
+                controller: 'EditPostCtrl as controller',
                 navItem: 'blog'
             })
             .state('add', {
                 url: '/add',
                 templateUrl: '/templates/add.html',
-                controller: 'EditPostCtrl',
+                controller: 'EditPostCtrl as controller',
                 navItem: 'add'
             })
             .state('about', {
                 url: '/about',
                 templateUrl: '/templates/about.html',
-                controller: 'AboutCtrl',
+                controller: 'AboutCtrl as controller',
                 navItem: 'about',
                 css: 'stylesheets/about.css'
             })
             .state('login', {
                 url: '/login',
                 templateUrl: '/templates/login.html',
-                controller: 'AuthCtrl',
-                onEnter: ['$state', 'authFactory', function($state, authFactory) {
-                    // Detect if the user is already logged in before entering the state
-                    if (authFactory.isLoggedIn()) {
-                        $state.go('home');
-                    }
-                }]
+                controller: 'AuthCtrl as controller',
+                onEnter: onEnterRestricted
             })
             .state('register', {
                 url: '/register',
                 templateUrl: '/templates/register.html',
-                controller: 'AuthCtrl',
-                onEnter: ['$state', 'authFactory', function($state, authFactory) {
-                    // Detect if the user is already logged in before entering the state
-                    if (authFactory.isLoggedIn()) {
-                        $state.go('home');
-                    }
-                }]
+                controller: 'AuthCtrl as controller',
+                onEnter: onEnterRestricted
             });
 
         $urlRouterProvider.otherwise('/');

@@ -15,7 +15,7 @@ class Post {
         Object.assign(this, data);
 
         // Convert all versions to PostVersions
-        this.version = this.versions.map(v => new PostVersion(v));
+        this.versions = this.versions.map(v => new PostVersion(v));
 
         // Set the published version to one of the versions
         if (this.publishedVersion) {
