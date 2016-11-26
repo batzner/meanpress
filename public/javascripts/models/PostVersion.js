@@ -1,57 +1,68 @@
-let PostVersion = function(data) {
-    data = data || {};
-    this._id = data._id || null;
-    this.title = data.title || '';
-    this.preview = data.preview || '';
-    this.body = data.body || '';
-    this.slug = data.slug || '';
-    this.metaDescription = data.metaDescription || '';
-    this.focusKeyword = data.focusKeyword || '';
-    this.jsIncludes = data.jsIncludes || [];
-    this.cssIncludes = data.cssIncludes || [];
-    this.createdAt = data.createdAt || new Date();
-    this.updatedAt = data.updatedAt || new Date();
-};
+/**
+ * Model for a post version in the frontend.
+ */
 
-PostVersion.prototype = {
-    constructor: PostVersion,
-    loadCss: function(angularLoad) {
-        this.cssIncludes.forEach(function(url) {
-            angularLoad.loadCSS(url).catch(function(err) {
-                console.error(err);
-            })
-        });
-    },
-    loadJs: function(angularLoad) {
-        // Load the JavaScripts asynchronously but ordered
-        let that = this;
-        function loadScript(index) {
-            if (index >= that.jsIncludes.length) return;
-            angularLoad.loadScript(that.jsIncludes[index]).then(function() {
-                // Script loaded succesfully. Load the next one.
-                loadScript(index + 1);
-            }).catch(function(err) {
-                console.error(err);
-            });
-        }
+class PostVersion {
+    /**
+     * Construct a PostVersion by passing an object with the same properties as the result of
+     * getDefaults(). The given object does not need to have all properties set; only those, who
+     * shall be overwritten.
+     * @param {Object} data - The properties for the version, which shall overwrite the defaults.
+     */
+    constructor(data) {
+        // Get the default properties for the post and overwrite them with the given data
+        Object.assign(this, PostVersion.getDefaults());
+        Object.assign(this, data);
+    }
 
-        loadScript(0);
-    },
-    loadScripts: function (angularLoad) {
+    loadCss(angularLoad) {
+        // Load all css includes
+        // TODO: Refactor logging
+        Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url)))
+            .catch(err => console.error(err));
+    }
+
+    loadJs(angularLoad) {
+        // Load all js includes
+        // TODO: Refactor logging
+        Promise.all(this.jsIncludes.map(url => angularLoad.loadJs(url)))
+            .catch(err => console.error(err));
+    }
+
+    loadScripts(angularLoad) {
+        // Load css and js (each ordered, but both simultaneously)
         this.loadCss(angularLoad);
         this.loadJs(angularLoad);
-    },
-    isPublished: function () {
+    }
+
+    isPublished() {
         // TODO: Check if corresponding post contains this one as published version
         return true;
-    },
+    }
 
     // BUG: This is only for copy pasting
-    getScripts: function() {
+    // TODO: Search for BUG:s
+    getScripts() {
         // Split by spaces and newline
         let scripts = this.scripts.replace(/\n/g, " ").split(" ");
-        return scripts.map(function(script) {
+        return scripts.map(function (script) {
             return script.trim();
         });
     }
-};
+
+    static getDefaults() {
+        return {
+            _id: null,
+            title: '',
+            preview: '',
+            body: '',
+            slug: '',
+            metaDescription: '',
+            focusKeyword: '',
+            jsIncludes: [],
+            cssIncludes: [],
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }
+    }
+}
