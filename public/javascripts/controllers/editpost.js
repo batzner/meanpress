@@ -28,7 +28,7 @@ class EditPostCtrl extends InjectionReceiver {
             this.$scope.form = angular.copy(this.$scope.post.getCurrentVersion());
         } else {
             this.$scope.form = {
-                // TODO: make this an empty object
+                // TODO: Make the setting of asdf to string automated, if debug mode is enabled.
                 title: 'asdf',
                 preview: 'asdf',
                 body: 'asdf',
