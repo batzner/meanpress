@@ -13,7 +13,7 @@ class EditPostCtrl extends InjectionReceiver {
 
         // If we are editing a post and the posts are not fetched yet, wait for the fetch
         if (this.$stateParams.slug && !this.PostService.hasPosts()) {
-            this.$scope.$on('posts:fetched', this.fillTemplate);
+            this.$scope.$on('posts:fetched', () => this.fillTemplate());
         } else {
             this.fillTemplate();
         }
@@ -26,7 +26,6 @@ class EditPostCtrl extends InjectionReceiver {
         if (this.$scope.post) {
             // Ensure that editing the $scope.form does not update the post's current version
             this.$scope.form = angular.copy(this.$scope.post.getCurrentVersion());
-            console.log(this.$scope.form);
         } else {
             this.$scope.form = {
                 // TODO: make this an empty object
@@ -53,16 +52,29 @@ class EditPostCtrl extends InjectionReceiver {
 
     savePost() {
         // Preprocess the form inputs
-        let includeStringToList = (str) => str.replace(/\n/g, ' ').split(' ').map(s => s.trim());
+        /* TODO: let includeStringToList = (str) => str.replace(/\n/g, ' ').split(' ').map(s =>
+         s.trim());
         this.$scope.form.jsIncludes = includeStringToList(this.$scope.form.jsIncludes);
         this.$scope.form.cssIncludes = includeStringToList(this.$scope.form.cssIncludes);
+         */
 
         // Either add a version or create the post. This function returns a promise used by
         // save, publish and preview.
         if (this.$scope.post) {
-            return this.PostService.createPostVersion(this.$scope.post, this.$scope.form)
+            // Create a post version. This is necessary, because the form contains properties that
+            // we don't want to send to the API endpoint.
+            const postVersionData = angular.copy(this.$scope.form);
+            postVersionData.post = this.$scope.post;
+            const postVersion = new PostVersion(postVersionData);
+
+            // Create the post version in the backend
+            return this.PostService.createPostVersion(this.$scope.post, postVersion)
         } else {
-            return this.PostService.createPost(this.$scope.form);
+            // Create a post. This is necessary, because the form contains properties that we
+            // don't want to send to the API endpoint.
+            const post = new Post(this.$scope.form);
+
+            return this.PostService.createPost(post);
         }
     }
 

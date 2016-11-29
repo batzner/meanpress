@@ -14,7 +14,7 @@ class PostCtrl extends InjectionReceiver {
 
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts()) {
-            this.$scope.$on('posts:fetched', this.fillTemplate);
+            this.$scope.$on('posts:fetched', () => this.fillTemplate());
         } else {
             this.fillTemplate();
         }

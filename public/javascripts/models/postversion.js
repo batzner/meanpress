@@ -4,6 +4,19 @@
 
 class PostVersion extends BaseEntity {
 
+    constructor(data) {
+        super(data);
+
+        // The post *must* be set, because PostVersions are weakly associated
+        if (!this.post) {
+            throw new ReferenceError('Tried to construct a PostVersion without a post set.');
+        }
+
+        if (!(this.post instanceof Post)) {
+            throw new TypeError('post is set, but not an instance of Post.');
+        }
+    }
+
     loadCss(angularLoad) {
         // Load all css includes
         Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url)))
@@ -17,8 +30,14 @@ class PostVersion extends BaseEntity {
     }
 
     isPublished() {
-        // TODO: Check if corresponding post contains this one as published version
-        return true;
+        return this.post && this.post.publishedVersion == this;
+    }
+
+    copyForJson() {
+        const result = super.copyForJson();
+        // Make the post reference an id
+        result.post = result.post._id;
+        return result;
     }
 
     static getDefaults() {
@@ -32,6 +51,7 @@ class PostVersion extends BaseEntity {
             focusKeyword: '',
             jsIncludes: [],
             cssIncludes: [],
+            post: null,
             createdAt: new Date(),
             updatedAt: new Date()
         }

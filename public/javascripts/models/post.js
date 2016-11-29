@@ -9,6 +9,9 @@ class Post extends BaseEntity {
     constructor(data) {
         super(data);
 
+        // Set this post as post in all PostVersions
+        this.versions.forEach(v => v.post = this);
+
         // Convert all versions to PostVersions
         this.versions = this.versions.map(v => new PostVersion(v));
 

@@ -63,7 +63,15 @@ class BaseEntity {
     constructor(data) {
         // Get the default properties for the entity and overwrite them with the given data
         Object.assign(this, this.constructor.getDefaults());
-        Object.assign(this, data);
+        // Set the given values
+        this.updateProperties(data);
+    }
+
+    updateProperties(data) {
+        // Only allow values that are in the defaults
+        Object.keys(this).forEach(key => {
+            if (data[key]) this[key] = data[key];
+        });
     }
 
     set createdAt(value) {
@@ -80,6 +88,11 @@ class BaseEntity {
 
     get updatedAt() {
         return this._updatedAt;
+    }
+
+    copyForJson() {
+        // Return a copy of this for json serialization (removing circular references)
+        return angular.copy(this);
     }
 
     static getDefaults() {

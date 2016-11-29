@@ -30,7 +30,7 @@ class PostService extends InjectionReceiver {
         let post = null;
         if (this.posts.has(postData._id)) {
             post = this.posts.get(postData._id);
-            Object.assign(post, postData);
+            post.updateProperties(postData);
         } else {
             post = new Post(postData);
             this.posts.set(post._id, post);
@@ -52,6 +52,9 @@ class PostService extends InjectionReceiver {
      * @returns {Promise.<Post>}
      */
     callPostModification(method, url, data) {
+        // Prepare the data for serializing
+        data = this.prepareSerialise(data);
+
         return method(url, data, {
             headers: {
                 Authorization: 'Bearer ' + this.AuthService.token
@@ -60,6 +63,25 @@ class PostService extends InjectionReceiver {
             // Return the created post to be usable in promises
             return this.updatePostMap(response.data);
         }).catch(this.$log.error);
+    }
+
+    prepareSerialise(data) {
+        // Prepare all BaseEntity instances (to remove circular references)
+        if (data instanceof BaseEntity) {
+            // Prepare BaseEntities
+            return data.copyForJson();
+        }
+        else if (variable.constructor === Array){
+            // Run recursive for arrays
+            data = data.map(this.prepareSerialise);
+        } else {
+            // Run recursive for objects
+            for (let key in data) {
+                if (!data.hasOwnProperty(key)) continue;
+                data[key] = this.prepareSerialise(data[key]);
+            }
+        }
+        return data;
     }
 
     // API CALLING METHODS

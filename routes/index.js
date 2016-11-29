@@ -1,18 +1,18 @@
-var REGISTRATION_ENABLED = true;
+const REGISTRATION_ENABLED = true;
 
-var express = require('express');
-var mongoose = require('mongoose');
-var passport = require('passport');
-var jwt = require('express-jwt');
+const express = require('express');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const jwt = require('express-jwt');
 
-var router = express.Router();
+const router = express.Router();
 
-var Post = mongoose.model('Post');
-var PostVersion = mongoose.model('PostVersion');
-var User = mongoose.model('User');
+const Post = mongoose.model('Post');
+const PostVersion = mongoose.model('PostVersion');
+const User = mongoose.model('User');
 
 // Authentication middleware
-var auth = jwt({
+const auth = jwt({
     secret: process.env.JWT_SECRET
 });
 
@@ -50,40 +50,35 @@ router.get('/api/posts/all', auth, function (req, res, next) {
 router.post('/api/posts', auth, function (req, res, next) {
     var post = new Post();
     var postVersion = new PostVersion(req.body);
+    postVersion.post = post._id;
     post.versions = [postVersion];
 
-    // Save the post and the version
-    postVersion.save(function (err, postVersion) {
-        if (err) return next(err);
-        post.save(function (err, post) {
-            if (err) return next(err);
-            res.json(post);
-        });
-    });
+    // Save the post and the version and return the post.
+    postVersion.save().then(postVersion => post.save()).then(post => res.json(post)).catch(next);
 });
 
 // Route for adding a post version
 router.post('/api/posts/:id/version', auth, function (req, res, next) {
     // Create the post version
-    var postVersion = new PostVersion(req.body);
+    let postVersion = new PostVersion(req.body);
     postVersion._id = new mongoose.Types.ObjectId();
+    postVersion.post = mongoose.Types.ObjectId(req.params.id);
 
     postVersion.save()
-        .then(function (postVersion) {
-            // Find the post to update
-            return Post.findOne({'_id': mongoose.Types.ObjectId(req.params.id)});
-        }).then(function (post) {
-        // Update the post
-        post.versions.push(postVersion);
-        return post.save();
-    }).then(function (post) {
-        // Get the updated post with populated fields
-        return Post.populate(post, 'publishedVersion versions');
-    }).then(function (post) {
-        res.json(post);
-    }).catch(function (err) {
-        next(err);
-    });
+        .then(postVersion => {
+            // Find the post
+            return Post.findOne({'_id': postVersion.post});
+        }).then(post => {
+            // Update the post
+            post.versions.push(postVersion);
+            return post.save();
+        }).then(post => {
+            // Get the updated post with populated fields
+            return Post.populate(post, 'publishedVersion versions');
+        }).then(post => {
+            // Return the post
+            res.json(post);
+        }).catch(next);
 });
 
 // Route for updating a post
