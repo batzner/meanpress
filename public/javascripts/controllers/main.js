@@ -6,11 +6,13 @@
 class MainCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$sce', 'AuthService'];
+        return ['$rootScope', '$sce', 'AuthService'];
     }
 
     constructor(...injections) {
         super(...injections); // Set the injections on this.
+
+        this.$rootScope.log = console.log;
     }
 
     isLoggedIn() {

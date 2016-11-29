@@ -1,14 +1,12 @@
-<div ng-repeat="postVersion in postVersions | orderBy: '-createdAt'">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h1><a href="post/{{postVersion.slug}}/">{{postVersion.title}}</a></h1>
-                    <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
-                    <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
-                </div>
-                <div class="panel-body post-body"  ng-bind-html="main.toTrusted(postVersion.preview)"></div>
+<div ng-repeat="post in posts | orderBy: '-createdAt'" ng-init="postVersion = post.getDisplayVersion()" class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1><a href="post/{{postVersion.slug}}/">{{postVersion.title}}</a></h1>
+                <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
+                <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
             </div>
+            <div class="panel-body post-body" ng-bind-html="main.toTrusted(postVersion.preview)"></div>
         </div>
     </div>
 </div>

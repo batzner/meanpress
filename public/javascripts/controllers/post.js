@@ -12,11 +12,9 @@ class PostCtrl extends InjectionReceiver {
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
-        // TODO: Listen to changes to the post
-
-        // If the posts are not present, we need to fetch them before filling the page
-        if (!this.PostService.getPosts()) {
-            this.PostService.fetchAll().then(() => this.fillTemplate());
+        // If the posts are not fetched yet, wait for the fetch
+        if (!this.PostService.hasPosts()) {
+            this.$scope.$on('posts:fetched', this.fillTemplate);
         } else {
             this.fillTemplate();
         }
@@ -26,9 +24,15 @@ class PostCtrl extends InjectionReceiver {
     fillTemplate() {
         this.post = this.PostService.findPostBySlug(this.$stateParams.slug);
 
+        if (!this.post) return;
+
         // Set the variables on the scope
-        this.$scope.postVersion = this.post.getDisplayVersion();
-        this.$scope.editUrl = this.$location.path() + 'edit';
+        if (this.$stateParams.preview) {
+            this.$scope.postVersion = this.post.getCurrentVersion();
+        } else {
+            this.$scope.postVersion = this.post.getDisplayVersion();
+        }
+        this.$scope.editUrl = this.$state.href('edit', {slug: this.$stateParams.slug});
 
         this.loadScripts();
     }

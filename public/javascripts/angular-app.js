@@ -32,6 +32,15 @@ app.config([
                 controller: 'PostCtrl as controller',
                 navItem: 'blog'
             })
+            .state('preview', {
+                url: '/post/{slug}/preview',
+                templateUrl: '/templates/post.html',
+                controller: 'PostCtrl as controller',
+                navItem: 'blog',
+                params: {
+                    preview: true
+                }
+            })
             .state('edit', {
                 url: '/post/{slug}/edit',
                 templateUrl: '/templates/edit.html',

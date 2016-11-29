@@ -11,43 +11,22 @@ class EditPostCtrl extends InjectionReceiver {
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
-        this.setPost().then(() => this.fillTemplate());
-    }
-
-    /**
-     * Returns a promise, which sets the post and returns it. If we are in the Add state, the post
-     * will be null.
-     * @returns {Promise.<Post>}
-     */
-    setPost() {
-        // Exit early, if we don't need to set a post
-        const slug = this.$stateParams.slug;
-        if (!slug) {
-            this.post = null;
-            return this.$q.when(this.post);
-        }
-
-        //If the posts are not present, we need to fetch them first
-        if (!this.PostService.getPosts()) {
-            return this.PostService.fetchAll().then(() => {
-                // Set the post and return it
-                this.post = this.PostService.findPostBySlug(slug);
-                return this.post;
-            });
+        // If we are editing a post and the posts are not fetched yet, wait for the fetch
+        if (this.$stateParams.slug && !this.PostService.hasPosts()) {
+            this.$scope.$on('posts:fetched', this.fillTemplate);
         } else {
-            this.post = this.PostService.findPostBySlug(slug);
-            return this.$q.when(this.post);
+            this.fillTemplate();
         }
     }
 
     fillTemplate() {
-        // Prefill the form with the post values / defaults
-        if (this.post) {
-            // TODO: Ensure that editing the $scope.form does not update the post's current version
-            this.$scope.form = this.post.getCurrentVersion();
+        this.$scope.post = this.PostService.findPostBySlug(this.$stateParams.slug);
 
-            // Use the post's created at instead of the post version's date
-            this.$scope.form.createdAt = new Date(this.post.createdAt);
+        // Prefill the form with the post values / defaults
+        if (this.$scope.post) {
+            // Ensure that editing the $scope.form does not update the post's current version
+            this.$scope.form = angular.copy(this.$scope.post.getCurrentVersion());
+            console.log(this.$scope.form);
         } else {
             this.$scope.form = {
                 // TODO: make this an empty object
@@ -75,8 +54,9 @@ class EditPostCtrl extends InjectionReceiver {
     savePost() {
         // Either add a version or create the post. This function returns a promise used by
         // save, publish and preview.
-        if (this.post) {
-            return this.PostService.createPostVersion(this.post, this.$scope.form)
+        if (this.$scope.post) {
+            console.log(this.$scope.form);
+            return this.PostService.createPostVersion(this.$scope.post, this.$scope.form)
         } else {
             return this.PostService.createPost(this.$scope.form);
         }
@@ -92,14 +72,15 @@ class EditPostCtrl extends InjectionReceiver {
 
     preview() {
         // Save the post and view it without publishing
+        // Don't view the post, but only the current post version. Also, open the post in a new tab.
         this.savePost().then(post => {
             // View the post
-            this.$state.go('post', {slug: post.getCurrentVersion().slug});
+            this.$state.go('preview', {slug: post.getCurrentVersion().slug});
         }).catch(this.$log.error);
     }
 
     publish() {
-        // Save the post, view it and publish it
+        // Save the post, publish it and view it
         this.savePost().then(post => {
             // Publish the post
             post.publishedVersion = post.getCurrentVersion();
@@ -111,7 +92,13 @@ class EditPostCtrl extends InjectionReceiver {
     }
 
     unpublish() {
-        // TODO: Don't save the post, but update it to unpublished
+        if (!this.$scope.post) {
+            console.error('Trying to unpublish a post in add mode / post not set in scope.');
+            return;
+        }
+
+        this.$scope.post.publishedVersion = null;
+        this.PostService.updatePost(post);
     }
 }
 

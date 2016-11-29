@@ -2,18 +2,7 @@
  * Model for a post version in the frontend.
  */
 
-class PostVersion {
-    /**
-     * Construct a PostVersion by passing an object with the same properties as the result of
-     * getDefaults(). The given object does not need to have all properties set; only those, who
-     * shall be overwritten.
-     * @param {Object} data - The properties for the version, which shall overwrite the defaults.
-     */
-    constructor(data) {
-        // Get the default properties for the post and overwrite them with the given data
-        Object.assign(this, PostVersion.getDefaults());
-        Object.assign(this, data);
-    }
+class PostVersion extends BaseEntity {
 
     loadCss(angularLoad) {
         // Load all css includes

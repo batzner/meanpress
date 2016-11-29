@@ -2,17 +2,12 @@
  * Model for a post in the frontend.
  */
 
-class Post {
+class Post extends BaseEntity {
     /**
-     * Construct a post by passing an object with the same properties as the result of getDefaults()
-     * The given object does not need to have all properties set; only those, who shall be
-     * overwritten.
-     * @param {Object} data - The properties for the post, which shall overwrite the defaults.
+     * See constructor of super class.
      */
     constructor(data) {
-        // Get the default properties for the post and overwrite them with the given data
-        Object.assign(this, Post.getDefaults());
-        Object.assign(this, data);
+        super(data);
 
         // Convert all versions to PostVersions
         this.versions = this.versions.map(v => new PostVersion(v));
@@ -36,6 +31,10 @@ class Post {
     matchesSlug(slug) {
         // Check, if this posts matches a given slug
         return this.versions.some(v => v.slug == slug);
+    }
+
+    isPublished() {
+        return !!this.publishedVersion;
     }
 
     static getDefaults() {

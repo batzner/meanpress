@@ -11,34 +11,35 @@ class PostService extends InjectionReceiver {
 
     constructor(...injections) {
         super(...injections);
-        this.posts = new Map(); // Dictionary mapping uuid (string) to post object
+        this.posts = new BindableMap(); // Dictionary mapping uuid (string) to post object
 
         this.fetchAll();
     }
 
     // HELPER METHODS
 
-    getPosts() {
-        return Array.from(this.posts.values());
-    }
-
     findPostBySlug(slug) {
-        const result = this.getPosts().find(post => post.matchesSlug(slug));
+        const result = this.posts.bindableValues.find(post => post.matchesSlug(slug));
         if (!result) console.log('Could not find post by slug.');
         return result;
     }
 
-    getSortedPosts() {
-        // Return all posts in descending order (by creation date)
-        return this.getPosts().sort((first, second) => -(first.createdAt - second.createdAt));
+    updatePostMap(postData) {
+        // If the post already exists, we update it instead of setting a new reference. Thus,
+        // bindings remain existent.
+        let post = null;
+        if (this.posts.has(postData._id)) {
+            post = this.posts.get(postData._id);
+            Object.assign(post, postData);
+        } else {
+            post = new Post(postData);
+            this.posts.set(post._id, post);
+        }
+        return post;
     }
 
-    updatePostLocally(postData, broadcastUpdate = true) {
-        const post = new Post(postData);
-        this.posts.set(post._id, post);
-
-        if (broadcastUpdate) this.$rootScope.$broadcast('posts:updated', this.posts);
-        return post;
+    hasPosts() {
+        return !!this.posts.size;
     }
 
     /**
@@ -57,7 +58,7 @@ class PostService extends InjectionReceiver {
             }
         }).then(response => {
             // Return the created post to be usable in promises
-            return this.updatePostLocally(response.data);
+            return this.updatePostMap(response.data);
         }).catch(this.$log.error);
     }
 
@@ -78,11 +79,11 @@ class PostService extends InjectionReceiver {
             this.$log.debug('Fetched all posts. Count: ' + response.data.length);
 
             // Update the posts
-            this.posts = new Map();
-            response.data.forEach(postData => this.updatePost(postData, false));
+            this.posts.clear();
+            response.data.forEach(postData => this.updatePostMap(postData));
 
-            // Broadcast the update
-            this.$rootScope.$broadcast('posts:updated', this.posts);
+            // Broadcast the fetch
+            this.$rootScope.$broadcast('posts:fetched', this.posts);
         }).catch(this.$log.error);
     }
 
@@ -102,7 +103,7 @@ class PostService extends InjectionReceiver {
     }
 
     deletePost(post) {
-        return $http.delete('/api/posts/' + post._id, {
+        return this.$http.delete('/api/posts/' + post._id, {
             headers: {
                 Authorization: 'Bearer ' + this.AuthService.token
             }
@@ -111,7 +112,7 @@ class PostService extends InjectionReceiver {
             this.posts.delete(post._id);
 
             // Broadcast the update
-            $rootScope.$broadcast('posts:updated', this.posts);
+            this.$rootScope.$broadcast('posts:updated', this.posts);
         }).catch(this.$log.error);
     }
 }

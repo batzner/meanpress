@@ -30,5 +30,5 @@
     <button ng-click="controller.submit('publish')" class="btn btn-success pull-right">Publish</button>
     <button ng-click="controller.submit('preview')" class="btn btn-primary">Preview</button>
     <button ng-click="controller.submit('save')" class="btn btn-default">Save</button>
-    <button ng-click="controller.submit('unpublish')" ng-show="post.getCurrentVersion().isPublished()" class="btn btn-danger pull-right">Unpublish</button>
+    <button ng-click="controller.submit('unpublish')" ng-show="post.isPublished()" class="btn btn-danger pull-right">Unpublish</button>
 </form>
