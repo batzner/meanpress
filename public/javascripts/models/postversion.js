@@ -6,37 +6,19 @@ class PostVersion extends BaseEntity {
 
     loadCss(angularLoad) {
         // Load all css includes
-        // TODO: Refactor logging
         Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url)))
-            .catch(err => console.error(err));
+            .catch(console.error);
     }
 
     loadJs(angularLoad) {
         // Load all js includes
-        // TODO: Refactor logging
         Promise.all(this.jsIncludes.map(url => angularLoad.loadJs(url)))
-            .catch(err => console.error(err));
-    }
-
-    loadScripts(angularLoad) {
-        // Load css and js (each ordered, but both simultaneously)
-        this.loadCss(angularLoad);
-        this.loadJs(angularLoad);
+            .catch(console.error);
     }
 
     isPublished() {
         // TODO: Check if corresponding post contains this one as published version
         return true;
-    }
-
-    // BUG: This is only for copy pasting
-    // TODO: Search for BUG:s
-    getScripts() {
-        // Split by spaces and newline
-        let scripts = this.scripts.replace(/\n/g, " ").split(" ");
-        return scripts.map(function (script) {
-            return script.trim();
-        });
     }
 
     static getDefaults() {

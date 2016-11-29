@@ -13,11 +13,6 @@ class HomeCtrl extends InjectionReceiver {
 
         this.$scope.posts = this.PostService.posts.bindableValues;
     }
-
-    onPostsUpdated() {
-        this.$scope.postVersions = this.PostService.getSortedPosts()
-            .map(post => post.getDisplayVersion());
-    }
 }
 
 angular.module('mlstuff.controllers').controller('HomeCtrl', HomeCtrl);

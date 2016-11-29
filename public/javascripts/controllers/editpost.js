@@ -52,10 +52,14 @@ class EditPostCtrl extends InjectionReceiver {
     }
 
     savePost() {
+        // Preprocess the form inputs
+        let includeStringToList = (str) => str.replace(/\n/g, ' ').split(' ').map(s => s.trim());
+        this.$scope.form.jsIncludes = includeStringToList(this.$scope.form.jsIncludes);
+        this.$scope.form.cssIncludes = includeStringToList(this.$scope.form.cssIncludes);
+
         // Either add a version or create the post. This function returns a promise used by
         // save, publish and preview.
         if (this.$scope.post) {
-            console.log(this.$scope.form);
             return this.PostService.createPostVersion(this.$scope.post, this.$scope.form)
         } else {
             return this.PostService.createPost(this.$scope.form);

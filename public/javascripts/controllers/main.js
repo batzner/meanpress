@@ -6,13 +6,18 @@
 class MainCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$rootScope', '$sce', 'AuthService'];
+        return ['$rootScope', '$sce', '$document', 'AuthService'];
     }
 
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
         this.$rootScope.log = console.log;
+
+        // Wrap tables to make them responsive.
+        this.$document.ready(() => {
+            $('table').wrap("<div class='table-container'></div>");
+        });
     }
 
     isLoggedIn() {

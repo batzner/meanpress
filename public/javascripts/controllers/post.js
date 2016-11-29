@@ -5,7 +5,7 @@
 class PostCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$stateParams', '$location', '$state', '$sce', 'angularLoad',
+        return ['$scope', '$stateParams', '$location', '$state', '$sce', '$document', 'angularLoad',
             'PostService'];
     }
 
@@ -42,18 +42,12 @@ class PostCtrl extends InjectionReceiver {
     }
 
     loadScripts() {
-        // TODO: Put this into the PostVersion model?
         // Load the css directly.
         this.$scope.postVersion.loadCss(this.angularLoad);
 
-        // TODO: Change to $document
-        angular.element(document).ready(() => {
+        this.$document.ready(() => {
             // Load the JavaScripts when the page is loaded.
             this.$scope.postVersion.loadJs(this.angularLoad);
-
-            // wrap tables to make them responsive.
-            // TODO: Should this go in here? Not rather in MainCtrl?
-            $('table').wrap("<div class='table-container'></div>");
         });
     }
 }
