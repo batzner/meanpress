@@ -1,4 +1,4 @@
-var REGISTERING_ENABLED = false;
+var REGISTRATION_ENABLED = true;
 
 var express = require('express');
 var mongoose = require('mongoose');
@@ -119,7 +119,7 @@ router.delete('/api/posts/:id', auth, function (req, res, next) {
 
 // Register route. Creates a user given a username and password
 router.post('/api/register', function (req, res, next) {
-    if (!REGISTERING_ENABLED) {
+    if (!REGISTRATION_ENABLED) {
         return res.status(400).json({
             message: "Registering is currently not activated."
         });
