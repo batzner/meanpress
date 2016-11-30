@@ -70,7 +70,7 @@ class BaseEntity {
     updateProperties(data) {
         // Only allow values that are in the defaults
         Object.keys(this).forEach(key => {
-            if (data[key]) this[key] = data[key];
+            if (key in data) this[key] = data[key];
         });
     }
 
@@ -90,9 +90,8 @@ class BaseEntity {
         return this._updatedAt;
     }
 
-    copyForJson() {
-        // Return a copy of this for json serialization (removing circular references)
-        return angular.copy(this);
+    prepareForJson() {
+        // Prepare the properties for json serialization (removing circular references)
     }
 
     static getDefaults() {

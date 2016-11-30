@@ -48,20 +48,29 @@ router.get('/api/posts/all', auth, function (req, res, next) {
 
 // Route for adding a post
 router.post('/api/posts', auth, function (req, res, next) {
-    var post = new Post();
-    var postVersion = new PostVersion(req.body);
+    // Ignore a passed id for the post version
+    delete req.body._id;
+
+    const post = new Post();
+    const postVersion = new PostVersion(req.body);
     postVersion.post = post._id;
-    post.versions = [postVersion];
 
     // Save the post and the version and return the post.
-    postVersion.save().then(postVersion => post.save()).then(post => res.json(post)).catch(next);
+    postVersion.save().then(postVersion => {
+        post.versions = [postVersion];
+        return post.save();
+    }).then(post => {
+        res.json(post);
+    }).catch(next);
 });
 
 // Route for adding a post version
 router.post('/api/posts/:id/version', auth, function (req, res, next) {
+    // Ignore a passed id for the post version
+    delete req.body._id;
+
     // Create the post version
     let postVersion = new PostVersion(req.body);
-    postVersion._id = new mongoose.Types.ObjectId();
     postVersion.post = mongoose.Types.ObjectId(req.params.id);
 
     postVersion.save()

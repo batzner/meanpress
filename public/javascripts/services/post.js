@@ -52,8 +52,11 @@ class PostService extends InjectionReceiver {
      * @returns {Promise.<Post>}
      */
     callPostModification(method, url, data) {
+        // Clone to prevent modifying the given data
+        data = angular.copy(data);
+
         // Prepare the data for serializing
-        data = this.prepareSerialise(data);
+        this.prepareSerialise(data);
 
         return method(url, data, {
             headers: {
@@ -66,22 +69,26 @@ class PostService extends InjectionReceiver {
     }
 
     prepareSerialise(data) {
+        if (!data) return;
+
+        // Run recursive for arrays
+        if (data.constructor === Array){
+            data.forEach(v => this.prepareSerialise(v));
+        }
+
         // Prepare all BaseEntity instances (to remove circular references)
         if (data instanceof BaseEntity) {
             // Prepare BaseEntities
-            return data.copyForJson();
+            data.prepareForJson();
         }
-        else if (variable.constructor === Array){
-            // Run recursive for arrays
-            data = data.map(this.prepareSerialise);
-        } else {
-            // Run recursive for objects
+
+        // Iterate over the keys for objects
+        if (data === Object(data)) {
             for (let key in data) {
                 if (!data.hasOwnProperty(key)) continue;
-                data[key] = this.prepareSerialise(data[key]);
+                this.prepareSerialise(data[key]);
             }
         }
-        return data;
     }
 
     // API CALLING METHODS

@@ -23,7 +23,6 @@ class EditPostCtrl extends InjectionReceiver {
     }
 
     fillTemplate() {
-        console.log('Filling template');
         this.$scope.post = this.PostService.findPostBySlug(this.$stateParams.slug);
 
         // Prefill the form with the post values / defaults
@@ -109,7 +108,7 @@ class EditPostCtrl extends InjectionReceiver {
         }
 
         this.$scope.post.publishedVersion = null;
-        this.PostService.updatePost(post);
+        this.PostService.updatePost(this.$scope.post);
     }
 }
 

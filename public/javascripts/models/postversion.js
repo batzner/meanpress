@@ -20,11 +20,9 @@ class PostVersion extends BaseEntity {
         return this.post && this.post.publishedVersion == this;
     }
 
-    copyForJson() {
-        const result = super.copyForJson();
+    prepareForJson() {
         // Make the post reference an id
-        if (result.post) result.post = result.post._id;
-        return result;
+        if (this.post) this.post = this.post._id;
     }
 
     static getDefaults() {
