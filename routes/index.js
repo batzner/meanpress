@@ -110,15 +110,16 @@ router.put('/api/posts/:id', auth, function (req, res, next) {
 // Route for deleting a post
 router.delete('/api/posts/:id', auth, function (req, res, next) {
     // Find the post to update
-    var query = {
+    const query = {
         '_id': mongoose.Types.ObjectId(req.params.id)
     };
-    Post.remove(query, function (err, post) {
-        if (err) return next(err);
-        res.json({
-            message: 'Successfully deleted'
-        });
-    })
+    Post.findOne(query)
+        .then(post => post.remove())
+        .then(() => {
+            res.json({
+                message: 'Successfully deleted'
+            });
+        }).catch(next);
 });
 
 // Register route. Creates a user given a username and password

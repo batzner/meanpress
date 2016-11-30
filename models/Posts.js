@@ -3,7 +3,7 @@
  */
 
 const mongoose = require('mongoose');
-const PostVersionSchema = mongoose.model('PostVersion').schema;
+const PostVersion = mongoose.model('PostVersion');
 
 const PostSchema = new mongoose.Schema(
     {
@@ -21,9 +21,8 @@ const PostSchema = new mongoose.Schema(
 );
 
 // Add middleware to cascade-delete the post versions before deleting the post
-// TODO: This needs to be tested.
 PostSchema.pre('remove', function (next) {
-    PostVersionSchema.remove({post: this._id}).exec();
+    PostVersion.remove({post: this._id}).exec();
     next();
 });
 
