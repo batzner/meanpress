@@ -12,7 +12,7 @@ class PostVersion extends BaseEntity {
 
     loadJs(angularLoad) {
         // Load all js includes
-        Promise.all(this.jsIncludes.map(url => angularLoad.loadJs(url)))
+        Promise.all(this.jsIncludes.map(url => angularLoad.loadScript(url)))
             .catch(console.error);
     }
 

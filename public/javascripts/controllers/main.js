@@ -15,6 +15,7 @@ class MainCtrl extends InjectionReceiver {
         this.$rootScope.log = console.log;
 
         // Wrap tables to make them responsive.
+        // TODO: This needs to be called *after* the posts are loaded / displayed
         this.$document.ready(() => {
             $('table').wrap("<div class='table-container'></div>");
         });

@@ -36,8 +36,10 @@ class EditPostCtrl extends InjectionReceiver {
             }
         }
 
-        // Form cosmetics
+        // Form cosmetics:
         this.$scope.postVersion.createdAt.setSeconds(0, 0);
+        this.$scope.postVersion.jsIncludes = this.$scope.postVersion.jsIncludes.join('\n');
+        this.$scope.postVersion.cssIncludes = this.$scope.postVersion.cssIncludes.join('\n');
     }
 
     // Validating function that calls another function only if the form is valid
@@ -49,11 +51,9 @@ class EditPostCtrl extends InjectionReceiver {
 
     savePost() {
         // Preprocess the form inputs
-        /* TODO: let includeStringToList = (str) => str.replace(/\n/g, ' ').split(' ').map(s =>
-         s.trim());
-        this.$scope.form.jsIncludes = includeStringToList(this.$scope.form.jsIncludes);
-        this.$scope.form.cssIncludes = includeStringToList(this.$scope.form.cssIncludes);
-         */
+        let toList = (str) => str.replace(/\n/g, ' ').split(' ').map(s => s.trim());
+        this.$scope.postVersion.jsIncludes = toList(this.$scope.postVersion.jsIncludes);
+        this.$scope.postVersion.cssIncludes = toList(this.$scope.postVersion.cssIncludes);
 
         // Either add a version or create the post. This function returns a promise used by
         // save, publish and preview.
