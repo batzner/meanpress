@@ -1,31 +1,31 @@
-<form name="form.element" ng-model="post">
+<form name="form.theForm">
     <div class="form-group">
         <label for="title">Title</label>
-        <input ng-model="form.title" type="text" class="form-control" id="title" required>
+        <input ng-model="postVersion.title" type="text" class="form-control" id="title" required>
 
         <label for="preview">Preview</label>
-        <textarea rows="10" ng-model="form.preview" type="text" class="form-control" id="preview" required></textarea>
+        <textarea rows="10" ng-model="postVersion.preview" type="text" class="form-control" id="preview" required></textarea>
 
         <label for="body">Body</label>
-        <textarea rows="20" ng-model="form.body" type="text" class="form-control" id="body" required></textarea>
+        <textarea rows="20" ng-model="postVersion.body" type="text" class="form-control" id="body" required></textarea>
 
         <label for="cssIncludes">CSS includes (separate with new line)</label>
-        <textarea rows="2" ng-model="form.cssIncludes" type="text" class="form-control" id="cssIncludes"></textarea>
+        <textarea rows="2" ng-model="postVersion.cssIncludes" type="text" class="form-control" id="cssIncludes"></textarea>
 
         <label for="jsIncludes">JavaScript includes (separate with new line)</label>
-        <textarea rows="2" ng-model="form.jsIncludes" type="text" class="form-control" id="jsIncludes"></textarea>
+        <textarea rows="2" ng-model="postVersion.jsIncludes" type="text" class="form-control" id="jsIncludes"></textarea>
 
         <label for="createdAt">Created At</label>
-        <input ng-model="form.createdAt" type="datetime-local" class="form-control" id="createdAt" required>
+        <input ng-model="postVersion.createdAt" type="datetime-local" class="form-control" id="createdAt" required>
 
         <label for="slug">Slug</label>
-        <input ng-model="form.slug" type="text" class="form-control" id="slug" required>
+        <input ng-model="postVersion.slug" type="text" class="form-control" id="slug" required>
 
         <label for="metaDescription">Meta Description</label>
-        <input ng-model="form.metaDescription" type="text" class="form-control" id="metaDescription" required>
+        <input ng-model="postVersion.metaDescription" type="text" class="form-control" id="metaDescription" required>
 
         <label for="focusKeyword">Focus Keyword</label>
-        <input ng-model="form.focusKeyword" type="text" class="form-control" id="focusKeyword" required>
+        <input ng-model="postVersion.focusKeyword" type="text" class="form-control" id="focusKeyword" required>
     </div>
     <button ng-click="controller.submit('publish')" class="btn btn-success pull-right">Publish</button>
     <button ng-click="controller.submit('preview')" class="btn btn-primary">Preview</button>
