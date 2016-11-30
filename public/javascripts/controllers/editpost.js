@@ -48,7 +48,6 @@ class EditPostCtrl extends InjectionReceiver {
 
     // Validating function that calls another function only if the form is valid
     submit(methodName) {
-        console.log(this.$scope);
         if (this.$scope.form.theForm.$valid) {
             this[methodName]();
         }

@@ -3,20 +3,17 @@
  */
 
 class Post extends BaseEntity {
-    /**
-     * See constructor of super class.
-     */
-    constructor(data) {
-        super(data);
+    updateProperties(data) {
+        // Before setting the properties to this object, we need to cast the post versions
+        if (data.versions) {
+            data.versions.forEach(v => v.post = this);
+            data.versions = data.versions.map(v => new PostVersion(v));
+        }
 
-        // Set this post as post in all PostVersions
-        this.versions.forEach(v => v.post = this);
+        super.updateProperties(data);
 
-        // Convert all versions to PostVersions
-        this.versions = this.versions.map(v => new PostVersion(v));
-
-        // Set the published version to one of the versions
-        if (this.publishedVersion) {
+        // After updating the properties, we might need to reset the published version
+        if (data.publishedVersion) {
             this.publishedVersion = this.versions.find(v => v._id == this.publishedVersion._id);
         }
     }
