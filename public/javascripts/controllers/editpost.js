@@ -5,7 +5,7 @@
 class EditPostCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$stateParams', '$state', '$log', '$q', 'PostService'];
+        return ['$scope', '$stateParams', '$state', '$log', '$q', 'CONFIG', 'PostService'];
     }
 
     constructor(...injections) {
@@ -30,15 +30,10 @@ class EditPostCtrl extends InjectionReceiver {
             // Ensure that editing the $scope.form does not update the post's current version
             this.$scope.postVersion = angular.copy(this.$scope.post.getCurrentVersion());
         } else {
-            this.$scope.postVersion = new PostVersion({
-                // TODO: Make the setting of asdf to string automated, if debug mode is enabled.
-                title: 'asdf',
-                preview: 'asdf',
-                body: 'asdf',
-                slug: 'asdf',
-                metaDescription: 'asdf',
-                focusKeyword: 'asdf'
-            });
+            this.$scope.postVersion = new PostVersion();
+            if (this.CONFIG.DEBUG) {
+                this.$scope.postVersion.updateProperties(PostVersion.getDebugValues());
+            }
         }
 
         // Form cosmetics

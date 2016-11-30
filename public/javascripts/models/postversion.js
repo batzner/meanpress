@@ -25,6 +25,20 @@ class PostVersion extends BaseEntity {
         if (this.post) this.post = this.post._id;
     }
 
+    static getDebugValues() {
+        return {
+            title: 'asdf',
+            preview: 'asdf',
+            body: 'asdf',
+            slug: 'asdf',
+            metaDescription: 'asdf',
+            focusKeyword: 'asdf',
+            jsIncludes: [],
+            cssIncludes: [],
+            createdAt: new Date()
+        }
+    }
+
     static getDefaults() {
         return {
             _id: null,

@@ -60,7 +60,7 @@ class BaseEntity {
      * shall be overwritten.
      * @param {Object} data - The properties for the entity, which shall overwrite the defaults.
      */
-    constructor(data) {
+    constructor(data={}) {
         // Get the default properties for the entity and overwrite them with the given data
         Object.assign(this, this.constructor.getDefaults());
         // Set the given values
