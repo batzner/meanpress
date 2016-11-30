@@ -19,12 +19,16 @@ class PostService extends InjectionReceiver {
     // HELPER METHODS
 
     findPostBySlug(slug) {
-        const result = this.posts.bindableValues.find(post => post.matchesSlug(slug));
-        if (!result) console.log('Could not find post by slug.');
-        return result;
+        return this.posts.bindableValues.find(post => post.matchesSlug(slug));
     }
 
-    updatePostMap(postData) {
+    hasPosts() {
+        return !!this.posts.size;
+    }
+
+    // PRIVATE METHODS
+
+    _updatePostMap(postData) {
         // If the post already exists, we update it instead of setting a new reference. Thus,
         // bindings remain existent.
         let post = null;
@@ -38,10 +42,6 @@ class PostService extends InjectionReceiver {
         return post;
     }
 
-    hasPosts() {
-        return !!this.posts.size;
-    }
-
     /**
      * Call the API to modify a post. The called endpoint needs to return a post as data in the
      * response. This function also updates the posts list with the updated post. It returns a
@@ -51,12 +51,12 @@ class PostService extends InjectionReceiver {
      * @param {Object} data Object to pass in the request as data
      * @returns {Promise.<Post>}
      */
-    callPostModification(method, url, data) {
+    _callPostModification(method, url, data) {
         // Clone to prevent modifying the given data
         data = angular.copy(data);
 
         // Prepare the data for serializing
-        this.prepareSerialise(data);
+        this._prepareSerialise(data);
 
         return method(url, data, {
             headers: {
@@ -64,16 +64,16 @@ class PostService extends InjectionReceiver {
             }
         }).then(response => {
             // Return the created post to be usable in promises
-            return this.updatePostMap(response.data);
+            return this._updatePostMap(response.data);
         }).catch(this.$log.error);
     }
 
-    prepareSerialise(data) {
+    _prepareSerialise(data) {
         if (!data) return;
 
         // Run recursive for arrays
         if (data.constructor === Array){
-            data.forEach(v => this.prepareSerialise(v));
+            data.forEach(v => this._prepareSerialise(v));
         }
 
         // Prepare all BaseEntity instances (to remove circular references)
@@ -86,12 +86,12 @@ class PostService extends InjectionReceiver {
         if (data === Object(data)) {
             for (let key in data) {
                 if (!data.hasOwnProperty(key)) continue;
-                this.prepareSerialise(data[key]);
+                this._prepareSerialise(data[key]);
             }
         }
     }
 
-    // API CALLING METHODS
+    // PUBLIC API CALLING METHODS
 
     fetchAll() {
         // Construct the request
@@ -109,7 +109,7 @@ class PostService extends InjectionReceiver {
 
             // Update the posts
             this.posts.clear();
-            response.data.forEach(postData => this.updatePostMap(postData));
+            response.data.forEach(postData => this._updatePostMap(postData));
 
             // Broadcast the fetch
             this.$rootScope.$broadcast('posts:fetched', this.posts);
@@ -118,17 +118,17 @@ class PostService extends InjectionReceiver {
 
     createPost(postVersion) {
         const url = '/api/posts';
-        return this.callPostModification(this.$http.post, url, postVersion);
+        return this._callPostModification(this.$http.post, url, postVersion);
     }
 
     createPostVersion(post, version) {
         const url = '/api/posts/' + post._id + '/version';
-        return this.callPostModification(this.$http.post, url, version);
+        return this._callPostModification(this.$http.post, url, version);
     }
 
     updatePost(post) {
         const url = '/api/posts/' + post._id;
-        return this.callPostModification(this.$http.put, url, post);
+        return this._callPostModification(this.$http.put, url, post);
     }
 
     deletePost(post) {
@@ -137,11 +137,9 @@ class PostService extends InjectionReceiver {
                 Authorization: 'Bearer ' + this.AuthService.token
             }
         }).then(response => {
-            // TODO: Check the response
+            // We don't need to check the response, because all other status codes than 200 will
+            // cause an error and this block won't be called.
             this.posts.delete(post._id);
-
-            // Broadcast the update
-            this.$rootScope.$broadcast('posts:updated', this.posts);
         }).catch(this.$log.error);
     }
 }

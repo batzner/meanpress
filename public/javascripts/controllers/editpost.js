@@ -48,7 +48,6 @@ class EditPostCtrl extends InjectionReceiver {
     }
 
     savePost() {
-        // TODO: Cascade deletion of post versions
         // Preprocess the form inputs
         /* TODO: let includeStringToList = (str) => str.replace(/\n/g, ' ').split(' ').map(s =>
          s.trim());
