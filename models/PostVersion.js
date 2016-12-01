@@ -14,6 +14,8 @@ const PostVersionSchema = new mongoose.Schema(
         focusKeyword: String,
         jsIncludes: [{type: String}],
         cssIncludes: [{type: String}],
+        category: String,
+        tags: [{type: String}],
         post: {type: mongoose.Schema.Types.ObjectId, ref: 'Post'}
     }, {
         timestamps: true // Will add createdAt and modifiedAt fields, which get set and updated automatically.

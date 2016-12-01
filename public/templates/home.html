@@ -2,9 +2,15 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h1><a href="post/{{postVersion.slug}}/">{{postVersion.title}}</a></h1>
-                <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
-                <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
+                <div class="headings">
+                    <h1><a href="post/{{postVersion.slug}}/">{{postVersion.title}}</a></h1>
+                    <h5 ng-bind="postVersion.createdAt | date:'longDate'"></h5>
+                    <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
+                </div>
+
+                <div class="tags">
+                    <div ng-repeat="tag in postVersion.tags" class="tag">{{tag}}</div>
+                </div>
             </div>
             <div class="panel-body post-body" ng-bind-html="main.toTrusted(postVersion.preview)"></div>
         </div>

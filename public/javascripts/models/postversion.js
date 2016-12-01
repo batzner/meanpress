@@ -27,7 +27,10 @@ class PostVersion extends BaseEntity {
 
     static getDebugValues() {
         return {
-            title: 'asdf',
+            title: 'This is title of usual length - Lorem Ipsum Bliblablubb This Might Break the' +
+            ' Line',
+            category: 'asdf-category',
+            tags: ['neural-networks', 'fun', 'implementation', 'theory'],
             preview: 'asdf',
             body: 'asdf',
             slug: 'asdf',
@@ -43,6 +46,8 @@ class PostVersion extends BaseEntity {
         return {
             _id: null,
             title: '',
+            category: '',
+            tags: [],
             preview: '',
             body: '',
             slug: '',

@@ -18,9 +18,10 @@ h1 {
     font-size: 1.7rem;
 }
 
-.profile h1 {
+.panel-default>.profile h1 {
     font-size: 2rem;
-    margin-top: 1.5rem !important;
+    margin-top: 1.5rem;
+    margin-bottom: 0.2rem;
 }
 
 .profile h2, .heading h2  {
