@@ -98,3 +98,25 @@ class BaseEntity {
         throw new TypeError('Inheriting classes need to implement their getDefaults');
     }
 }
+
+class Util {
+    static chainPromises(thenBlocks) {
+        // Chains blocks in a then call together. Each block should be a function returning a
+        // Promise
+
+        // Start the chain with an immediately resolved promise
+        const start = Promise.resolve();
+        return thenBlocks.reduce((reduced, block) => {
+            // Add the block to the chain with then
+            return reduced.then(block);
+        }, start);
+    }
+
+    static registerMathJaxWatch(scope) {
+        // Rerun MathJax on updates
+        scope.$watch(function(){
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+            return true;
+        });
+    }
+}

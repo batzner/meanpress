@@ -12,8 +12,13 @@ class PostVersion extends BaseEntity {
 
     loadJs(angularLoad) {
         // Load all js includes
-        Promise.all(this.jsIncludes.map(url => angularLoad.loadScript(url)))
-            .catch(console.error);
+
+        // In order to chain promises, each block in a then call needs to return a promise
+        let thenCalls = this.jsIncludes.map(url => {
+            return () => angularLoad.loadScript(url);
+        });
+
+        Util.chainPromises(thenCalls).catch(console.error);
     }
 
     isPublished() {
