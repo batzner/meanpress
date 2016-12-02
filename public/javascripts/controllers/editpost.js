@@ -37,7 +37,7 @@ class EditPostCtrl extends InjectionReceiver {
         }
 
         // Form cosmetics:
-        this.$scope.postVersion.createdAt.setSeconds(0, 0);
+        this.$scope.postVersion.publishedAt.setSeconds(0, 0);
         this.$scope.postVersion.jsIncludes = this.$scope.postVersion.jsIncludes.join('\n');
         this.$scope.postVersion.cssIncludes = this.$scope.postVersion.cssIncludes.join('\n');
         this.$scope.postVersion.tags = this.$scope.postVersion.tags.join(', ');

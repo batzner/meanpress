@@ -38,7 +38,7 @@ class PostVersion extends BaseEntity {
             focusKeyword: 'asdf',
             jsIncludes: [],
             cssIncludes: [],
-            createdAt: new Date()
+            publishedAt: new Date()
         }
     }
 
@@ -56,6 +56,7 @@ class PostVersion extends BaseEntity {
             jsIncludes: [],
             cssIncludes: [],
             post: null,
+            publishedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date()
         }
