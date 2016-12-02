@@ -6,13 +6,16 @@
 class MainCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$rootScope', '$sce', '$document', 'AuthService'];
+        return ['$rootScope', '$sce', '$document', 'angularLoad', 'AuthService'];
     }
 
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
         this.$rootScope.log = console.log;
+
+        // Load MathJax
+        Util.loadMathJax(this.$rootScope, this.angularLoad);
 
         // Wrap tables to make them responsive.
         // TODO: This needs to be called *after* the posts are loaded / displayed

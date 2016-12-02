@@ -7,7 +7,7 @@
         <input ng-model="postVersion.category" type="text" class="form-control" id="category" required>
 
         <label for="tags">Tags</label>
-        <input ng-model="postVersion.tags" type="text" class="form-control" id="tags" required>
+        <input ng-model="postVersion.tags" type="text" class="form-control" id="tags">
 
         <label for="preview">Preview</label>
         <textarea rows="10" ng-model="postVersion.preview" type="text" class="form-control" id="preview" required></textarea>
@@ -21,8 +21,8 @@
         <label for="jsIncludes">JavaScript includes (separate with new line)</label>
         <textarea rows="2" ng-model="postVersion.jsIncludes" type="text" class="form-control" id="jsIncludes"></textarea>
 
-        <label for="createdAt">Created At</label>
-        <input ng-model="postVersion.createdAt" type="datetime-local" class="form-control" id="createdAt" required>
+        <label for="publishedAt">Published At</label>
+        <input ng-model="postVersion.publishedAt" type="datetime-local" class="form-control" id="publishedAt" required>
 
         <label for="slug">Slug</label>
         <input ng-model="postVersion.slug" type="text" class="form-control" id="slug" required>

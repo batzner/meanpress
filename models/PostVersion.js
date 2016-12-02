@@ -16,9 +16,11 @@ const PostVersionSchema = new mongoose.Schema(
         cssIncludes: [{type: String}],
         category: String,
         tags: [{type: String}],
+        publishedAt: Date,
         post: {type: mongoose.Schema.Types.ObjectId, ref: 'Post'}
     }, {
-        timestamps: true // Will add createdAt and modifiedAt fields, which get set and updated automatically.
+        // Add createdAt and modifiedAt fields, which get set and updated automatically.
+        timestamps: true
     }
 );
 

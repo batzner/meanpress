@@ -4,6 +4,13 @@
 
 class PostVersion extends BaseEntity {
 
+    updateProperties(data) {
+        // Convert date strings to Date objects before updating
+        if (data.publishedAt !== undefined) data.publishedAt = new Date(data.publishedAt);
+
+        super.updateProperties(data);
+    }
+
     loadCss(angularLoad) {
         // Load all css includes
         Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url)))
@@ -12,8 +19,14 @@ class PostVersion extends BaseEntity {
 
     loadJs(angularLoad) {
         // Load all js includes
-        Promise.all(this.jsIncludes.map(url => angularLoad.loadScript(url)))
-            .catch(console.error);
+
+        // Wrap each angularLoad Promise in a function returning it. See Util.chainBlockPromises
+        // for more detail.
+        const blocks = this.jsIncludes.map(url => {
+            return () => angularLoad.loadScript(url);
+        });
+
+        Util.chainPromiseBlocks(blocks).catch(console.error);
     }
 
     isPublished() {
@@ -38,7 +51,7 @@ class PostVersion extends BaseEntity {
             focusKeyword: 'asdf',
             jsIncludes: [],
             cssIncludes: [],
-            createdAt: new Date()
+            publishedAt: new Date()
         }
     }
 
@@ -56,6 +69,7 @@ class PostVersion extends BaseEntity {
             jsIncludes: [],
             cssIncludes: [],
             post: null,
+            publishedAt: new Date(),
             createdAt: new Date(),
             updatedAt: new Date()
         }
