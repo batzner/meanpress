@@ -1,4 +1,4 @@
-const REGISTRATION_ENABLED = true;
+const REGISTRATION_ENABLED = false;
 
 const express = require('express');
 const mongoose = require('mongoose');
