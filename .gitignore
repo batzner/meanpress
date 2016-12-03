@@ -46,4 +46,5 @@ jspm_packages
 public/lib
 dist
 resources/env_vars.prod.sh
-resources/blog.pem
+resources/kilians-net.pem
+.DS_Store
