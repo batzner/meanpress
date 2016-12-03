@@ -15,6 +15,8 @@ A very simple CMS based on the MEAN stack
     
     at the end. 
 6. Run `node bin/www` and go to `localhost:3000`.
+7. In production, do: `sudo -E forever start ./bin/www` (TODO: Add forever install instructions.
+ Explain sudo for port 80).
 
 ## Setup
 1. Enable registration in `routes/index.js` by setting `REGISTRATION_ENABLED = true`.
