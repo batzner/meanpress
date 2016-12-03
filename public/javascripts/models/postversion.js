@@ -17,7 +17,7 @@ class PostVersion extends BaseEntity {
     }
 
     loadJs(angularLoad) {
-        // Load all js includes
+        // Load all js includes. Returns a Promise
 
         // Wrap each angularLoad Promise in a function returning it. See Util.chainBlockPromises
         // for more detail.
@@ -25,7 +25,7 @@ class PostVersion extends BaseEntity {
             return () => angularLoad.loadScript(url);
         });
 
-        Util.chainPromiseBlocks(blocks).catch(console.error);
+        return Util.chainPromiseBlocks(blocks).catch(console.error);
     }
 
     unloadCss(angularLoad) {

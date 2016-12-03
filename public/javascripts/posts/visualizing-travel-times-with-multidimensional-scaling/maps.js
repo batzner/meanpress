@@ -1,11 +1,11 @@
-var cityNames = ["San Francisco", "Sacramento", "Los Angeles", "Las Vegas"];
-
+var cityNames = [];
 var cityMarkers = [];
 var coordinateMarkers = [];
 
-console.log('Executing posts JS');
-
-initMap();
+function runPostScript() {
+    cityNames = ["San Francisco", "Sacramento", "Los Angeles", "Las Vegas"];
+    initMap();
+}
 
 function getCityCoordinates(cityNames, callback) {
     var result = [];
