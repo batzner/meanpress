@@ -13,12 +13,7 @@ class PostVersion extends BaseEntity {
 
     loadCss(angularLoad) {
         // Load all css includes
-        Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url)))
-            .then(() => {
-                // Enable all css links
-                this.cssIncludes.forEach(url => $(`[href="${url}"]`).removeAttr('disabled'));
-            })
-            .catch(console.error);
+        Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url))).catch(console.error);
     }
 
     loadJs(angularLoad) {
@@ -33,8 +28,8 @@ class PostVersion extends BaseEntity {
         Util.chainPromiseBlocks(blocks).catch(console.error);
     }
 
-    unloadCss() {
-        this.cssIncludes.forEach(url => $(`[href="${url}"]`).attr('disabled', 'disabled'));
+    unloadCss(angularLoad) {
+        this.cssIncludes.forEach(angularLoad.unloadCSS);
     }
 
     isPublished() {

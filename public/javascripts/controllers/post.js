@@ -53,10 +53,9 @@ class PostCtrl extends InjectionReceiver {
             this.$scope.postVersion.loadJs(this.angularLoad);
         });
 
-        // Register JS/CSS cleanup on exit
+        // Register CSS cleanup on exit
         this.$scope.$on('$destroy', () => {
-            this.$scope.postVersion.unloadCss(this.$document);
-            this.$scope.postVersion.unloadJs(this.$document);
+            this.$scope.postVersion.unloadCss(this.angularLoad);
         });
     }
 }

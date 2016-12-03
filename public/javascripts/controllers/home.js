@@ -5,7 +5,7 @@
 class HomeCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$document', 'angularLoad', 'PostService'];
+        return ['$scope', 'angularLoad', 'PostService'];
     }
 
     constructor(...injections) {
@@ -20,8 +20,6 @@ class HomeCtrl extends InjectionReceiver {
             this.fillTemplate();
         }
 
-        // TODO: Fix the ordering of posts on the home page
-
         // Rerun MathJax on updates
         Util.registerMathJaxWatch(this.$scope);
     }
@@ -29,9 +27,9 @@ class HomeCtrl extends InjectionReceiver {
     fillTemplate() {
         this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
 
-        // Register JS/CSS cleanup on exit
+        // Register CSS cleanup on exit
         this.$scope.$on('$destroy', () => {
-            this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.$document));
+            this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.angularLoad));
         });
     }
 }
