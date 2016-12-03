@@ -73,9 +73,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
-
 module.exports = app;
 
-
 // Connect to the mongodb
-mongoose.connect('mongodb://localhost/blog');
+mongoose.connect(process.env.MONGO_URL);

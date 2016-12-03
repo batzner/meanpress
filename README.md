@@ -3,11 +3,12 @@ A very simple CMS based on the MEAN stack
 
 ## Installation
 1. Install `node` and `npm` by [downloading the installer](https://nodejs.org/en/download/).
-2. Install and run the [mongoDB community server](https://www.mongodb.com/download-center#community).
+2. Install and run the [mongoDB community server](https://www.mongodb
+.com/download-center#community). Create a database.
 3. Run `npm install` in the project's root directory.
 4. Set the following environment variables in `resources/env_vars.sh`
     - `MONGO_URL=mongodb://<dbuser>:<dbpassword>@<host>:<port>/<dbname>`
-    - `JWT_SECRET=r4nd0mAlphanumer1cString`
+    - `JWT_SECRET=rand0mAlphanumer1cString`
 5. Source `resources/env_vars.sh` in your `.bashrc` by adding 
         
         source ~/path/to/resources/env_vars.sh

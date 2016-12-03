@@ -45,3 +45,4 @@ jspm_packages
 .idea
 public/lib
 dist
+resources/env_vars.prod.sh
