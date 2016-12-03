@@ -3,6 +3,8 @@ var cityNames = ["San Francisco", "Sacramento", "Los Angeles", "Las Vegas"];
 var cityMarkers = [];
 var coordinateMarkers = [];
 
+console.log('Executing posts JS');
+
 initMap();
 
 function getCityCoordinates(cityNames, callback) {

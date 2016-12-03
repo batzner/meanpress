@@ -52,6 +52,12 @@ class PostCtrl extends InjectionReceiver {
             // Load the JavaScripts when the page is loaded.
             this.$scope.postVersion.loadJs(this.angularLoad);
         });
+
+        // Register JS/CSS cleanup on exit
+        this.$scope.$on('$destroy', () => {
+            this.$scope.postVersion.unloadCss(this.$document);
+            this.$scope.postVersion.unloadJs(this.$document);
+        });
     }
 }
 

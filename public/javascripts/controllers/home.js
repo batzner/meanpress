@@ -5,7 +5,7 @@
 class HomeCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', 'angularLoad', 'PostService'];
+        return ['$scope', '$document', 'angularLoad', 'PostService'];
     }
 
     constructor(...injections) {
@@ -28,6 +28,11 @@ class HomeCtrl extends InjectionReceiver {
 
     fillTemplate() {
         this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
+
+        // Register JS/CSS cleanup on exit
+        this.$scope.$on('$destroy', () => {
+            this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.$document));
+        });
     }
 }
 
