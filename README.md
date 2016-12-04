@@ -15,12 +15,19 @@ A very simple CMS based on the MEAN stack
     
     at the end. 
 6. Run `node bin/www` and go to `localhost:3000`.
-7. In production, do: `sudo -E forever start ./bin/www` (TODO: Add forever install instructions.
- Explain sudo for port 80).
-8. TODO: Activate Babel processing
-9. TODO: Alle Schritte in Production Steps dokumentieren
 
 ## Setup
 1. Enable registration in `routes/index.js` by setting `REGISTRATION_ENABLED = true`.
 2. Restart the server and go to `localhost:3000/register`.
 3. Create a user and click register. From now on, visit `localhost:3000/login` to log in.
+
+## Deployment to Production
+1. Install `node` and `mongoDB` on your host. For AWS, I can recommend [this tutorial]
+(https://scotch.io/tutorials/deploying-a-mean-app-to-amazon-ec2-part-1).
+2. Clone the repository on the host and run `sudo npm install`.
+3. Copy `resources/env_vars.sh` to `resources/env_vars.prod.sh` and change the port, mongoDB URL 
+etc.
+4. Source `resources/env_vars.prod.sh` in `~.bashrc`.
+5. Install the `forever` node module.
+6. Start the server with `sudo -E forever start ./bin/www`. The `sudo` is needed for running on port 80. The `-E` will preserve the existing environment variables (port, mongoDB URL etc.).
+7. TODO: Activate Babel processing
