@@ -4,7 +4,18 @@ var coordinateMarkers = [];
 
 function runPostScript() {
     cityNames = ["San Francisco", "Sacramento", "Los Angeles", "Las Vegas"];
-    initMap();
+    try {
+        initMap();
+    } catch (e) {
+        // Display the error beneath the interactive google maps
+        displayError();
+    }
+}
+
+function displayError(message) {
+    message = message || "Something went wrong with the Google Maps API. Please try reloading" +
+        " the page";
+    $("#post-error").show().html(message);
 }
 
 function getCityCoordinates(cityNames, callback) {
@@ -23,7 +34,7 @@ function getCityCoordinates(cityNames, callback) {
                     callback(result);
                 }
             } else {
-                alert("Something got wrong " + status);
+                displayError();
             }
         })
     });
@@ -196,6 +207,7 @@ function getDurations(geocoder, callback) {
         }
     }, function(response, status) {
         if (status == google.maps.DistanceMatrixStatus.OK) {
+
             for (var i = 0; i < response.rows.length; i++) {
                 var row = response.rows[i];
                 for (var j = 0; j < row.elements.length; j++) {
@@ -213,7 +225,8 @@ function getDurations(geocoder, callback) {
                         if (element.duration.value > durationRange.max)
                             durationRange.max = element.duration.value;
                     } else {
-                        alert("GoogleMaps could not find a public transport connection between " + cities[i].name + " and " + cities[j].name);
+                        displayError("GoogleMaps could not find a public transport connection" +
+                            " between " + cities[i].name + " and " + cities[j].name + ".");
                         // remove the city that was last added and redraw everything
                         cities.pop();
                         drawCities();
@@ -410,6 +423,9 @@ function addSearchBox() {
     searchBox.addListener('places_changed', function() {
         var place = searchBox.getPlaces()[0];
         if (place) {
+            // Hide the potential previous error message
+            $("#post-error").hide();
+
             cities.push({
                 name: getCityForPlace(place),
                 location: place.geometry.location
