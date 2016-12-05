@@ -45,6 +45,6 @@ jspm_packages
 .idea
 public/lib
 dist
-resources/env_vars.prod.sh
-resources/kilians-net.pem
+resources
 .DS_Store
+server/config/general.prod.js

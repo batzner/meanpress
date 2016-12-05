@@ -5,6 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+// Load the config
+var config = require('./config/passport');
+
 // Load the models
 var mongoose = require('mongoose');
 require('./models/PostVersion');
@@ -76,4 +79,4 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 // Connect to the mongodb
-mongoose.connect(process.env.MONGO_URL);
+mongoose.connect(config.MONGO_URL);
