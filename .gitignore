@@ -47,4 +47,3 @@ public/lib
 dist
 resources
 .DS_Store
-server/config/general.prod.js
