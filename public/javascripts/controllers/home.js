@@ -13,8 +13,6 @@ class HomeCtrl extends InjectionReceiver {
 
         this.$scope.posts = this.PostService.posts.bindableValues;
 
-        // Load the css of each post
-
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts()) {
             this.$scope.$on('posts:fetched', () => this.fillTemplate());
@@ -22,15 +20,16 @@ class HomeCtrl extends InjectionReceiver {
             this.fillTemplate();
         }
 
-        // TODO: Fix ordering of posts on homepage
-
         // Rerun MathJax on updates
         Util.registerMathJaxWatch(this.$scope);
     }
 
     fillTemplate() {
-        this.$scope.posts.forEach(post => {
-            post.getDisplayVersion().loadCss(this.angularLoad);
+        this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
+
+        // Register CSS cleanup on exit
+        this.$scope.$on('$destroy', () => {
+            this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.angularLoad));
         });
     }
 }

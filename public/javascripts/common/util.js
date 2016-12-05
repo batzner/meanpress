@@ -100,23 +100,41 @@ class BaseEntity {
 }
 
 class Util {
-    static chainPromises(thenBlocks) {
-        // Chains blocks in a then call together. Each block should be a function returning a
-        // Promise
+    static chainPromiseBlocks(blocks) {
+        // Chains an array of functions, which return a promise to a sequence of then calls. The
+        // blocks should each return a promise, just like in a then block.
 
-        // Start the chain with an immediately resolved promise
+        // Start the chain with an empty promise
         const start = Promise.resolve();
-        return thenBlocks.reduce((reduced, block) => {
-            // Add the block to the chain with then
+        return blocks.reduce((reduced, block) => {
+            // Add the block to the chain by calling then on the reduced promise. The block
+            // returning the promise will be called, when all promises so far are resolved.
             return reduced.then(block);
         }, start);
     }
 
     static registerMathJaxWatch(scope) {
-        // Rerun MathJax on updates
-        scope.$watch(function(){
-            MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
-            return true;
-        });
+        // If Mathjax is already loaded, we can directly set the watch. Otherwise, we have to wait
+        const setWatch = () => {
+            scope.$watch(function(){
+                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+                return true;
+            });
+        };
+
+        if (window.MathJax) {
+            setWatch();
+        } else {
+            scope.$on('mathjax:loaded', () => setWatch());
+        }
+    }
+
+    static loadMathJax($rootScope, angularLoad) {
+        // Load MathJax and broadcast the event
+        const url = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+        angularLoad.loadScript(url).then(() => {
+            // Broadcast
+            $rootScope.$broadcast('mathjax:loaded');
+        })
     }
 }

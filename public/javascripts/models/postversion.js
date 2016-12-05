@@ -4,21 +4,32 @@
 
 class PostVersion extends BaseEntity {
 
+    updateProperties(data) {
+        // Convert date strings to Date objects before updating
+        if (data.publishedAt !== undefined) data.publishedAt = new Date(data.publishedAt);
+
+        super.updateProperties(data);
+    }
+
     loadCss(angularLoad) {
         // Load all css includes
-        Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url)))
-            .catch(console.error);
+        Promise.all(this.cssIncludes.map(url => angularLoad.loadCSS(url))).catch(console.error);
     }
 
     loadJs(angularLoad) {
-        // Load all js includes
+        // Load all js includes. Returns a Promise
 
-        // In order to chain promises, each block in a then call needs to return a promise
-        let thenCalls = this.jsIncludes.map(url => {
+        // Wrap each angularLoad Promise in a function returning it. See Util.chainBlockPromises
+        // for more detail.
+        const blocks = this.jsIncludes.map(url => {
             return () => angularLoad.loadScript(url);
         });
 
-        Util.chainPromises(thenCalls).catch(console.error);
+        return Util.chainPromiseBlocks(blocks).catch(console.error);
+    }
+
+    unloadCss(angularLoad) {
+        this.cssIncludes.forEach(angularLoad.unloadCSS);
     }
 
     isPublished() {
