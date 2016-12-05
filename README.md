@@ -27,7 +27,7 @@ A very simple CMS based on the MEAN stack
 2. Clone the repository on the host and run `sudo npm install`.
 3. Copy `resources/env_vars.sh` to `resources/env_vars.prod.sh` and change the port, mongoDB URL 
 etc.
-4. Source `resources/env_vars.prod.sh` in `~.bashrc`.
+4. Source `resources/env_vars.prod.sh` in `~/.bashrc`.
 5. Install the `forever` node module.
 6. Start the server with `sudo -E forever start ./bin/www`. The `sudo` is needed for running on port 80. The `-E` will preserve the existing environment variables (port, mongoDB URL etc.).
 7. TODO: Activate Babel processing
