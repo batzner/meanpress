@@ -29,3 +29,5 @@ gulp.task('watch', () => {
 gulp.task('default', ['clean', 'babel', 'watch']);
 
 // TODO: Add tasks to reduce page weight: https://www.sitepoint.com/introduction-gulp-js/
+
+// TODO: Set NODE_ENV like in https://github.com/meanjs/mean/blob/master/gulpfile.js

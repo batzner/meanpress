@@ -6,6 +6,10 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 // Load the config
+// TODO: load the correct config depending on debug or not
+// TODO: Specify debug or not in the npm start / npm build / npm server command
+// TODO: OR: copy general.prod.js as js in the gulp task
+// TODO: Try to go without .babelrc if feasible
 var config = require('./config/passport');
 
 // Load the models
