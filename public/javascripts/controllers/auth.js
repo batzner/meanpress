@@ -21,12 +21,14 @@ class AuthCtrl extends InjectionReceiver {
 
     register() {
         // Call the backend to register. Go home if succeeded.
-        this.AuthService.register(this.$scope.user).then(() => this.$state.go('home'), this.onError);
+        this.AuthService.register(this.$scope.user)
+            .then(() => this.$state.go('home'), this.onError);
     }
 
     login() {
         // Call the backend to login. Go home if succeeded.
-        this.AuthService.login(this.$scope.user).then(() => this.$state.go('home'), this.onError);
+        this.AuthService.login(this.$scope.user)
+            .then(() => this.$state.go('home'), this.onError);
     }
 }
 

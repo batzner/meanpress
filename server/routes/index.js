@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const jwt = require('express-jwt');
+const config = require('../config/general');
 
 const router = express.Router();
 
@@ -13,7 +14,7 @@ const User = mongoose.model('User');
 
 // Authentication middleware
 const auth = jwt({
-    secret: process.env.JWT_SECRET
+    secret: config.JWT_SECRET
 });
 
 // route middleware that will happen on every request
@@ -26,7 +27,11 @@ router.use(function (req, res, next) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    res.render('index');
+    if (process.env.NODE_ENV === 'production') {
+        res.render('index.prod');
+    } else {
+        res.render('index');
+    }
 });
 
 router.get('/api/posts', function (req, res, next) {

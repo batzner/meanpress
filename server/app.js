@@ -6,11 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 // Load the config
-// TODO: load the correct config depending on debug or not
-// TODO: Specify debug or not in the npm start / npm build / npm server command
-// TODO: OR: copy general.prod.js as js in the gulp task
-// TODO: Try to go without .babelrc if feasible
-var config = require('./config/passport');
+var config = require('./config/general');
 
 // Load the models
 var mongoose = require('mongoose');
@@ -31,15 +27,14 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, '../dist', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // Initialise passport
 app.use(passport.initialize());
@@ -58,7 +53,7 @@ app.use(function(req, res, next) {
 
 // development error handler
 // will print stacktrace
-if (app.get('env') === 'development') {
+if (process.env.NODE_ENV === 'development') {
     app.use(function(err, req, res, next) {
         console.error(err);
         res.status(err.status || 500);

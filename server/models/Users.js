@@ -5,6 +5,7 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const config = require('../config/general');
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -40,7 +41,7 @@ UserSchema.methods.generateJWT = function() {
         _id: this._id,
         username: this.username,
         exp: parseInt(exp.getTime() / 1000),
-    }, process.env.JWT_SECRET);
+    }, config.JWT_SECRET);
 };
 
 mongoose.model('User', UserSchema);
