@@ -4,8 +4,3 @@ module.exports = {
     PORT: 3000,
     REGISTRATION_ENABLED: false
 };
-
-// If we are in production, overwrite the module exports
-if (process.env.NODE_ENV === 'production') {
-    module.exports = require('./general-prod.js');
-}

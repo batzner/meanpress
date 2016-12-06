@@ -28,7 +28,7 @@ router.use(function (req, res, next) {
 /* GET home page. */
 router.get('/', function (req, res, next) {
     if (process.env.NODE_ENV === 'production') {
-        res.render('index.prod');
+        res.render('index-prod');
     } else {
         res.render('index');
     }

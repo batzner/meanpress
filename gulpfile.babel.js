@@ -76,6 +76,7 @@ gulp.task('images', ['copy'], function () {
         .pipe(gulp.dest(bases.dist+destPaths.images));
 });
 
+// Watch the public directory in order to move changes directly to dist
 gulp.task('dev', ['copy'], function () {
     gulp.watch(['public/**/*'], ['copy']);
 });
