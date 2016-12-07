@@ -39,3 +39,10 @@ npm start
 
 gulp
 npm run-script server
+
+ON AWS:
+sudo git pull
+sudo npm install
+sudo forever stopall
+sudo gulp
+sudo npm run-script server
