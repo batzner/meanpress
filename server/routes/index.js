@@ -17,6 +17,10 @@ const auth = jwt({
     secret: config.JWT_SECRET
 });
 
+function getIndexTemplateName() {
+    return process.env.NODE_ENV === 'production' ? 'index-prod' : 'index';
+}
+
 // route middleware that will happen on every request
 router.use(function (req, res, next) {
     // log each request to the console
@@ -27,11 +31,7 @@ router.use(function (req, res, next) {
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-    if (process.env.NODE_ENV === 'production') {
-        res.render('index-prod');
-    } else {
-        res.render('index');
-    }
+    res.render(getIndexTemplateName());
 });
 
 router.get('/api/posts', function (req, res, next) {
@@ -176,9 +176,10 @@ router.post('/api/login', function (req, res, next) {
     })(req, res, next);
 });
 
-// This route deals enables HTML5Mode by forwarding missing files to the index
+// This route deals enables HTML5Mode by forwarding missing files to the index. This needs to be
+// at the end, because it is a catch all
 router.get('*', function (req, res) {
-    res.render('index');
+    res.render(getIndexTemplateName());
 });
 
 module.exports = router;
