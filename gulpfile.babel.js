@@ -41,16 +41,44 @@ const minJsName = 'app.min.js';
 const eslintIgnores = ['!**/visualizing-travel-times-with-multidimensional-scaling/**/*'];
 
 // Delete the dist directory
-gulp.task('clean', function () {
+gulp.task('_clean', function () {
     return gulp.src(bases.dist)
         .pipe(clean());
 });
 
 // Copy the public directory to dist. We are copying all files to make sure, we don't miss files
 // that get added in the future.
-gulp.task('copy', ['clean'], function () {
+gulp.task('_copy', ['_clean'], function () {
     return gulp.src(sourcePaths.all, {cwd: bases.frontend})
         .pipe(gulp.dest(bases.dist));
+});
+
+// Transpile the javascript files to ES5. Then, minify them.
+gulp.task('_javascripts', ['_copy'], function () {
+    return gulp.src(sourcePaths.javascripts, {cwd: bases.dist})
+        .pipe(babel())
+        .pipe(uglify())
+        .pipe(concat(minJsName))
+        .pipe(gulp.dest(bases.dist+destPaths.javascripts));
+});
+
+// Minify the images
+gulp.task('_images', ['_copy'], function () {
+    return gulp.src(sourcePaths.images, {cwd: bases.dist})
+        .pipe(imagemin())
+        .pipe(gulp.dest(bases.dist+destPaths.images));
+});
+
+// Transpile the javascript files to ES5.
+gulp.task('babel', ['_copy'], function () {
+    return gulp.src(sourcePaths.javascripts, {cwd: bases.dist})
+        .pipe(babel())
+        .pipe(gulp.dest(bases.dist+destPaths.javascripts));
+});
+
+// Watch the public directory in order to move changes directly to dist. Also, apply babel.
+gulp.task('babel-watch', ['babel'], function () {
+    gulp.watch(['public/**/*'], ['babel']);
 });
 
 // Check code style on JS
@@ -60,26 +88,10 @@ gulp.task('eslint', function () {
         .pipe(eslint.format());
 });
 
-// Transpile the javascript files to ES5. Then, minify them.
-gulp.task('javascripts', ['copy'], function () {
-    return gulp.src(sourcePaths.javascripts, {cwd: bases.dist})
-        .pipe(babel())
-        .pipe(uglify())
-        .pipe(concat(minJsName))
-        .pipe(gulp.dest(bases.dist+destPaths.javascripts));
-});
-
-// Minify the images
-gulp.task('images', ['copy'], function () {
-    return gulp.src(sourcePaths.images, {cwd: bases.dist})
-        .pipe(imagemin())
-        .pipe(gulp.dest(bases.dist+destPaths.images));
-});
-
 // Watch the public directory in order to move changes directly to dist
-gulp.task('dev', ['copy'], function () {
-    gulp.watch(['public/**/*'], ['copy']);
+gulp.task('dev', ['_copy'], function () {
+    gulp.watch(['public/**/*'], ['_copy']);
 });
 
 // Default task producing a ready-to-ship frontend in the dist folder
-gulp.task('default', ['javascripts', 'images']);
+gulp.task('default', ['_javascripts', '_images']);
