@@ -22,7 +22,7 @@ const bases = {
 // Paths to be used in gulp.src
 const sourcePaths = {
     javascripts: ['javascripts/**/*.js', '!javascripts/posts/**/*.js'],
-    stylesheets: ['stylesheets/**/*.css', '!stylesheets/posts/**/*.css'],
+    stylesheets: ['stylesheets/**/*.css', '!stylesheets/posts/**/*.css', '!stylesheets/about.css'],
     templates: ['templates/**/*.html'],
     images: ['images/**/*.png', 'images/**/*.jpg', 'images/**/*.jpeg', 'images/**/*.gif'],
     all: ['**/*', '!**/README.md']
