@@ -1,3 +1,5 @@
+const extend = require('extend');
+
 module.exports = {
     JWT_SECRET: 'rand0mAlphanumer1cString',
     MONGO_URL: 'mongodb://localhost:27017/blog',
@@ -7,5 +9,5 @@ module.exports = {
 
 // If we are in production, overwrite the module exports
 if (process.env.NODE_ENV === 'production') {
-    module.exports = require('./general-prod.js');
+    extend(module.exports, require('./general-prod.js'));
 }

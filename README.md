@@ -30,6 +30,12 @@ etc.
 4. Source `resources/env_vars.prod.sh` in `~/.bashrc`.
 5. Install the `forever` node module.
 6. Start the server with `sudo -E forever start ./bin/server.js`. The `sudo` is needed for running on port 80. The `-E` will preserve the existing environment variables (port, mongoDB URL etc.).
-7. TODO: Activate Babel processing
 
-TODO: Run all npm 
+node v6.9.2
+npm  v3.10.9
+
+gulp dev
+npm start
+
+gulp
+npm run-script server
