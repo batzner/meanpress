@@ -16,35 +16,69 @@ class InjectionReceiver {
 }
 
 /*
- * Extension of the ES6 map, which also supports binding to it's array of values
+ * Extension of the ES6 map, which also supports binding to it's array of values. Unfortunately,
+ * we can't subclass Map, because of Babel: http://stackoverflow.com/questions/29434406/create-a-class-extending-from-es6-map/29436039#29436039
+ * Therefore, we provide all Map methods.
  */
-class BindableMap extends Map {
+class BindableMap {
 
     constructor(...args) {
-        super(...args);
         this.bindableValues = [];
+        this.map = new Map(...args);
     }
 
     updateBindableValues() {
         // Clear the array without creating a new one.
         this.bindableValues.length = 0;
         // Push all the new values
-        this.bindableValues.push(...Array.from(super.values()));
+        this.bindableValues.push(...Array.from(this.map.values()));
+    }
+
+    get size() {
+        return this.map.size;
     }
 
     clear(...args) {
-        super.clear(...args);
+        this.map.clear(...args);
         this.updateBindableValues();
     }
 
     set(...args) {
-        super.set(...args);
+        this.map.set(...args);
         this.updateBindableValues();
     }
 
     delete(...args) {
-        super.delete(...args);
+        this.map.delete(...args);
         this.updateBindableValues();
+    }
+
+    entries(...args) {
+        return this.map.entries(...args);
+    }
+
+    forEach(...args) {
+        return this.map.forEach(...args);
+    }
+
+    get(...args) {
+        return this.map.get(...args);
+    }
+
+    has(...args) {
+        return this.map.has(...args);
+    }
+
+    keys(...args) {
+        return this.map.keys(...args);
+    }
+
+    values(...args) {
+        return this.map.values(...args);
+    }
+
+    [Symbol.iterator]() {
+        return this.map[Symbol.iterator]();
     }
 }
 
@@ -60,7 +94,7 @@ class BaseEntity {
      * shall be overwritten.
      * @param {Object} data - The properties for the entity, which shall overwrite the defaults.
      */
-    constructor(data={}) {
+    constructor(data = {}) {
         // Get the default properties for the entity and overwrite them with the given data
         Object.assign(this, this.constructor.getDefaults());
         // Set the given values
@@ -116,8 +150,8 @@ class Util {
     static registerMathJaxWatch(scope) {
         // If Mathjax is already loaded, we can directly set the watch. Otherwise, we have to wait
         const setWatch = () => {
-            scope.$watch(function(){
-                MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+            scope.$watch(function () {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
                 return true;
             });
         };
