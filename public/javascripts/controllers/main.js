@@ -6,7 +6,7 @@
 class MainCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$rootScope', '$sce', '$document', 'angularLoad', 'AuthService'];
+        return ['$rootScope', '$sce', '$document', '$window', 'angularLoad', 'AuthService'];
     }
 
     constructor(...injections) {
@@ -21,6 +21,11 @@ class MainCtrl extends InjectionReceiver {
         // TODO: This needs to be called *after* the posts are loaded / displayed
         this.$document.ready(() => {
             $('table').wrap("<div class='table-container'></div>");
+        });
+
+        // Scroll to the top on new pages
+        this.$rootScope.$on('$viewContentLoaded', () => {
+            this.$window.scrollTo(0, 0);
         });
     }
 
