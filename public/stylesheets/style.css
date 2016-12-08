@@ -94,9 +94,10 @@ input, textarea {
 
 pre {
     padding: 0;
-    background-color: transparent;
+    background-color: #f7f7f7;
     border: none;
-    margin: 10px;
+    margin: 10px 0;
+    font-size: 75%;
 }
 
 code {
@@ -105,6 +106,10 @@ code {
     font-size: 0.8em;
     white-space: nowrap;
     border-radius: 3px;
+}
+
+.hljs {
+    background-color: transparent !important;
 }
 
 .brand, #sidebar {
