@@ -24,18 +24,20 @@ var users = require('./routes/users');
 
 var app = express();
 
+const PUBLIC_DIR = (process.env.NODE_ENV === 'production') ? '../dist' : '../public';
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-app.use(favicon(path.join(__dirname, '../dist', 'favicon.ico')));
+app.use(favicon(path.join(__dirname, PUBLIC_DIR, 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, PUBLIC_DIR)));
 
 // Initialise passport
 app.use(passport.initialize());

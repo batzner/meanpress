@@ -127,8 +127,3 @@ gulp.task('eslint', function () {
         .pipe(eslint())
         .pipe(eslint.format());
 });
-
-// Watch the public directory in order to move changes directly to dist
-gulp.task('dev', ['_copy'], function () {
-    gulp.watch(['public/**/*'], ['_copy']);
-});

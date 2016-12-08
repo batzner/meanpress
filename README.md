@@ -6,8 +6,7 @@ A very simple CMS based on the MEAN stack
 2. Install and run the [mongoDB community server](https://server.js.mongodb.com/download-center#community). Create a database.
 3. Run `npm install` in the project's root directory.
 4. Set the mongoDB URL in `server/config/general.js` and set `REGISTRATION_ENABLED: true`.
-5. Run `gulp dev` in order to copy `public` to `dist`.
-6. Run `npm start` and go to `localhost:3000`.
+5. Run `npm start` and go to `localhost:3000`.
 
 ## Setup
 1. Go to `localhost:3000/register`.
