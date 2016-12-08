@@ -147,28 +147,49 @@ class Util {
         }, start);
     }
 
-    static registerMathJaxWatch(scope) {
-        // If Mathjax is already loaded, we can directly set the watch. Otherwise, we have to wait
+    static runHighlighting() {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub]); // Run Mathjax
+
+        // Run hljs
+        $('pre code').each(function (i, block) {
+            hljs.highlightBlock(block);
+        });
+    }
+
+    static highlightContinuously(scope, angularLoad) {
+        // Watch the scope and rerun highlighting on changes (state changes for example). Also,
+        // this runs the highlighting initally.
+
+        // If all libs are already loaded, we can directly set the watch. Otherwise, we have to wait
         const setWatch = () => {
+            Util.runHighlighting(); // Run the highlighting initially
+
+            // Set the watch for updates
             scope.$watch(function () {
-                MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+                Util.runHighlighting();
                 return true;
             });
         };
 
-        if (window.MathJax) {
+        if (window.MathJax && window.hljs) {
             setWatch();
         } else {
-            scope.$on('mathjax:loaded', () => setWatch());
+            scope.$on('highlighting:loaded', () => setWatch());
+            Util.loadHighlightingLibs(scope, angularLoad);
         }
     }
 
-    static loadMathJax($rootScope, angularLoad) {
-        // Load MathJax and broadcast the event
-        const url = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-        angularLoad.loadScript(url).then(() => {
-            // Broadcast
-            $rootScope.$broadcast('mathjax:loaded');
-        })
+    static loadHighlightingLibs($rootScope, angularLoad) {
+        // Load MathJax and highlightJs and then broadcast the event
+        const mathjaxJsPath = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+        const highlightJsPath = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js';
+        const highlightCssPath = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/github-gist.min.css';
+
+        Promise.all([angularLoad.loadScript(mathjaxJsPath), angularLoad.loadScript(highlightJsPath),
+            angularLoad.loadCSS(highlightCssPath)])
+            .then(() => {
+                // Broadcast
+                $rootScope.$broadcast('highlighting:loaded');
+            });
     }
 }

@@ -18,9 +18,6 @@ class PostCtrl extends InjectionReceiver {
         } else {
             this.fillTemplate();
         }
-
-        // Rerun MathJax on updates
-        Util.registerMathJaxWatch(this.$scope);
     }
 
 

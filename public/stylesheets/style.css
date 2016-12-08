@@ -15,12 +15,7 @@ a:hover, a:active, a:focus {
 }
 
 a {
-    color: #333333;
     cursor: pointer;
-}
-
-a:hover {
-    color: #111111;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -32,10 +27,6 @@ h1, h2, h3, h4 {
     font-weight: 300;
     letter-spacing: 2px;
     text-transform: uppercase;
-}
-
-pre {
-    margin: 10px 0;
 }
 
 h1 {
@@ -89,16 +80,27 @@ button:focus {
     outline: none;
 }
 
-button, .post-body a {
-    color: #888888;
-}
-
 textarea {
     resize: vertical;
 }
 
 input, textarea {
     margin-bottom: 20px;
+}
+
+pre {
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    margin: 10px;
+}
+
+code {
+    color: #555555;
+    background-color: #f5f5f5;
+    font-size: 0.8em;
+    white-space: nowrap;
+    border-radius: 3px;
 }
 
 .brand, #sidebar {
@@ -201,6 +203,11 @@ footer {
 
 .panel-default > .panel-heading h1 {
     margin-top: 0;
+}
+
+
+.panel-default > .panel-heading a {
+    color: #222222;
 }
 
 .panel-default > .panel-heading .headings {

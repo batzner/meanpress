@@ -14,8 +14,8 @@ class MainCtrl extends InjectionReceiver {
 
         this.$rootScope.log = console.log;
 
-        // Load MathJax
-        Util.loadMathJax(this.$rootScope, this.angularLoad);
+        // Highlight the content
+        Util.highlightContinuously(this.$rootScope, this.angularLoad);
 
         // Wrap tables to make them responsive.
         // TODO: This needs to be called *after* the posts are loaded / displayed
@@ -50,7 +50,7 @@ class NavCtrl extends InjectionReceiver {
         // Return the active CSS class for a nav item, if it is active
         return (this.$state.current.navItem === navItem) ? 'active' : '';
     }
-    
+
     logout() {
         this.AuthService.logout();
     }
