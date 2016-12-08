@@ -17,8 +17,7 @@ A very simple CMS based on the MEAN stack
 ## Deployment to Production
 
 ### First time
-1. Install `node` and `mongoDB` on your host. For AWS, I can recommend [this tutorial]
-(https://scotch.io/tutorials/deploying-a-mean-app-to-amazon-ec2-part-1).
+1. Install `node` and `mongoDB` on your host. For AWS, I can recommend [this tutorial](https://scotch.io/tutorials/deploying-a-mean-app-to-amazon-ec2-part-1).
 2. `sudo git clone https://github.com/batzner/meanpress.git` and `cd meanpress`
 3. `sudo npm install gulp forever -g`
 4. `sudo vim server/config/general-prod.js` - Change your mongoDB URL, port etc. here
