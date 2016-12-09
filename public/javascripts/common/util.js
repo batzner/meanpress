@@ -171,7 +171,7 @@ class Util {
             });
         };
 
-        if (window.MathJax && window.hljs) {
+        if (window.MathJax) {
             setWatch();
         } else {
             scope.$on('highlighting:loaded', () => setWatch());
@@ -180,13 +180,10 @@ class Util {
     }
 
     static loadHighlightingLibs($rootScope, angularLoad) {
-        // Load MathJax and highlightJs and then broadcast the event
+        // Load MathJax and then broadcast the event
         const mathjaxJsPath = 'https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML';
-        const highlightJsPath = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js';
-        const highlightCssPath = '//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/styles/github-gist.min.css';
 
-        Promise.all([angularLoad.loadScript(mathjaxJsPath), angularLoad.loadScript(highlightJsPath),
-            angularLoad.loadCSS(highlightCssPath)])
+        Promise.all([angularLoad.loadScript(mathjaxJsPath)])
             .then(() => {
                 // Broadcast
                 $rootScope.$broadcast('highlighting:loaded');
