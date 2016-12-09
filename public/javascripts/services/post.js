@@ -128,7 +128,11 @@ class PostService extends InjectionReceiver {
 
     updatePost(post) {
         const url = '/api/posts/' + post._id;
-        return this._callPostModification(this.$http.put, url, post);
+        
+        // We are not allowed to modify the versions, so delete them from the data
+        const data = angular.copy(post);
+        delete data.versions;
+        return this._callPostModification(this.$http.put, url, data);
     }
 
     deletePost(post) {

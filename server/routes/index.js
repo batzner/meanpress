@@ -98,18 +98,26 @@ router.post('/api/posts/:id/version', auth, function (req, res, next) {
 // Route for updating a post
 router.put('/api/posts/:id', auth, function (req, res, next) {
     // Find the post to update
-    var query = {
+    const query = {
         '_id': mongoose.Types.ObjectId(req.params.id)
     };
+
+    // Don't allow any modification of post versions
+    if (req.body.versions !== undefined) {
+        res.status(400).json({
+            message: "Modification of the versions field is not allowed in this route."
+        });
+    }
+
     Post.findOneAndUpdate(query, req.body, {'new': true})
         .then(function (post) {
             // Get the updated post with populated fields
             return Post.populate(post, 'publishedVersion versions');
         }).then(function (post) {
-        res.json(post);
-    }).catch(function (err) {
-        next(err);
-    });
+            res.json(post);
+        }).catch(function (err) {
+            next(err);
+        });
 });
 
 // Route for deleting a post
