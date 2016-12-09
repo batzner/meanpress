@@ -214,6 +214,10 @@ figcaption {
     max-width: 800px;
 }
 
+#post-error {
+    display: none;
+}
+
 footer {
     margin-top: -50px;
     font-family: 'Source Sans Pro', sans-serif;
