@@ -92,6 +92,12 @@ input, textarea {
     margin-bottom: 20px;
 }
 
+blockquote {
+    font-size: inherit;
+    font-style: italic;
+    margin: 15px 0;
+}
+
 pre {
     padding: 0;
     background-color: #f7f7f7;
@@ -110,6 +116,21 @@ code {
 
 .hljs {
     background-color: transparent !important;
+}
+
+figure {
+    margin: 15px 0;
+}
+
+figure > img {
+    display: block;
+    margin: 0 auto;
+}
+
+figcaption {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.85em;
 }
 
 .brand, #sidebar {
@@ -201,6 +222,10 @@ footer {
     color: #666;
 }
 
+.panel {
+    border:none;
+}
+
 .panel-default > .panel-heading {
     border-bottom: 1px solid #eee;
     background: none;
@@ -214,7 +239,6 @@ footer {
     margin-top: 0;
 }
 
-
 .panel-default > .panel-heading a {
     color: #222222;
 }
@@ -223,7 +247,7 @@ footer {
     float: left;
 }
 
-.panel-default>.panel-heading .tools-menu {
+.panel-default > .panel-heading .tools-menu {
     margin-top: 10px;
     right: 10px;
     float: right;
