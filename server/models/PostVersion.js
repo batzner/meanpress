@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const PostVersionSchema = new mongoose.Schema(
     {
         title: String,
+        summary: String,
         preview: String,
         body: String,
         slug: String,
