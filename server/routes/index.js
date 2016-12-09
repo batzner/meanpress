@@ -21,6 +21,17 @@ function getIndexTemplateName() {
     return process.env.NODE_ENV === 'production' ? 'index-prod' : 'index';
 }
 
+function removeOldVersions(post, keepUnpublished) {
+    // Remove all but the published version of the post. If the published version is not the
+    // last one, also keep the last version (specified by keepUnpublished).
+    const lastVersion = post.versions.length ? post.versions[post.versions.length-1] : null;
+    post.versions = post.publishedVersion ? [post.publishedVersion] : [];
+
+    if (keepUnpublished && lastVersion && !lastVersion._id.equals(post.publishedVersion._id)) {
+        post.versions.push(lastVersion);
+    }
+}
+
 // route middleware that will happen on every request
 router.use(function (req, res, next) {
     // log each request to the console
@@ -39,6 +50,8 @@ router.get('/api/posts', function (req, res, next) {
         .populate('publishedVersion versions')
         .exec(function (err, posts) {
             if (err) return next(err);
+
+            posts.forEach(post => removeOldVersions(post, false));
             res.json(posts);
         });
 });
@@ -47,6 +60,8 @@ router.get('/api/posts/all', auth, function (req, res, next) {
     Post.find().populate('publishedVersion versions')
         .exec(function (err, posts) {
             if (err) return next(err);
+
+            posts.forEach(post => removeOldVersions(post, true));
             res.json(posts);
         });
 });
