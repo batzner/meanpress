@@ -11,14 +11,24 @@ class AboutCtrl extends InjectionReceiver {
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
-        $('.show-more').click(this.toggleDetail);
+        $('.show-more').click(this.showDetail);
+        $('.show-more-toggle').click(this.toggleDetail);
+    }
+
+    showDetail($event) {
+        // Show the detail
+        const button = $($event.target);
+        const target = $('#'+button.data('targetId'));
+        button.hide();
+        target.show();
     }
 
     toggleDetail($event) {
         // Expand / hide additional information in the CV.
         const button = $($event.target);
+        const target = $('#'+button.data('targetId'));
         button.html(button.html() == 'Show less' ? 'Show more' : 'Show less');
-        button.closest('.cv-item').children('.detail').toggle();
+        target.slideToggle();
     }
 }
 

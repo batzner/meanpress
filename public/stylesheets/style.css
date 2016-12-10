@@ -10,12 +10,24 @@ body {
     font-weight: 300;
 }
 
-a:hover, a:active, a:focus {
+/* Copy anchor styles from Bootstrap and apply them to buttons as well */
+a, button {
+    color: #337ab7;
+    text-decoration: none;
+    cursor: pointer;
+}
+a:hover, a:active, a:focus,
+button:hover, button:active, button:focus{
+    color: #23527c;
     text-decoration: none;
 }
+a:focus, button:focus {
+    outline: none;
+}
 
-a {
-    cursor: pointer;
+button {
+    background: none;
+    border: none;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -51,11 +63,6 @@ h5 {
     font-size: 1rem;
 }
 
-button {
-    background: none;
-    border: none;
-}
-
 th {
     font-weight: bold;
     text-transform: uppercase;
@@ -78,10 +85,6 @@ td, th {
 
 td {
     border-top: #eeeeee solid 1px;
-}
-
-button:focus {
-    outline: none;
 }
 
 textarea {
@@ -201,7 +204,7 @@ footer {
     margin-top: 0;
 }
 
-.panel-default > .panel-heading a {
+h1 a, h1 a:hover, h1 a:active, h1 a:focus {
     color: #222222;
 }
 
@@ -220,7 +223,8 @@ footer {
 }
 
 .panel-body {
-    padding: 20px;
+    padding: 20px 0;
+    margin: 0 20px;
 }
 
 .tags {

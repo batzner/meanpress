@@ -18,6 +18,14 @@ h1 {
     font-size: 1.7rem;
 }
 
+.panel-default > .panel-heading {
+    border-bottom: none;
+}
+
+.panel-default > .panel-body {
+    border-top: 1px solid #eee;
+}
+
 .panel-default>.profile h1 {
     font-size: 2rem;
     margin-top: 1.5rem;
