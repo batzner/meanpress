@@ -5,7 +5,7 @@
 class HomeCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', 'angularLoad', 'PostService'];
+        return ['$scope', '$document', 'angularLoad', 'PostService'];
     }
 
     constructor(...injections) {
@@ -27,6 +27,11 @@ class HomeCtrl extends InjectionReceiver {
         // Register CSS cleanup on exit
         this.$scope.$on('$destroy', () => {
             this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.angularLoad));
+        });
+
+        // Wrap tables to make them responsive.
+        this.$document.ready(() => {
+            $('table').wrap("<div class='table-container'></div>");
         });
     }
 }

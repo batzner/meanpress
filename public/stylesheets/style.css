@@ -114,8 +114,19 @@ code {
     border-radius: 3px;
 }
 
+pre > code {
+    width: auto;
+    overflow-x: visible;
+    word-wrap: normal;
+    white-space: pre;
+}
+
 .hljs {
     background-color: transparent !important;
+}
+
+img {
+    margin-bottom: 15px;
 }
 
 figure {
@@ -124,78 +135,13 @@ figure {
 
 figure > img {
     display: block;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 figcaption {
     text-align: center;
-    margin-top: 15px;
     font-size: 0.85em;
-}
-
-.brand, #sidebar {
-    position: fixed;
-    width: 220px;
-    left: 0;
-    padding: 20px 30px;
-    font-family: 'Oswald', sans-serif;
-}
-
-.brand {
-    top: 0;
-    height: 100px;
-    background: #222222;
-}
-
-#sidebar {
-    top: 100px;
-    bottom: 0px;
-    background: #222222;
-    padding-top: 40px;
-}
-
-.brand {
-    color: #eeeeee;
-}
-
-.brand a {
-    color: inherit;
-}
-
-.brand #logo-title {
-    font-size: 2.5em;
-    font-weight: bold;
-}
-
-.brand #logo-title .handwriting {
-    font-family: 'Pacifico', cursive;
-    font-weight: normal;
-    font-size: 0.8em;
-    margin-left: 4px;
-}
-
-.brand #logo-subtitle {
-    font-size: 1.1em;
-}
-
-.sidebar-nav {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar-nav a {
-    color: #bbbbbb;
-    font-size: 1.1rem;
-    line-height: 2.5;
-}
-
-.sidebar-nav a .fa {
-    margin-right: 15px;
-    width: 16px;
-}
-
-.sidebar-nav a.active, .sidebar-nav a:hover, .brand:hover {
-    color: #ffffff;
 }
 
 .wrapper, footer {
@@ -204,10 +150,22 @@ figcaption {
 
 .wrapper {
     padding-bottom: 70px;
-    padding-top: 20px;
-    padding-left: 40px;
-    padding-right: 40px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
     min-height: 100%;
+}
+
+@media only screen and (max-width: 767px) {
+    .wrapper, footer {
+        margin-left: 0;
+    }
+
+    .wrapper {
+        padding-top: 60px;
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 #content {
@@ -272,7 +230,7 @@ footer {
 
 .tag {
     display: inline-block;
-    background-color: #FAFAFA;
+    background-color: #F7F7F7;
     border-radius: 5px;
     margin-right: 5px;
     margin-bottom: 5px;

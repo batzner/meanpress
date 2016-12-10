@@ -22,47 +22,54 @@
     <meta name="msapplication-TileImage" content="/favicons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
-    <link href="https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300|Pacifico" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300|Pacifico"
+          rel="stylesheet">
 
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"
+          rel="stylesheet">
+    <link rel="stylesheet"
+          href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
     <link href="/stylesheets/style.css" rel="stylesheet">
+    <link href="/stylesheets/nav.css" rel="stylesheet">
     <link href="/stylesheets/lib/highlight.css" rel="stylesheet">
 </head>
 
 <body ng-app="mlstuff" ng-controller="MainCtrl as main">
-<header>
-    <div class="brand">
-        <a href="/">
-            <div id="logo-title">ML<span class="handwriting">thoughts</span></div>
-            <div id="logo-subtitle">Machine Learning et al.</div>
-        </a>
-    </div>
-</header>
-<aside>
-    <div id="sidebar" ng-controller="NavCtrl as nav">
+<div id="navigation">
+    <header>
+        <div class="brand">
+            <a href="/">
+                <div id="logo-title"><img src="images/logo.png"/></div>
+                <div id="logo-subtitle">Machine Learning et al.</div>
+            </a>
+        </div>
+    </header>
+    <aside>
+        <div id="sidebar" ng-controller="NavCtrl as nav">
 
-        <!-- Sidebar -->
-        <ul class="sidebar-nav">
-            <li>
-                <a ng-class="nav.getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
-            </li>
-            <li>
-                <a ng-class="nav.getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural Net</a>
-            </li>
-            <li>
-                <a ng-class="nav.getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
-            </li>
-            <li ng-show="main.isLoggedIn()">
-                <a ng-class="nav.getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
-            </li>
-            <li ng-show="main.isLoggedIn()">
-                <a href="" ng-click="nav.logout()"><i class="fa fa-sign-out"></i>Logout</a>
-            </li>
-        </ul>
-    </div>
-</aside>
-<!-- /#sidebar-wrapper -->
+            <!-- Sidebar -->
+            <ul class="sidebar-nav">
+                <li>
+                    <a ng-class="nav.getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
+                </li>
+                <li>
+                    <a ng-class="nav.getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural
+                        Net</a>
+                </li>
+                <li>
+                    <a ng-class="nav.getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
+                </li>
+                <li ng-show="main.isLoggedIn()">
+                    <a ng-class="nav.getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
+                </li>
+                <li ng-show="main.isLoggedIn()">
+                    <a href="" ng-click="nav.logout()"><i class="fa fa-sign-out"></i>Logout</a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+    <!-- /#sidebar-wrapper -->
+</div>
 
 <!-- Page Content -->
 <section class="wrapper">
@@ -72,12 +79,16 @@
 
     </div>
 </section>
-<footer class="footer">Powered by a simple CMS built on the MEAN stack. <a href="https://github.com/batzner/meanpress">Fork it on <i class="fa fa-github" aria-hidden="true"></i></a></footer>
+<footer class="footer">Powered by a simple CMS built on the MEAN stack. <a
+            href="https://github.com/batzner/meanpress">Fork it on <i class="fa fa-github"
+                                                                      aria-hidden="true"></i></a>
+</footer>
 <!-- /#page-content-wrapper -->
 <!-- /#wrapper -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.3.1/angular-ui-router.min.js"></script>
+>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-sanitize/1.5.8/angular-sanitize.min.js"></script>
 <script src="https://cdn.rawgit.com/urish/angular-load/master/angular-load.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-css/1.0.8/angular-css.js"></script>

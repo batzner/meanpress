@@ -35,6 +35,11 @@ class PostCtrl extends InjectionReceiver {
         this.$scope.editUrl = this.$state.href('edit', {slug: this.$stateParams.slug});
 
         this.loadScripts();
+
+        // Wrap tables to make them responsive.
+        this.$document.ready(() => {
+            $('table').wrap("<div class='table-container'></div>");
+        });
     }
 
     deletePost() {

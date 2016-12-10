@@ -17,12 +17,6 @@ class MainCtrl extends InjectionReceiver {
         // Highlight the content
         Util.highlightContinuously(this.$rootScope, this.angularLoad);
 
-        // Wrap tables to make them responsive.
-        // TODO: This needs to be called *after* the posts are loaded / displayed
-        this.$document.ready(() => {
-            $('table').wrap("<div class='table-container'></div>");
-        });
-
         // Scroll to the top on new pages
         this.$rootScope.$on('$viewContentLoaded', () => {
             this.$window.scrollTo(0, 0);

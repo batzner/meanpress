@@ -1,0 +1,111 @@
+#navigation {
+    height: 100%;
+    width: 220px;
+    position: fixed;
+    font-family: 'Oswald', sans-serif;
+    z-index: 1;
+    box-shadow: #999 2px 0 10px;
+    background: #242745; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient(left, #212433, #232636); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(right, #212433, #232636); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(right, #212433, #232636); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(to right, #212433, #26293B); /* Standard syntax */
+}
+
+.brand, #sidebar {
+    padding: 20px 30px;
+}
+
+.brand {
+    top: 0;
+    height: 130px;
+    color: #eeeeee;
+}
+
+#sidebar {
+    top: 130px;
+    bottom: 0;
+    padding-top: 40px;
+}
+
+.brand a {
+    color: inherit;
+}
+
+.brand #logo-title img {
+    width: 130px;
+    margin-bottom: 5px;
+}
+
+.brand #logo-subtitle {
+    font-size: 1.1em;
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav a {
+    color: #dddddd;
+    font-size: 1.1rem;
+    line-height: 2.5;
+}
+
+.sidebar-nav a .fa {
+    margin-right: 15px;
+    width: 16px;
+}
+
+.sidebar-nav a.active, .sidebar-nav a:hover {
+    color: #ffffff;
+}
+
+@media only screen and (min-width: 397px) and (max-width: 767px) {
+    #navigation {
+        height: 50px;
+        width: 100%;
+    }
+
+    .brand {
+        width: 120px;
+        padding: 10px 30px;
+        float: left;
+    }
+
+    .brand #logo-title img {
+        width: 60px;
+    }
+
+    #sidebar {
+        margin-left: 120px;
+        padding: 4px 30px;
+    }
+
+    .brand #logo-subtitle {
+        display: none;
+    }
+
+    .sidebar-nav {
+        overflow: hidden;
+    }
+
+    .sidebar-nav li {
+        float: left;
+        margin-right: 20px;
+    }
+
+    .sidebar-nav li:last-child {
+        margin-right: 0;
+    }
+
+    .sidebar-nav a .fa {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 396px) {
+    .brand, #sidebar {
+        display: none;
+    }
+}
