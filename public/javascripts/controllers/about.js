@@ -20,7 +20,7 @@ class AboutCtrl extends InjectionReceiver {
         const button = $($event.target);
         const target = $('#'+button.data('targetId'));
         button.hide();
-        target.show();
+        target.slideToggle();
     }
 
     toggleDetail($event) {
