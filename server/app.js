@@ -12,11 +12,12 @@ var config = require('./config/general');
 // Load the models
 var mongoose = require('mongoose');
 require('./models/PostVersion');
-require('./models/Posts');
+require('./models/Post');
+require('./models/User');
+require('./models/Category');
 
 // Load Passport for authentication
 var passport = require('passport');
-require('./models/Users');
 require('./config/passport');
 
 var routes = require('./routes/index');

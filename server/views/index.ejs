@@ -1,7 +1,7 @@
 <html>
 
 <head>
-    <title>MLthoughts - Machine Learning et al.</title>
+    <title>MLOwl - Machine Learning et al.</title>
     <base href="/">
 
     <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-icon-57x57.png">
@@ -22,7 +22,7 @@
     <meta name="msapplication-TileImage" content="/favicons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
-    <link href="https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300|Pacifico"
+    <link href="https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300,600"
           rel="stylesheet">
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"
@@ -53,14 +53,19 @@
                     <a ng-class="nav.getClass('blog')" href="/"><i class="fa fa-home"></i>Blog</a>
                 </li>
                 <li>
-                    <a ng-class="nav.getClass('neural')" href="#"><i class="fa fa-sitemap"></i>Neural
-                        Net</a>
+                    <a ng-class="nav.getClass('neural-network')"
+                       href="category/neural-network"><i class="fa fa-sitemap"></i>Neural
+                        Network</a>
                 </li>
                 <li>
                     <a ng-class="nav.getClass('about')" href="about"><i class="fa fa-user"></i>About</a>
                 </li>
                 <li ng-show="main.isLoggedIn()">
                     <a ng-class="nav.getClass('add')" href="add"><i class="fa fa-plus"></i>Add Post</a>
+                </li>
+                <li ng-show="main.isLoggedIn()">
+                    <a ng-class="nav.getClass('addCategory')" href="add-category"><i class="fa
+                    fa-plus"></i>Add Category</a>
                 </li>
                 <li ng-show="main.isLoggedIn()">
                     <a href="" ng-click="nav.logout()"><i class="fa fa-sign-out"></i>Logout</a>
@@ -106,14 +111,18 @@
 <script src="/javascripts/config.js"></script>
 <script src="/javascripts/models/post.js"></script>
 <script src="/javascripts/models/postversion.js"></script>
+<script src="/javascripts/models/category.js"></script>
 <script src="/javascripts/controllers/about.js"></script>
 <script src="/javascripts/controllers/auth.js"></script>
 <script src="/javascripts/controllers/home.js"></script>
 <script src="/javascripts/controllers/main.js"></script>
 <script src="/javascripts/controllers/post.js"></script>
-<script src="/javascripts/controllers/editpost.js"></script>
+<script src="/javascripts/controllers/editPost.js"></script>
+<script src="/javascripts/controllers/category.js"></script>
+<script src="/javascripts/controllers/addCategory.js"></script>
 <script src="/javascripts/services/auth.js"></script>
 <script src="/javascripts/services/post.js"></script>
+<script src="/javascripts/services/category.js"></script>
 
 </body>
 

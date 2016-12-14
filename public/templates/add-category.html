@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h1>Add a category</h1>
+            </div>
+            <div class="panel-body">
+                <form name="form.theForm">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input ng-model="category.name" type="text" class="form-control" id="name" required>
+
+                        <label for="title">Title</label>
+                        <input ng-model="category.title" type="text" class="form-control" id="title" required>
+
+                        <label for="introduction">Introduction Text</label>
+                        <textarea rows="10" ng-model="category.introduction" type="text" class="form-control" id="introduction" required></textarea>
+
+                        <label for="navItem">NavItem</label>
+                        <input ng-model="category.navItem" type="text" class="form-control" id="navItem" required>
+
+                        <label for="isSeries">Is this an ordered series?</label>
+                        <input ng-model="category.isSeries" type="checkbox" class="form-control" id="isSeries">
+                    </div>
+                    <button ng-click="controller.submit('add')" class="btn btn-primary">Add</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

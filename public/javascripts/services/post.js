@@ -69,6 +69,7 @@ class PostService extends InjectionReceiver {
     }
 
     _prepareSerialise(data) {
+        // TODO: Maybe put this into a EntityService super class
         if (!data) return;
 
         // Run recursive for arrays
@@ -94,6 +95,8 @@ class PostService extends InjectionReceiver {
     // PUBLIC API CALLING METHODS
 
     fetchAll() {
+        // TODO: Store, if there is a current fetch going on. Then, just return that as a promise.
+
         // Construct the request
         let url = 'api/posts';
         let headers = {};
@@ -112,7 +115,7 @@ class PostService extends InjectionReceiver {
             response.data.forEach(postData => this._updatePostMap(postData));
 
             // Broadcast the fetch
-            this.$rootScope.$broadcast('posts:fetched', this.posts);
+            this.$rootScope.$broadcast('posts:fetched');
         }).catch(this.$log.error);
     }
 

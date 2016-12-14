@@ -19,6 +19,9 @@ class InjectionReceiver {
  * Extension of the ES6 map, which also supports binding to it's array of values. Unfortunately,
  * we can't subclass Map, because of Babel: http://stackoverflow.com/questions/29434406/create-a-class-extending-from-es6-map/29436039#29436039
  * Therefore, we provide all Map methods.
+ *
+ * Even though we can just reset the array on the scope in the controller, this class prevents
+ * having to send broadcasts through the whole app.
  */
 class BindableMap {
 

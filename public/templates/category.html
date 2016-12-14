@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="headings">
+                    <h1>{{category.title}}</h1>
+                </div>
+            </div>
+            <div class="panel-body post-body" ng-bind-html="main.toTrusted(category.introduction)"></div>
+        </div>
+    </div>
+</div>
+
+<div ng-repeat="post in posts | filter:filter" ng-init="postVersion = post.getDisplayVersion()" class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="headings">
+                    <h1><a href="post/{{postVersion.slug}}/"><span ng-show="category.isSeries">Part {{$index+1}} - </span>{{postVersion.title}}</a></h1>
+                    <h5 ng-bind="postVersion.publishedAt | date:'longDate'"></h5>
+                    <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
+                </div>
+
+                <div class="tags" ng-show="postVersion.tags.length">
+                    <div ng-repeat="tag in postVersion.tags" class="tag">{{tag}}</div>
+                </div>
+            </div>
+            <div class="panel-body post-body" ng-bind-html="main.toTrusted(postVersion.summary)"></div>
+        </div>
+    </div>
+</div>

@@ -11,6 +11,7 @@ const router = express.Router();
 const Post = mongoose.model('Post');
 const PostVersion = mongoose.model('PostVersion');
 const User = mongoose.model('User');
+const Category = mongoose.model('Category');
 
 // Authentication middleware
 const auth = jwt({
@@ -43,6 +44,19 @@ router.use(function (req, res, next) {
 /* GET home page. */
 router.get('/', function (req, res, next) {
     res.render(getIndexTemplateName());
+});
+
+router.get('/api/categories', function (req, res, next) {
+    Category.find().then(categories => res.json(categories));
+});
+
+// Route for adding a category
+router.post('/api/categories', auth, function (req, res, next) {
+    // Ignore a passed id
+    delete req.body._id;
+
+    const category = new Category(req.body);
+    category.save().then(category => res.json(category)).catch(next);
 });
 
 router.get('/api/posts', function (req, res, next) {

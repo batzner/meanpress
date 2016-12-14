@@ -6,7 +6,10 @@
 class MainCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$rootScope', '$sce', '$document', '$window', 'angularLoad', 'AuthService'];
+        // Inject the services so that posts and categories are loaded in all states
+        // (asynchronous anyways).
+        return ['$rootScope', '$sce', '$document', '$window', 'angularLoad', 'AuthService',
+            'PostService', 'CategoryService'];
     }
 
     constructor(...injections) {

@@ -53,6 +53,18 @@ app.config([
                 controller: 'EditPostCtrl as controller',
                 navItem: 'add'
             })
+            .state('category', {
+                url: '/category/{name}',
+                templateUrl: '/templates/category.html',
+                controller: 'CategoryCtrl as controller',
+                navItem: 'overwritten-in-controller'
+            })
+            .state('addCategory', {
+                url: '/add-category',
+                templateUrl: '/templates/add-category.html',
+                controller: 'AddCategoryCtrl as controller',
+                navItem: 'add'
+            })
             .state('about', {
                 url: '/about',
                 templateUrl: '/templates/about.html',
