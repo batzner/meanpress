@@ -8,14 +8,21 @@ class MainCtrl extends InjectionReceiver {
     static get $inject() {
         // Inject the services so that posts and categories are loaded in all states
         // (asynchronous anyways).
-        return ['$rootScope', '$sce', '$document', '$window', 'angularLoad', 'AuthService',
-            'PostService', 'CategoryService'];
+        return ['$rootScope', '$sce', '$document', '$window', '$stateParams',
+            'angularLoad', 'usSpinnerService',
+            'AuthService', 'PostService', 'CategoryService'];
     }
 
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
         this.$rootScope.log = console.log;
+
+        // Show the spinner, if specified. We need to wait for the ui-view to be loaded before
+        // accessing $stateParams
+        this.$rootScope.$on('$viewContentLoaded',() => {
+            if (this.$stateParams.showSpinner) this.usSpinnerService.spin('spinner');
+        });
 
         // Highlight the content
         Util.highlightContinuously(this.$rootScope, this.angularLoad);

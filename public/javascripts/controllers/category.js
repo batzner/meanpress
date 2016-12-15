@@ -5,8 +5,8 @@
 class CategoryCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$document', '$stateParams', '$state', 'angularLoad', 'PostService',
-            'CategoryService'];
+        return ['$scope', '$document', '$stateParams', '$state',
+            'angularLoad', 'usSpinnerService', 'PostService', 'CategoryService'];
     }
 
     constructor(...injections) {
@@ -28,6 +28,9 @@ class CategoryCtrl extends InjectionReceiver {
     }
 
     fillTemplate() {
+        // Hide the spinner
+        this.usSpinnerService.stop('spinner');
+
         this.$scope.category = this.CategoryService.findCategoryByName(this.$stateParams.name);
 
         // Highlight this category in the navigation
@@ -49,11 +52,6 @@ class CategoryCtrl extends InjectionReceiver {
 
 
         this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
-
-        // Register CSS cleanup on exit
-        this.$scope.$on('$destroy', () => {
-            this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.angularLoad));
-        });
 
         // Wrap tables to make them responsive.
         this.$document.ready(() => {

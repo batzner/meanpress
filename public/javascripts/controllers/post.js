@@ -5,7 +5,8 @@
 class PostCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$stateParams', '$location', '$state', '$sce', '$document', 'angularLoad',
+        return ['$scope', '$stateParams', '$location', '$state', '$sce', '$document',
+            'angularLoad', 'usSpinnerService',
             'PostService'];
     }
 
@@ -22,6 +23,9 @@ class PostCtrl extends InjectionReceiver {
 
 
     fillTemplate() {
+        // Hide the spinner
+        this.usSpinnerService.stop('spinner');
+
         this.post = this.PostService.findPostBySlug(this.$stateParams.slug);
 
         if (!this.post) return;
@@ -57,11 +61,6 @@ class PostCtrl extends InjectionReceiver {
                     // Execute the Post's script
                     if (window.runPostScript) runPostScript();
                 });
-        });
-
-        // Register CSS cleanup on exit
-        this.$scope.$on('$destroy', () => {
-            this.$scope.postVersion.unloadCss(this.angularLoad);
         });
     }
 }

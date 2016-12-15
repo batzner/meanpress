@@ -4,7 +4,7 @@ A very simple CMS based on the MEAN stack
 ## Installation
 1. Install `node (v6.9.2)` and `npm (v3.10.9)` by [downloading the installer](https://nodejs.org/en/download/).
 2. Install and run the [mongoDB community server](https://server.js.mongodb.com/download-center#community). Create a database.
-3. Run `npm install` in the project's root directory.
+3. Run `npm install` and `npm install --prefix public/javascripts/lib` in the project's root directory.
 4. Set the mongoDB URL in `server/config/general.js` and set `REGISTRATION_ENABLED: true`.
 5. Run `npm start` and go to `localhost:3000`.
 
@@ -23,7 +23,7 @@ A very simple CMS based on the MEAN stack
 
 ### Every time
 1. `sudo git pull`
-2. `sudo npm install`
+2. `sudo npm install` and `sudo npm install --prefix public/javascripts/lib`
 3. `sudo forever stopall`
 4. `sudo gulp`
 5. `sudo npm run-script server` and test the site in your browser.

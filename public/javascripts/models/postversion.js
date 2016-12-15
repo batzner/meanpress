@@ -28,10 +28,6 @@ class PostVersion extends BaseEntity {
         return Util.chainPromiseBlocks(blocks).catch(console.error);
     }
 
-    unloadCss(angularLoad) {
-        this.cssIncludes.forEach(angularLoad.unloadCSS);
-    }
-
     isPublished() {
         return this.post && this.post.publishedVersion == this;
     }

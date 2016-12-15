@@ -5,7 +5,7 @@
 class HomeCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$document', 'angularLoad', 'PostService'];
+        return ['$scope', '$document', 'angularLoad', 'usSpinnerService', 'PostService'];
     }
 
     constructor(...injections) {
@@ -22,12 +22,10 @@ class HomeCtrl extends InjectionReceiver {
     }
 
     fillTemplate() {
-        this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
+        // Hide the spinner
+        this.usSpinnerService.stop('spinner');
 
-        // Register CSS cleanup on exit
-        this.$scope.$on('$destroy', () => {
-            this.$scope.posts.forEach(post => post.getDisplayVersion().unloadCss(this.angularLoad));
-        });
+        this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
 
         // Wrap tables to make them responsive.
         this.$document.ready(() => {

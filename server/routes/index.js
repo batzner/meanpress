@@ -66,7 +66,7 @@ router.get('/api/posts', function (req, res, next) {
             if (err) return next(err);
 
             posts.forEach(post => removeOldVersions(post, false));
-            res.json(posts);
+            setTimeout(() => res.json(posts), 1000);
         });
 });
 
