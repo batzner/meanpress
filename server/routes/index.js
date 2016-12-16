@@ -43,19 +43,6 @@ function removeBody(post) {
     });
 }
 
-function postVersionsMatchQuery(post, criteria) {
-    // Check that for every criteria in the query there is a post version that matches it.
-    for (let version of post.versions) {
-        for (let criterium of Object.keys(criteria)) {
-            // Delete the criterium from the query, if it is met.
-            if (version[criterium] == criteria[criterium]) delete criteria[criterium];
-        }
-    }
-
-    // It matched, if all criteria were met
-    return Object.keys(criteria).length == 0;
-}
-
 // route middleware that will happen on every request
 router.use(function (req, res, next) {
     // log each request to the console
@@ -83,13 +70,20 @@ router.post('/api/categories', auth, function (req, res, next) {
 });
 
 function getPosts(req, res, next, keepUnpublished = false) {
-    let criteria = {};
-    if (req.query.category !== undefined) criteria.category = req.query.category;
-    if (req.query.slug !== undefined) criteria.slug = req.query.slug;
+    // For each criterium, we need to find one post version fulfilling it
+    let criteria = [];
+    if (req.query.category !== undefined) {
+        criteria.push({versions: {$elemMatch: {category: req.query.category}}});
+    }
+    if (req.query.slug !== undefined) {
+        criteria.push({versions: {$elemMatch: {slug: req.query.slug}}});
+    }
+
+    let query = criteria.length ? {$and: criteria} : {};
 
     // Check for URL parameters
     const startDate = new Date();
-    Post.find()
+    Post.find(query)
         .populate('versions')
         .exec(function (err, posts) {
             if (err) return next(err);
@@ -98,7 +92,6 @@ function getPosts(req, res, next, keepUnpublished = false) {
 
             // Filter posts that don't have a version at all after filtering the versions
             posts = posts.filter(post => post.versions.length);
-            posts = posts.filter(post => postVersionsMatchQuery(post, criteria));
 
             // Only send skeletons, if wanted
             if (req.query.withBody == 'false') posts.forEach(removeBody);
