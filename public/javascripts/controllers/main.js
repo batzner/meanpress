@@ -32,7 +32,7 @@ class MainCtrl extends InjectionReceiver {
             // controller is loaded as well. Thus, the child controller can issue prioritized
             // requests. http://stackoverflow.com/a/27197922/2628369
             if (!fetchingPosts) {
-                this.$timeout(() => this.PostService.fetchPosts(), 0);
+                // this.$timeout(() => this.PostService.fetchPosts(), 0);
                 fetchingPosts = true;
             }
         });

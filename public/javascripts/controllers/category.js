@@ -17,7 +17,7 @@ class CategoryCtrl extends InjectionReceiver {
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts() || !this.CategoryService.hasCategories()) {
             // Fetch all posts in this category
-            this.PostService.fetchPosts({category:this.$stateParams.name}, true);
+            this.PostService.fetchPosts({category:this.$stateParams.name}, false);
 
             // Show a spinner
             this.usSpinnerService.spin('spinner');
