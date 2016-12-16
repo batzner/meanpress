@@ -61,7 +61,7 @@
     color: #ffffff;
 }
 
-@media only screen and (min-width: 397px) and (max-width: 767px) {
+@media only screen and (min-width: 411px) and (max-width: 767px) {
     #navigation {
         height: 50px;
         width: 100%;
@@ -104,8 +104,8 @@
     }
 }
 
-@media only screen and (max-width: 396px) {
-    .brand, #sidebar {
+@media only screen and (max-width: 410px) {
+    #navigation {
         display: none;
     }
 }
