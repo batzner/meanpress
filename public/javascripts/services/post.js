@@ -12,8 +12,6 @@ class PostService extends InjectionReceiver {
     constructor(...injections) {
         super(...injections);
         this.posts = new BindableMap(); // Dictionary mapping uuid (string) to post object
-
-        this.fetchAll();
     }
 
     // HELPER METHODS
@@ -28,13 +26,17 @@ class PostService extends InjectionReceiver {
 
     // PRIVATE METHODS
 
-    _updatePostMap(postData) {
+    _updatePostMap(postData, overwrite=true) {
+        if (!overwrite && postData.versions) postData.versions[0]._id = 'yo';
+
         // If the post already exists, we update it instead of setting a new reference. Thus,
         // bindings remain existent.
         let post = null;
         if (this.posts.has(postData._id)) {
-            post = this.posts.get(postData._id);
-            post.updateProperties(postData);
+            if (overwrite) {
+                post = this.posts.get(postData._id);
+                post.updateProperties(postData);
+            }
         } else {
             post = new Post(postData);
             this.posts.set(post._id, post);
@@ -94,25 +96,29 @@ class PostService extends InjectionReceiver {
 
     // PUBLIC API CALLING METHODS
 
-    fetchAll() {
-        // TODO: Store, if there is a current fetch going on. Then, just return that as a promise.
-
+    fetchPosts(filterQuery={}, withBody=true) {
         // Construct the request
         let url = 'api/posts';
         let headers = {};
         if (this.AuthService.isLoggedIn()) {
-            url = 'api/posts/all';
+            url = 'api/posts/authorized';
             headers.Authorization = 'Bearer ' + this.AuthService.token;
         }
 
-        return this.$http.get(url, {
-            headers: headers
-        }).then(response => {
-            this.$log.debug('Fetched all posts. Count: ' + response.data.length);
+        let config = {
+            headers: headers,
+            params: {
+                withBody: withBody
+            }
+        };
 
-            // Update the posts
-            this.posts.clear();
-            response.data.forEach(postData => this._updatePostMap(postData));
+        $.extend(config.params, filterQuery);
+
+        return this.$http.get(url, config).then(response => {
+            this.$log.debug('Fetched posts. Count: ' + response.data.length);
+
+            // Update the posts. If we didn't fetch the bodies, don't overwrite existing posts
+            response.data.forEach(postData => this._updatePostMap(postData, withBody));
 
             // Broadcast the fetch
             this.$rootScope.$broadcast('posts:fetched');

@@ -15,7 +15,23 @@ class PostCtrl extends InjectionReceiver {
 
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts()) {
-            this.$scope.$on('posts:fetched', () => this.fillTemplate());
+            // Fetch this post with priority
+            this.PostService.fetchPosts({slug:this.$stateParams.slug});
+
+            // Show a spinner
+            this.usSpinnerService.spin('spinner');
+
+            // TODO: Clicking fast on a skeleton post will leave the skeleton empty forever on a
+            // post page.
+
+            // Keep the listener, so that updates of the posts will renew the post version.
+            // Otherwise, the post version will be different from its post's post version,
+            // because the post created a new post version but the old post version is still
+            // referenced by this scope.
+            this.$scope.$on('posts:fetched', () => {
+                this.usSpinnerService.stop('spinner');
+                this.fillTemplate();
+            });
         } else {
             this.fillTemplate();
         }
@@ -23,9 +39,6 @@ class PostCtrl extends InjectionReceiver {
 
 
     fillTemplate() {
-        // Hide the spinner
-        this.usSpinnerService.stop('spinner');
-
         this.post = this.PostService.findPostBySlug(this.$stateParams.slug);
 
         if (!this.post) return;

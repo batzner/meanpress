@@ -25,12 +25,34 @@ function getIndexTemplateName() {
 function removeOldVersions(post, keepUnpublished) {
     // Remove all but the published version of the post. If the published version is not the
     // last one, also keep the last version (specified by keepUnpublished).
-    const lastVersion = post.versions.length ? post.versions[post.versions.length-1] : null;
-    post.versions = post.publishedVersion ? [post.publishedVersion] : [];
+    const lastVersion = post.versions.length ? post.versions[post.versions.length - 1] : null;
+    const publishedVersion = post.versions.find(version => {
+        return version._id.equals(post.publishedVersion);
+    });
+    post.versions = publishedVersion ? [publishedVersion] : [];
 
-    if (keepUnpublished && lastVersion && !lastVersion._id.equals(post.publishedVersion._id)) {
+    if (keepUnpublished && lastVersion && !lastVersion._id.equals(post.publishedVersion)) {
         post.versions.push(lastVersion);
     }
+}
+
+function removeBody(post) {
+    post.versions.forEach(version => {
+        version.body = '';
+    });
+}
+
+function postVersionsMatchQuery(post, criteria) {
+    // Check that for every criteria in the query there is a post version that matches it.
+    for (let version of post.versions) {
+        for (let criterium of Object.keys(criteria)) {
+            // Delete the criterium from the query, if it is met.
+            if (version[criterium] == criteria[criterium]) delete criteria[criterium];
+        }
+    }
+
+    // It matched, if all criteria were met
+    return Object.keys(criteria).length == 0;
 }
 
 // route middleware that will happen on every request
@@ -59,25 +81,33 @@ router.post('/api/categories', auth, function (req, res, next) {
     category.save().then(category => res.json(category)).catch(next);
 });
 
-router.get('/api/posts', function (req, res, next) {
+function getPosts(req, res, next, keepUnpublished = false) {
+    let criteria = {};
+    if (req.query.category !== undefined) criteria.category = req.query.category;
+    if (req.query.slug !== undefined) criteria.slug = req.query.slug;
+
+    // Check for URL parameters
     Post.find({publishedVersion: {$ne: null}})
-        .populate('publishedVersion versions')
+        .populate('versions')
         .exec(function (err, posts) {
             if (err) return next(err);
 
             posts.forEach(post => removeOldVersions(post, false));
-            setTimeout(() => res.json(posts), 1000);
-        });
-});
+            posts = posts.filter(post => postVersionsMatchQuery(post, criteria));
 
-router.get('/api/posts/all', auth, function (req, res, next) {
-    Post.find().populate('publishedVersion versions')
-        .exec(function (err, posts) {
-            if (err) return next(err);
+            // Only send skeletons, if wanted
+            if (req.query.withBody == 'false') posts.forEach(removeBody);
 
-            posts.forEach(post => removeOldVersions(post, true));
             res.json(posts);
         });
+}
+
+router.get('/api/posts', function (req, res, next) {
+    getPosts(req, res, next);
+});
+
+router.get('/api/posts/authorized', auth, function (req, res, next) {
+    getPosts(req, res, next, true);
 });
 
 // Route for adding a post
@@ -112,16 +142,16 @@ router.post('/api/posts/:id/version', auth, function (req, res, next) {
             // Find the post
             return Post.findOne({'_id': postVersion.post});
         }).then(post => {
-            // Update the post
-            post.versions.push(postVersion);
-            return post.save();
-        }).then(post => {
-            // Get the updated post with populated fields
-            return Post.populate(post, 'publishedVersion versions');
-        }).then(post => {
-            // Return the post
-            res.json(post);
-        }).catch(next);
+        // Update the post
+        post.versions.push(postVersion);
+        return post.save();
+    }).then(post => {
+        // Get the updated post with populated fields
+        return Post.populate(post, 'versions');
+    }).then(post => {
+        // Return the post
+        res.json(post);
+    }).catch(next);
 });
 
 // Route for updating a post
@@ -141,12 +171,12 @@ router.put('/api/posts/:id', auth, function (req, res, next) {
     Post.findOneAndUpdate(query, req.body, {'new': true})
         .then(function (post) {
             // Get the updated post with populated fields
-            return Post.populate(post, 'publishedVersion versions');
+            return Post.populate(post, 'versions');
         }).then(function (post) {
-            res.json(post);
-        }).catch(function (err) {
-            next(err);
-        });
+        res.json(post);
+    }).catch(function (err) {
+        next(err);
+    });
 });
 
 // Route for deleting a post

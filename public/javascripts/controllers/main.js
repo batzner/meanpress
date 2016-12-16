@@ -8,8 +8,8 @@ class MainCtrl extends InjectionReceiver {
     static get $inject() {
         // Inject the services so that posts and categories are loaded in all states
         // (asynchronous anyways).
-        return ['$rootScope', '$sce', '$document', '$window', '$stateParams',
-            'angularLoad', 'usSpinnerService',
+        return ['$rootScope', '$sce', '$document', '$window', '$stateParams', '$state', '$timeout',
+            'angularLoad',
             'AuthService', 'PostService', 'CategoryService'];
     }
 
@@ -18,18 +18,23 @@ class MainCtrl extends InjectionReceiver {
 
         this.$rootScope.log = console.log;
 
-        // Show the spinner, if specified. We need to wait for the ui-view to be loaded before
-        // accessing $stateParams
-        this.$rootScope.$on('$viewContentLoaded',() => {
-            if (this.$stateParams.showSpinner) this.usSpinnerService.spin('spinner');
-        });
-
         // Highlight the content
         Util.highlightContinuously(this.$rootScope, this.angularLoad);
 
-        // Scroll to the top on new pages
+        // $viewContentLoaded will be broadcastet twice. Once for the root view and once for
+        // the ui-view. We only want to fetch the posts.
+        let fetchingPosts = false;
         this.$rootScope.$on('$viewContentLoaded', () => {
+            // Scroll to the top on new pages
             this.$window.scrollTo(0, 0);
+
+            // Set a timeout, so that this gets called in the next cycle, when the ui-view's
+            // controller is loaded as well. Thus, the child controller can issue prioritized
+            // requests. http://stackoverflow.com/a/27197922/2628369
+            if (!fetchingPosts) {
+                this.$timeout(() => this.PostService.fetchPosts(), 0);
+                fetchingPosts = true;
+            }
         });
     }
 

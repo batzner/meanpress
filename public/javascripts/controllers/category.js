@@ -16,10 +16,18 @@ class CategoryCtrl extends InjectionReceiver {
 
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts() || !this.CategoryService.hasCategories()) {
-            this.$scope.$on('posts:fetched', () => {
+            // Fetch all posts in this category
+            this.PostService.fetchPosts({category:this.$stateParams.name}, true);
+
+            // Show a spinner
+            this.usSpinnerService.spin('spinner');
+
+            let postListener = this.$scope.$on('posts:fetched', () => {
+                postListener(); // Remove this listener
                 if (this.CategoryService.hasCategories()) this.fillTemplate();
             });
-            this.$scope.$on('categories:fetched', () => {
+            let categoryListener = this.$scope.$on('categories:fetched', () => {
+                categoryListener(); // Remove this listener
                 if (this.PostService.hasPosts()) this.fillTemplate();
             });
         } else {

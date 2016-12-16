@@ -16,7 +16,16 @@ class EditPostCtrl extends InjectionReceiver {
 
         // If we are editing a post and the posts are not fetched yet, wait for the fetch
         if (this.$stateParams.slug && !this.PostService.hasPosts()) {
-            this.$scope.$on('posts:fetched', () => this.fillTemplate());
+            // Fetch this post with priority
+            this.PostService.fetchPosts({slug:this.$stateParams.slug});
+
+            // Keep the listener, so that updates of the posts will renew the post version.
+            // Otherwise, the post version will be different from its post's post version,
+            // because the post created a new post version but the old post version is still
+            // referenced by this scope.
+            this.$scope.$on('posts:fetched', () => {
+                this.fillTemplate();
+            });
         } else {
             this.fillTemplate();
         }

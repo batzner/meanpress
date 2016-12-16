@@ -5,7 +5,8 @@
 class HomeCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$document', 'angularLoad', 'usSpinnerService', 'PostService'];
+        return ['$scope', '$document', '$timeout', 'angularLoad', 'usSpinnerService',
+            'PostService'];
     }
 
     constructor(...injections) {
@@ -15,7 +16,17 @@ class HomeCtrl extends InjectionReceiver {
 
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts()) {
-            this.$scope.$on('posts:fetched', () => this.fillTemplate());
+            // Fetch the posts without body first, then with
+            this.PostService.fetchPosts({}, false);
+
+            // Show a spinner
+            this.usSpinnerService.spin('spinner');
+
+            let postListener = this.$scope.$on('posts:fetched', () => {
+                postListener(); // Remove this listener
+                this.usSpinnerService.stop('spinner');
+                this.fillTemplate();
+            });
         } else {
             this.fillTemplate();
         }

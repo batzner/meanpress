@@ -14,7 +14,7 @@ class Post extends BaseEntity {
 
         // After updating the properties, we might need to reset the published version
         if (data.publishedVersion) {
-            this.publishedVersion = this.versions.find(v => v._id == this.publishedVersion._id);
+            this.publishedVersion = this.versions.find(v => v._id == data.publishedVersion);
         }
     }
 
