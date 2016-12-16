@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const jwt = require('express-jwt');
 const config = require('../config/general');
+const winston = require('winston');
 
 const router = express.Router();
 
@@ -88,19 +89,23 @@ function getPosts(req, res, next, keepUnpublished = false) {
 
     // Check for URL parameters
     const startDate = new Date();
-    Post.find({publishedVersion: {$ne: null}})
+    Post.find()
         .populate('versions')
         .exec(function (err, posts) {
             if (err) return next(err);
 
             posts.forEach(post => removeOldVersions(post, false));
+
+            // Filter posts that don't have a version at all after filtering the versions
+            posts = posts.filter(post => post.versions.length);
             posts = posts.filter(post => postVersionsMatchQuery(post, criteria));
 
             // Only send skeletons, if wanted
             if (req.query.withBody == 'false') posts.forEach(removeBody);
 
-            res.json(new Date() - startDate);
-            // res.json(posts);
+            winston.info(`Time to answer: ${new Date() - startDate} req.query: ${
+                JSON.stringify(req.query)}`);
+            res.json(posts);
         });
 }
 

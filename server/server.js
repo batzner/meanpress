@@ -4,6 +4,9 @@
  * Module dependencies.
  */
 
+const winston = require('winston');
+winston.add(winston.transports.File, { filename: 'out/log/all.log' });
+
 var app = require('./app');
 var debug = require('debug')('blog:server');
 var http = require('http');

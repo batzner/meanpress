@@ -45,5 +45,7 @@ jspm_packages
 .idea
 public/lib
 dist
+out
+!out/log/.keep
 resources
 .DS_Store
