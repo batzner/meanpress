@@ -23,18 +23,15 @@ function getIndexTemplateName() {
     return process.env.NODE_ENV === 'production' ? 'index-prod' : 'index';
 }
 
-function removeOldVersions(post, keepUnpublished) {
-    // Remove all but the published version of the post. If the published version is not the
-    // last one, also keep the last version (specified by keepUnpublished).
-    const lastVersion = post.versions.length ? post.versions[post.versions.length - 1] : null;
-    const publishedVersion = post.versions.find(version => {
-        return version._id.equals(post.publishedVersion);
+function getIdsToPopulate(posts, withUnpublished) {
+    // Return an array containing all published ids and, if specified, all last ids as well.
+    let ids = [];
+    posts.forEach(post => {
+        if (post.publishedVersion) ids.push(post.publishedVersion);
+        const last = post.versions.length - 1;
+        if (withUnpublished && last >= 0) ids.push(post.versions[last]);
     });
-    post.versions = publishedVersion ? [publishedVersion] : [];
-
-    if (keepUnpublished && lastVersion && !lastVersion._id.equals(post.publishedVersion)) {
-        post.versions.push(lastVersion);
-    }
+    return ids;
 }
 
 function removeBody(post) {
@@ -69,7 +66,7 @@ router.post('/api/categories', auth, function (req, res, next) {
     category.save().then(category => res.json(category)).catch(next);
 });
 
-function getPosts(req, res, next, keepUnpublished = false) {
+function getPosts(req, res, next, withUnpublished = false) {
     // For each criterium, we need to find one post version fulfilling it
     let criteria = [];
     if (req.query.category !== undefined) {
@@ -84,12 +81,17 @@ function getPosts(req, res, next, keepUnpublished = false) {
     // Check for URL parameters
     const startDate = new Date();
     Post.find(query)
-        .populate('versions')
-        .exec(function (err, posts) {
-            if (err) return next(err);
-
-            posts.forEach(post => removeOldVersions(post, false));
-
+        .then(posts => {
+            // Only populate the published and the last version
+            let idsToPopulate = getIdsToPopulate(posts, withUnpublished);
+            return PostVersion.populate(posts, {
+                path: 'versions',
+                match: {
+                    _id: {$in: idsToPopulate}
+                }
+            });
+        })
+        .then(posts => {
             // Filter posts that don't have a version at all after filtering the versions
             posts = posts.filter(post => post.versions.length);
 
@@ -99,7 +101,8 @@ function getPosts(req, res, next, keepUnpublished = false) {
             winston.info(`Time to answer: ${new Date() - startDate} req.query: ${
                 JSON.stringify(req.query)}`);
             res.json(posts);
-        });
+        })
+        .catch(next);
 }
 
 router.get('/api/posts', function (req, res, next) {
