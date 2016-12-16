@@ -87,6 +87,7 @@ function getPosts(req, res, next, keepUnpublished = false) {
     if (req.query.slug !== undefined) criteria.slug = req.query.slug;
 
     // Check for URL parameters
+    const startDate = new Date();
     Post.find({publishedVersion: {$ne: null}})
         .populate('versions')
         .exec(function (err, posts) {
@@ -98,7 +99,8 @@ function getPosts(req, res, next, keepUnpublished = false) {
             // Only send skeletons, if wanted
             if (req.query.withBody == 'false') posts.forEach(removeBody);
 
-            res.json(posts);
+            res.json(new Date() - startDate);
+            // res.json(posts);
         });
 }
 
