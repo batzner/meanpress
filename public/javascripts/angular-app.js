@@ -99,6 +99,14 @@ app.config([
     }
 ]);
 
+app.run(['$rootScope', function ($rootScope) {
+    $rootScope.$on('$stateChangeSuccess', function (event, current, previous) {
+        // Set the default page title and SEO info
+        $rootScope.htmlTitle = 'MLOwl - Machine Learning et al.';
+        $rootScope.metaDescription = 'Blog about TensorFlow, LSTMs, Neural Networks and Machine Learning in general';
+    });
+}]);
+
 app.config(['usSpinnerConfigProvider', function (usSpinnerConfigProvider) {
     usSpinnerConfigProvider.setDefaults({
         lines: 14 // The number of lines to draw

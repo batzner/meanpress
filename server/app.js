@@ -31,6 +31,11 @@ const PUBLIC_DIR = (process.env.NODE_ENV === 'production') ? '../dist' : '../pub
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
+// Use prerendered pages for search engines
+if (process.env.NODE_ENV === 'production') {
+    app.use(require('prerender-node').set('prerenderToken', config.PRERENDER_TOKEN));
+}
+
 app.use(favicon(path.join(__dirname, PUBLIC_DIR, 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json({limit: '50mb'}));
@@ -51,7 +56,7 @@ app.use('/', routes);
 app.use('/users', users);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -62,7 +67,7 @@ app.use(function(req, res, next) {
 // development error handler
 // will print stacktrace
 if (process.env.NODE_ENV === 'development') {
-    app.use(function(err, req, res, next) {
+    app.use(function (err, req, res, next) {
         console.error(err);
         res.status(err.status || 500);
         res.render('error', {
@@ -74,7 +79,7 @@ if (process.env.NODE_ENV === 'development') {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
     console.error(err);
     res.status(err.status || 500);
     res.render('error', {

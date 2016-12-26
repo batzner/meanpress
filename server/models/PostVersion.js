@@ -11,6 +11,7 @@ const PostVersionSchema = new mongoose.Schema(
         preview: String,
         body: String,
         slug: String,
+        htmlTitle: String,
         metaDescription: String,
         focusKeyword: String,
         jsIncludes: [{type: String}],

@@ -5,7 +5,7 @@
 class PostCtrl extends InjectionReceiver {
 
     static get $inject() {
-        return ['$scope', '$stateParams', '$location', '$state', '$sce', '$document',
+        return ['$scope', '$stateParams', '$location', '$state', '$sce', '$document', '$rootScope',
             'angularLoad', 'usSpinnerService',
             'PostService'];
     }
@@ -16,7 +16,7 @@ class PostCtrl extends InjectionReceiver {
         // If the posts are not fetched yet, wait for the fetch
         if (!this.PostService.hasPosts()) {
             // Fetch this post with priority
-            this.PostService.fetchPosts({slug:this.$stateParams.slug});
+            this.PostService.fetchPosts({slug: this.$stateParams.slug});
 
             // Show a spinner
             this.usSpinnerService.spin('spinner');
@@ -49,6 +49,10 @@ class PostCtrl extends InjectionReceiver {
         } else {
             this.$scope.postVersion = this.post.getDisplayVersion();
         }
+
+        this.$rootScope.htmlTitle = (this.$scope.postVersion.htmlTitle
+            || this.$scope.postVersion.title);
+        this.$rootScope.metaDescription = this.$scope.postVersion.metaDescription;
         this.$scope.editUrl = this.$state.href('edit', {slug: this.$stateParams.slug});
 
         this.loadScripts();

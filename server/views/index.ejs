@@ -1,12 +1,26 @@
-<html>
+<html ng-app="mlstuff" ng-controller="MainCtrl as main">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>MLOwl - Machine Learning et al.</title>
+    <title ng-bind="htmlTitle">MLOwl - Blog about Machine Learning et al.</title>
     <base href="/">
 
+    <!-- SEO start -->
+    <meta name="description" content="{{metaDescription}}">
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="{{htmlTitle}}" />
+    <meta property="og:description" content="{{metaDescription}}" />
+    <meta property="og:url" content="http://kilians.net" />
+    <meta property="og:site_name" content="MLOwl" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:description" content="{{metaDescription}}" />
+    <meta name="twitter:title" content="{{htmlTitle}}" />
+    <meta name="twitter:site" content="@therealkilianb" />
+    <!-- SEO end -->
+
+    <!-- Favicons start -->
     <link rel="apple-touch-icon" sizes="57x57" href="/favicons/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/favicons/apple-icon-60x60.png">
     <link rel="apple-touch-icon" sizes="72x72" href="/favicons/apple-icon-72x72.png">
@@ -24,10 +38,11 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/favicons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
+    <!-- Favicons end -->
 
+    <!-- Stylesheets start -->
     <link href="https://fonts.googleapis.com/css?family=Oswald:300|Source+Sans+Pro:300,600"
           rel="stylesheet">
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"
           rel="stylesheet">
     <link rel="stylesheet"
@@ -35,9 +50,10 @@
     <link href="/stylesheets/style.css" rel="stylesheet">
     <link href="/stylesheets/nav.css" rel="stylesheet">
     <link href="/stylesheets/lib/highlight.css" rel="stylesheet">
+    <!-- Stylesheets end -->
 </head>
 
-<body ng-app="mlstuff" ng-controller="MainCtrl as main">
+<body>
 <div id="navigation">
     <header>
         <div class="brand">
