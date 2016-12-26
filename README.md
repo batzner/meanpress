@@ -24,7 +24,7 @@ A very simple CMS based on the MEAN stack
 ### Every time
 1. `sudo git pull`
 2. `sudo npm install` and `sudo npm install --prefix public/javascripts/lib`
-3. `sudo forever stopall`
-4. `sudo gulp`
+3. `sudo gulp`
+4. `sudo forever stopall`
 5. `sudo npm run-script server` and test the site in your browser.
 6. `sudo npm run-script forever` to detach.
