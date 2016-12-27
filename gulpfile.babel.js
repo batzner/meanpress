@@ -14,6 +14,7 @@ const concat = require('gulp-concat');
 const imagemin = require('gulp-imagemin');
 const cleanCSS = require('gulp-clean-css');
 const rename = require('gulp-rename');
+const gulpMerge = require('gulp-merge');
 
 // Bases for specifying paths in gulp.src and gulp.dest
 const bases = {
@@ -44,9 +45,11 @@ gulp.task('_clean', function () {
 
 // Transpile the javascript files to ES5. Then, minify them.
 gulp.task('_javascripts', ['_clean'], function () {
-    return gulp.src(sourcePaths.javascripts, {base: bases.frontend, cwd:bases.frontend})
+    const polyfill = './node_modules/babel-polyfill/dist/polyfill.min.js';
+    const jsStream = gulp.src(sourcePaths.javascripts, {base: bases.frontend, cwd:bases.frontend})
         .pipe(babel())
-        .pipe(uglify())
+        .pipe(uglify());
+    return gulpMerge(gulp.src(polyfill), jsStream)
         .pipe(concat(minJsName))
         .pipe(gulp.dest(bases.dist+'javascripts/'));
 });
