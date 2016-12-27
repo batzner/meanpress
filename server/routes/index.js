@@ -4,10 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const jwt = require('express-jwt');
-const winston = require('winston');
-const detectBot = require('detect-bot');
-const request = require('request');
 const config = require('../config/general');
+const winston = require('winston');
 
 const router = express.Router();
 
@@ -48,6 +46,13 @@ router.use(function (req, res, next) {
     console.log(req.method, req.url);
     // continue doing what we were doing and go to the route
     next();
+});
+
+
+
+/* GET home page. */
+router.get('/', function (req, res, next) {
+    res.render(getIndexTemplateName());
 });
 
 router.get('/api/categories', function (req, res, next) {
@@ -246,15 +251,6 @@ router.post('/api/login', function (req, res, next) {
 // This route deals enables HTML5Mode by forwarding missing files to the index. This needs to be
 // at the end, because it is a catch all
 router.get('*', function (req, res) {
-    // Serve a snapshot to bots
-    const requestedFromPrerender = req.get('host').startsWith('localhost');
-    if (detectBot(req.headers['user-agent']) && !requestedFromPrerender) {
-        const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        const newUrl = 'http://localhost:3001/' + fullUrl;
-        request(newUrl).pipe(res);
-        return;
-    }
-
     res.render(getIndexTemplateName());
 });
 
