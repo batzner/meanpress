@@ -1,5 +1,4 @@
 User-agent: *
-Disallow: /api/
 Disallow: /add
 Disallow: /add-category
 Disallow: /login
