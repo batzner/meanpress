@@ -122,9 +122,6 @@ class PostService extends InjectionReceiver {
 
             // Broadcast the fetch
             this.$rootScope.$broadcast('posts:fetched');
-
-            // Let Prerender create the snapshot
-            window.prerenderReady = true;
         }).catch(this.$log.error);
     }
 
