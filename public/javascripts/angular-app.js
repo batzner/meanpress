@@ -99,11 +99,23 @@ app.config([
     }
 ]);
 
-app.run(['$rootScope', function ($rootScope) {
-    $rootScope.$on('$stateChangeSuccess', function (event, current, previous) {
+// SEO and Google Analytics initializations
+app.run(['$rootScope', '$window', '$location', 'AuthService',
+    function ($rootScope, $window, $location, AuthService) {
+    // Initialise GAnalytics
+    if (typeof $window.ga === 'function' && !AuthService.isLoggedIn()) {
+        $window.ga('create', 'UA-70748485-2', 'auto');
+    }
+
+    $rootScope.$on('$stateChangeSuccess', function () {
         // Set the default page title and SEO info
         $rootScope.htmlTitle = 'MLOwl - Machine Learning et al.';
         $rootScope.metaDescription = 'Blog about TensorFlow, LSTMs, Neural Networks and Machine Learning in general';
+
+        // Send the page view to Google Analytics
+        if (typeof $window.ga === 'function' && !AuthService.isLoggedIn()) {
+            $window.ga('send', 'pageview', $location.path());
+        }
     });
 }]);
 
