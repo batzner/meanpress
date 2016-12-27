@@ -15,6 +15,7 @@ require('./models/PostVersion');
 require('./models/Post');
 require('./models/User');
 require('./models/Category');
+require('./models/Redirect');
 
 // Load Passport for authentication
 var passport = require('passport');

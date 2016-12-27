@@ -13,6 +13,7 @@ const Post = mongoose.model('Post');
 const PostVersion = mongoose.model('PostVersion');
 const User = mongoose.model('User');
 const Category = mongoose.model('Category');
+const Redirect = mongoose.model('Redirect');
 
 // Authentication middleware
 const auth = jwt({
@@ -46,13 +47,6 @@ router.use(function (req, res, next) {
     console.log(req.method, req.url);
     // continue doing what we were doing and go to the route
     next();
-});
-
-
-
-/* GET home page. */
-router.get('/', function (req, res, next) {
-    res.render(getIndexTemplateName());
 });
 
 router.get('/api/categories', function (req, res, next) {
@@ -251,7 +245,25 @@ router.post('/api/login', function (req, res, next) {
 // This route deals enables HTML5Mode by forwarding missing files to the index. This needs to be
 // at the end, because it is a catch all
 router.get('*', function (req, res) {
-    res.render(getIndexTemplateName());
+    // Check, if there is a redirect for the requested url
+    if (req.url.length > 0) {
+        Redirect.findOne({from: req.url})
+            .then(redirect => {
+                if (redirect) {
+                    res.redirect(redirect.to);
+                }
+                else {
+                    // Let the frontend handle the url
+                    res.render(getIndexTemplateName());
+                }
+            })
+            .catch(() => {
+                res.render(getIndexTemplateName());
+            });
+    } else {
+        // Let the frontend handle the url
+        res.render(getIndexTemplateName());
+    }
 });
 
 module.exports = router;
