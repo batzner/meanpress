@@ -38,6 +38,15 @@ app.config([
                     showSpinner: true
                 }
             })
+            .state('lab', {
+                url: '/lab/',
+                templateUrl: '/templates/lab.html',
+                controller: 'LabCtrl as controller',
+                navItem: 'blog',
+                params: {
+                    showSpinner: true
+                }
+            })
             .state('preview', {
                 url: '/post/{slug}/preview',
                 templateUrl: '/templates/post.html',

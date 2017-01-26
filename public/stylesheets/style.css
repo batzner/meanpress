@@ -24,8 +24,8 @@ button:hover, button:active, button:focus {
     text-decoration: none;
 }
 
-a:focus, button:focus {
-    outline: none;
+a:focus, button:focus, span:focus, div:focus {
+    outline: none !important;
 }
 
 button {

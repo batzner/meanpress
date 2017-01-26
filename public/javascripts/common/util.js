@@ -137,6 +137,10 @@ class BaseEntity {
 }
 
 class Util {
+    static objectValues(obj) {
+        return Object.keys(obj).map(key => obj[key]);
+    }
+
     static chainPromiseBlocks(blocks) {
         // Chains an array of functions, which return a promise to a sequence of then calls. The
         // blocks should each return a promise, just like in a then block.

@@ -1,0 +1,116 @@
+<p>High-level description what I did</p>
+
+<div id="talk-box">
+    <table>
+        <tr id="talk-box-heading">
+            <td></td>
+            <td class="nostretch">
+                <div>Generate text from</div>
+                <div class="btn-group" role="group" aria-label="Dataset choice">
+                    <button type="button" class="btn btn-default dark active">Wikipedia</button>
+                    <button type="button" class="btn btn-default dark">US Congress</button>
+                    <button type="button" class="btn btn-default dark">South Park</button>
+                    <button type="button" class="btn btn-default dark">Sherlock Holmes</button>
+                    <button type="button" class="btn btn-default dark">Goethe</button>
+                </div>
+            </td>
+            <td></td>
+        </tr>
+        <tr id="talk-box-body">
+            <td></td>
+            <td>
+                <div id="talk-box-input">
+                    <div id="text-input" contentEditable="true" oninput="onInput()">The meaning of life is</div>
+                    <div id="text-input-output-bridge">...</div>
+                    <span id="text-output">a strange thing to be considered. a strange thing to be considered. a strange thing to be considered.</span>
+                </div>
+            </td>
+            <td>
+                <button id="send-button" type="button" class="btn btn-default round btn-icon" onclick="completeText()">
+                    <span class="fa fa-paper-plane"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<p>Low-level description -> Char LM, LSTM, TensorFlow.
+    - Idea not new, inspired by Karpathy
+    - Implementation not notesworthy, TensorFlow newbie, but Flask ist quite new
+    - Hyperparameter search / odyssee is new</p>
+
+<h3>0. Setup:</h3>
+<p>Using RMSprop as an optimizer, which is still SGD, but with an improvement: it uses a different learning rate for each parameter, which depends on the last gradients of that parameter. Thus, parameters that recently had multiple large updates get a smaller learning rate.
+    http://sebastianruder.com/optimizing-gradient-descent/index.html
+
+    Dataset: Sherlock Holmes
+    Write exact metrics for every dataset, number of words, chars, bytes etc.
+
+    4 mio chars as validation set???</p>
+
+<h3>1. Batch Size:</h3>
+
+<div id="chart-wrapper">
+    <canvas id="chart" width="500" height="300"></canvas>
+</div>
+
+<p>generally unfair to compare the batch sizes with the same learning rate. Because the steps, which the optimizer takes with larger batch sizes, are more stable, it can use a higher learning rate. Thus, each batch_size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.
+
+    1/10/20 definitely too inefficient
+    1/10 overfit faster, because they only see a small portion of the text at every step so they lose the sense for the whole text???
+    500/2000 seem to get stuck in low local minima, because their minima don’t change as fast as with small batch_sizes
+
+    Why can't we just scale the batch size to whatever fits in the memory?
+    Good answer: https://www.quora.com/Intuitively-how-does-mini-batch-size-affect-the-performance-of-stochastic-gradient-descent/answer/Brian-Wong-21
+    While the gradient of a single data point is a lot noisier than the gradient of a 100-batch, the gradient of a 100-batch is not that much noisier than that of a 100,000-batch. So the additional 99,900 samples in that batch are useless, because we can use the almost the same step size with the 100-batch.
+    Also, noisiness prevent getting stuck in low local minima, because the error function and therefore the minima change for every batch.
+
+    "But noisiness isn't all bad. In particular, suppose that our error function is particularly pernicious and has a bunch of little valleys. If we used the entire training set to compute each gradient, our model would get stuck in the first valley it fell into (since it would register a gradient of 0 at this point). If we use smaller mini-batches, on the other hand, we'll get more noise in our estimate of the gradient. This noise might be enough to push us out of some of the shallow valleys in the error function.
+
+    There is thus an important trade-off to consider between being able to jump out of shallow minima and making sure that you eventually converge to some minimum instead of bouncing around.
+
+    In practice, small to moderate mini-batches (10-500) are generally used, combined with a decaying learning rate, which guarantees long run convergence while maintaining the power to jump out of shallow minima that are encountered early on."
+
+    -> Choose 200 as batch size for future experiments, because it has a similar time per epoch, but it converges faster.
+    Also, think about batch training a language model on a text
+    Graphic on splitting up the text into batches
+
+    How does batch processing work for character-level language model generation? How can we split up the dataset without destroying the logical dependencies between characters? You just start each batch at equidistant points in the dataset, so that the chars within a batch are never split up. See ptb_iterator(...) here for an implementation.
+    Lower batch size prevents splitting up the text into too many small parts and therefore destroying the logical connections between those parts.
+
+    LESSON LEARNED: Choose a good batch size first, because it affects the training time of future experiments. Also, the optimal value for the learning rate depends on the batch size.
+
+    Autocomplete of the 200 batch net: "The house which had been the strange problem which had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the stran"</p>
+
+
+<p>X Axis</p>
+<select id="x-axis-select" onchange="plot()">
+    <option value="secondsSinceStart">Training Time</option>
+    <option value="epochs">Epochs</option>
+</select>
+
+<p>Y Axis</p>
+<select id="y-axis-select" onchange="plot()">
+    <option value="lossesValid">Validation Loss</option>
+    <option value="lossesValidKeepState">Validation Loss (correct)</option>
+    <option value="lossesTrain">Training Loss</option>
+</select>
+
+<p>Hyperparameter</p>
+<select id="run-group-select" onchange="plot()">
+    <option value="batch_size">Batch Size</option>
+    <option value="learning_rate_512">Learning Rate</option>
+    <option value="learning_rate_decay">Learning Rate Decay</option>
+    <option value="num_timesteps">Number of Timesteps</option>
+    <option value="num_neurons_1024_failed_starts">1024 Neurons Failed Starts</option>
+    <option value="learning_rate_1024">Learning Rate (1024 Neurons)</option>
+    <option value="num_neurons">Neurons per Layer</option>
+    <option value="output_keep_prob">Output Keep Prob.</option>
+    <option value="num_layers">Number of Layers</option>
+    <option value="reset_state_interval_tokens">Reset State after Tokens</option>
+    <option value="wiki">Wikipedia Dataset</option>
+</select>
+
+<input id="stylesheets-input" value="stylesheets/posts/char-lm.css" style="display: none;">
+<!--  javascripts/posts/char-lm/batch-size.js javascripts/posts/char-lm/plot.js -->
+<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js" style="display: none;">

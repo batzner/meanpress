@@ -1,0 +1,81 @@
+#chart-wrapper {
+    width: 500px;
+}
+
+#talk-box {
+    width: calc(100% + 30px);
+    background: url(/images/posts/char-lm/text-box-background.jpg) no-repeat;
+    background-size: cover;
+    padding: 30px;
+    text-align: center;
+    margin: 0 -15px 10px -15px;
+}
+
+#talk-box table {
+    margin: 0 auto;
+    color: #fff;
+}
+
+#talk-box td {
+    vertical-align: top;
+}
+
+#talk-box-heading {
+    text-align: center;
+}
+
+#talk-box-heading .text {
+    padding-top: 2px;
+    font-size: 1rem;
+}
+
+#talk-box-heading .btn-group {
+    display: inline-block;
+    margin-top: 20px;
+}
+
+#talk-box-heading .btn-group .btn {
+    font-size: 1rem;
+    color: #eee;
+    min-width: 100px;
+}
+
+#talk-box-heading .btn-group .btn.active, #talk-box-heading .btn-group .btn:hover {
+    color: #fff;
+}
+
+#talk-box-body {
+    padding-bottom: 30px;
+}
+
+#talk-box-input {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 15px;
+    text-align: left;
+    overflow: hidden;
+}
+
+#text-input {
+    float: left;
+    min-width: 20px;
+}
+
+#text-output {
+    margin-left: 10px;
+    color: #ddd;
+    white-space: pre-wrap;
+}
+
+#text-input-output-bridge {
+    float: left;
+}
+
+#talk-box td {
+    border: transparent solid 10px;
+    padding: 0;
+}
+
+#send-button {
+    margin-top: 5px;
+}
