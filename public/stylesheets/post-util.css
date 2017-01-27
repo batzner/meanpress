@@ -1,8 +1,3 @@
-.nostretch {
-    width: 1%;
-    white-space: nowrap;
-}
-
 .btn-group {
     white-space: nowrap;
 }
@@ -13,7 +8,7 @@
 }
 
 .btn-group .btn:not(:last-child) {
-    margin-right: -4px;
+    margin-right: -3px;
 }
 
 .btn.round {

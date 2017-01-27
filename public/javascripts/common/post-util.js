@@ -83,12 +83,14 @@ class PostUtil {
 
         // Create a new series secondsSinceStart out of the intervalSeconds
         result.secondsSinceStart = new Map();
+        result.minutesSinceStart = new Map();
         let currentSeconds = 0;
         Array.from(result.intervalSeconds.keys())
             .sort((a, b) => a - b)
             .forEach(step => {
                 currentSeconds += result.intervalSeconds.get(step);
                 result.secondsSinceStart.set(step, currentSeconds);
+                result.minutesSinceStart.set(step, currentSeconds/60);
             });
         return result;
     }
@@ -111,4 +113,82 @@ class PostUtil {
         });
         return parsed;
     }
+
+    static placeCaretAtEnd(el) {
+        // See http://stackoverflow.com/questions/4233265/contenteditable-set-caret-at-the-end-of-the-text-cross-browser
+        el.focus();
+        if (typeof window.getSelection != "undefined"
+            && typeof document.createRange != "undefined") {
+            var range = document.createRange();
+            range.selectNodeContents(el);
+            range.collapse(false);
+            var sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(range);
+        } else if (typeof document.body.createTextRange != "undefined") {
+            var textRange = document.body.createTextRange();
+            textRange.moveToElementText(el);
+            textRange.collapse(false);
+            textRange.select();
+        }
+    }
+
+    static clearChart(id) {
+        const oldCanvas = $(`#${id}`);
+        // ChartJS modifies the canvas width and height attributes, so we need to store them in data
+        const width = oldCanvas.data('width');
+        const height = oldCanvas.data('height');
+        const classes = oldCanvas.attr('class');
+        const newCanvas = $('<canvas>')
+            .data('width', width).data('height', height)
+            .attr('width', width).attr('height', height)
+            .attr('class', classes).attr('id', id);
+        oldCanvas.parent().empty().append(newCanvas);
+    }
 }
+
+PostUtil.CHART_COLORS_DIVERSE = [
+    '#fe819d',
+    '#2196F3',
+    '#ffce56',
+    '#9575CD',
+    '#e0846b',
+    '#5f8ca1',
+    '#626a61',
+    '#A9A9A9',
+    '#C5CAE9'];
+PostUtil.CHART_COLORS_BLUE = [
+    '#BBDEFB',
+    '#64B5F6',
+    '#2196F3',
+    '#1565C0',
+    '#133270',
+    '#172237'];
+PostUtil.CHART_COLORS_INDIGO = [
+    '#C5CAE9',
+    '#7986CB',
+    '#3F51B5',
+    '#283593',
+    '#1e2868',
+    '#121424'];
+PostUtil.CHART_COLORS_DEEP_PURPLE = [
+    '#D1C4E9',
+    '#9575CD',
+    '#673AB7',
+    '#4527A0',
+    '#2e185d',
+    '#121424'];
+PostUtil.CHART_COLORS_RED = [
+    '#FFCDD2',
+    '#E57373',
+    '#F44336',
+    '#C62828',
+    '#721414',
+    '#340707'];
+PostUtil.CHART_COLORS_GREEN = [
+    '#C8E6C9',
+    '#81C784',
+    '#4CAF50',
+    '#2E7D32',
+    '#123317',
+    '#0a1a0d'];

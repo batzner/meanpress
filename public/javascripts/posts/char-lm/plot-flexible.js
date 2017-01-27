@@ -39,48 +39,19 @@ const BATCH_SIZE_COLORS = {
     '2000': '#2196F3'
 };
 
-plotBatchSizeDecay();
-plotBatchSizeEpochDuration();
-function plotBatchSizeDecay() {
+const Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
 
-}
-
-function plotBatchSizeEpochDuration() {
-    let labels = Object.keys(BATCH_SIZE_EPOCH_MINUTES).sort((a, b) => parseInt(a) - parseInt(b));
-    let values = labels.map(l => BATCH_SIZE_EPOCH_MINUTES[l]);
-    let colors = labels.map(l => BATCH_SIZE_COLORS[l]);
-    new Chart('batch-size-epoch-duration-chart', {
-        type: 'horizontalBar',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                borderColor: colors,
-                backgroundColor: colors
-            }]
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Minutes per Epoch'
-                    },
-                    ticks: {
-                        min: 0,
-                        max: 30,
-                        stepSize: 10
-                    }
-                }]
-            },
-            legend: {
-                display: false
-            }
-        }
+$(function (){
+    // Initialize the range slider
+    Y_AXIS_RANGE_SLIDER.ionRangeSlider({
+        type: 'double',
+        min: 0,
+        max: 100,
+        onFinish: plot
     });
-}
 
-plot();
+    plot();
+});
 //getLogs('batch_size', [1, 10, 20, 50, 100, 200, 500, 2000]).then(plotLogs);
 //getLogs('learning_rate_512', ['0.001', '0.005', '0.01', '0.05']).then(plotLogs);
 //getLogs('learning_rate_decay', ['0.5', '0.8', '0.9', '0.97']).then(plotLogs);
@@ -142,14 +113,37 @@ function getData(log, xKey, yKey) {
     return data;
 }
 
+function updateSlider(yMin, yMax) {
+    // Force some absolute limits on the slider values
+    yMax = Math.min(30, yMax);
+
+    const decimals = yMax - yMin > 2 ? 0 : 1;
+    $('#y-axis-range').data('ionRangeSlider').update({
+        min: yMin.toFixed(decimals),
+        max: yMax.toFixed(decimals)
+    })
+}
+
 function plotLogs(logs) {
     const xKey = $('#x-axis-select').val();
     const yKey = $('#y-axis-select').val();
 
+    // Filter the data points with the y-axis range slider
+    const yRangeSliderMin = Y_AXIS_RANGE_SLIDER.data('ionRangeSlider').result.from;
+    const yRangeSliderMax = Y_AXIS_RANGE_SLIDER.data('ionRangeSlider').result.to;
+    // Record the data's min and max to update the slider limits
+    let yRange = {min: null, max: null};
+
     const runValues = Object.keys(logs);
     const datasets = runValues.map((value, index) => {
         let data = getData(logs[value], xKey, yKey);
-        data = data.filter(point => point.y < 25);
+
+        data = data.filter(point => {
+            if (yRange.min == null || point.y < yRange.min) yRange.min = point.y;
+            if (yRange.max == null || point.y > yRange.max) yRange.max = point.y;
+            // Return the actual filter condition
+            return yRangeSliderMin <= point.y && point.y <= yRangeSliderMax;
+        });
         data = getEquidistantPoints(data, 30);
 
         return {
@@ -159,9 +153,11 @@ function plotLogs(logs) {
             backgroundColor: BATCH_SIZE_COLORS[value]
         };
     });
-    const yRange = PostUtil.getYRange(datasets);
 
-    new Chart('batch-size-decay-chart', {
+    updateSlider(yRange.min, yRange.max);
+
+    PostUtil.clearChart('flexible-chart');
+    new Chart('flexible-chart', {
         type: 'line',
         data: {
             datasets: datasets
@@ -170,17 +166,13 @@ function plotLogs(logs) {
             scales: {
                 xAxes: [{
                     type: 'linear',
-                    position: 'bottom',
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Training time [m]'
-                    }
+                    position: 'bottom'
                 }],
                 yAxes: [{
                     type: 'logarithmic',
                     ticks: {
-                        min: yRange.min,
-                        max: yRange.max,
+                        min: Math.max(yRange.min, yRangeSliderMin),
+                        max: Math.min(yRange.max, yRangeSliderMax),
                         callback: value => value.toFixed(2)
                     }
                 }]

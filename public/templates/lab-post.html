@@ -4,14 +4,14 @@
     <table>
         <tr id="talk-box-heading">
             <td></td>
-            <td class="nostretch">
+            <td class="no-stretch">
                 <div>Generate text from</div>
                 <div class="btn-group" role="group" aria-label="Dataset choice">
-                    <button type="button" class="btn btn-default dark active">Wikipedia</button>
-                    <button type="button" class="btn btn-default dark">US Congress</button>
-                    <button type="button" class="btn btn-default dark">South Park</button>
-                    <button type="button" class="btn btn-default dark">Sherlock Holmes</button>
-                    <button type="button" class="btn btn-default dark">Goethe</button>
+                    <button type="button" value="wiki" onclick="selectDataset(this.value)" class="btn btn-default dark">Wikipedia</button>
+                    <button type="button" value="congress" onclick="selectDataset(this.value)" class="btn btn-default dark">US Congress</button>
+                    <button type="button" value="sherlock" onclick="selectDataset(this.value)" class="btn btn-default dark">Sherlock Holmes</button>
+                    <button type="button" value="southPark" onclick="selectDataset(this.value)" class="btn btn-default dark">South Park</button>
+                    <button type="button" value="goethe" onclick="selectDataset(this.value)" class="btn btn-default dark">Goethe</button>
                 </div>
             </td>
             <td></td>
@@ -19,10 +19,10 @@
         <tr id="talk-box-body">
             <td></td>
             <td>
-                <div id="talk-box-input">
-                    <div id="text-input" contentEditable="true" oninput="onInput()">The meaning of life is</div>
+                <div id="talk-box-input" onclick="focusOnInput()">
+                    <div id="text-input" contentEditable="true" oninput="onInput()"></div>
                     <div id="text-input-output-bridge">...</div>
-                    <span id="text-output">a strange thing to be considered. a strange thing to be considered. a strange thing to be considered.</span>
+                    <span id="text-output"></span>
                 </div>
             </td>
             <td>
@@ -49,9 +49,11 @@
     4 mio chars as validation set???</p>
 
 <h3>1. Batch Size:</h3>
-
-<div id="chart-wrapper">
-    <canvas id="chart" width="500" height="300"></canvas>
+<div class="col-xs-9 no-padding">
+    <canvas id="batch-size-decay-chart" class="chart" width="600" height="300"></canvas>
+</div>
+<div class="col-xs-3 no-padding">
+    <canvas id="batch-size-epoch-duration-chart" width="200" height="300"></canvas>
 </div>
 
 <p>generally unfair to compare the batch sizes with the same learning rate. Because the steps, which the optimizer takes with larger batch sizes, are more stable, it can use a higher learning rate. Thus, each batch_size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.
@@ -83,34 +85,68 @@
     Autocomplete of the 200 batch net: "The house which had been the strange problem which had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the stran"</p>
 
 
-<p>X Axis</p>
-<select id="x-axis-select" onchange="plot()">
-    <option value="secondsSinceStart">Training Time</option>
-    <option value="epochs">Epochs</option>
-</select>
-
-<p>Y Axis</p>
-<select id="y-axis-select" onchange="plot()">
-    <option value="lossesValid">Validation Loss</option>
-    <option value="lossesValidKeepState">Validation Loss (correct)</option>
-    <option value="lossesTrain">Training Loss</option>
-</select>
-
-<p>Hyperparameter</p>
-<select id="run-group-select" onchange="plot()">
-    <option value="batch_size">Batch Size</option>
-    <option value="learning_rate_512">Learning Rate</option>
-    <option value="learning_rate_decay">Learning Rate Decay</option>
-    <option value="num_timesteps">Number of Timesteps</option>
-    <option value="num_neurons_1024_failed_starts">1024 Neurons Failed Starts</option>
-    <option value="learning_rate_1024">Learning Rate (1024 Neurons)</option>
-    <option value="num_neurons">Neurons per Layer</option>
-    <option value="output_keep_prob">Output Keep Prob.</option>
-    <option value="num_layers">Number of Layers</option>
-    <option value="reset_state_interval_tokens">Reset State after Tokens</option>
-    <option value="wiki">Wikipedia Dataset</option>
-</select>
+<h3>All Experiments</h3>
+<div class="col-xs-9">
+    <canvas id="flexible-chart" class="chart" data-width="600" data-height="300"></canvas>
+</div>
+<div class="col-xs-3">
+    <div class="chart-form-group">
+        <div>
+            <label for="run-group-select">Experiment</label>
+            <div class="btn-group dropdown-full-width">
+                <button id="run-group-select" type="button" value="batch_size" class="btn btn-default dropdown-toggle" onchange="plot()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="choice">Batch Size</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-value="batch_size">Batch Size</a></li>
+                    <li><a href="#" data-value="learning_rate_512">Learning Rate</a></li>
+                    <li><a href="#" data-value="learning_rate_decay">Learning Rate Decay</a></li>
+                    <li><a href="#" data-value="num_timesteps">Number of Timesteps</a></li>
+                    <li><a href="#" data-value="num_neurons_1024_failed_starts">1024 Neurons Failed Starts</a></li>
+                    <li><a href="#" data-value="learning_rate_1024">Learning Rate (1024 Neurons)</a></li>
+                    <li><a href="#" data-value="num_neurons">Neurons per Layer</a></li>
+                    <li><a href="#" data-value="output_keep_prob">Output Keep Prob.</a></li>
+                    <li><a href="#" data-value="num_layers">Number of Layers</a></li>
+                    <li><a href="#" data-value="reset_state_interval_tokens">Reset State after Tokens</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" data-value="wiki">Wikipedia</a></li>
+                    <li><a href="#" data-value="south_park">South Park</a></li>
+                    <li><a href="#" data-value="congress">Congress Transcripts</a></li>
+                    <li><a href="#" data-value="goethe">Goethe Poems</a></li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <label>X Axis</label>
+            <div class="btn-group dropdown-full-width">
+                <button id="x-axis-select" type="button" value="minutesSinceStart" class="btn btn-default dropdown-toggle" onchange="plot()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="choice">Training Time</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-value="minutesSinceStart">Training Time</a></li>
+                    <li><a href="#" data-value="epochs">Epochs</a></li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <label for="y-axis-select">Y Axis</label>
+            <div class="btn-group dropdown-full-width">
+                <button id="y-axis-select" type="button" value="lossesValid" class="btn btn-default dropdown-toggle" onchange="plot()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="choice">Validation Loss</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-value="lossesValid">Validation Loss</a></li>
+                    <li><a href="#" data-value="lossesTrain">Training Loss</a></li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <label for="y-axis-range">Y Axis Range</label>
+            <input id="y-axis-range">
+        </div>
+    </div>
+</div>
 
 <input id="stylesheets-input" value="stylesheets/posts/char-lm.css" style="display: none;">
 <!--  javascripts/posts/char-lm/batch-size.js javascripts/posts/char-lm/plot.js -->
-<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js" style="display: none;">
+<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js" style="display: none;">

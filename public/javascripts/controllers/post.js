@@ -61,6 +61,8 @@ class PostCtrl extends InjectionReceiver {
         this.$document.ready(() => {
             $('table').wrap("<div class='table-container'></div>");
         });
+
+        // TODO: Bring the bootstrap dropdowns to life
     }
 
     deletePost() {

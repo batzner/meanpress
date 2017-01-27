@@ -15,11 +15,24 @@ class LabCtrl extends InjectionReceiver {
 
         this.$document.ready(() => {
             this.loadScripts();
-        });
 
-        // Wrap tables to make them responsive.
-        this.$document.ready(() => {
-            $('table').wrap("<div class='table-container'></div>");
+            // Wrap tables to make them responsive.
+            $('table').wrap('<div class="table-container"></div>');
+
+            // Wrap each chart in a div to be able to safely clear the chart.js iframe junk
+            $('canvas.chart').wrap('<div></div>')
+
+            // Bring the bootstrap dropdowns to life
+            $('.dropdown-menu li a').click(function () {
+                const elem = $(this);
+                const buttonElem = elem.closest('.btn-group').find('button').first();
+                const choiceElem = buttonElem.find('.choice');
+                // Set the text on the span
+                choiceElem.html(elem.text());
+                // Set the selected value on the button
+                buttonElem.val(elem.data('value'));
+                buttonElem.change();
+            });
         });
     }
 

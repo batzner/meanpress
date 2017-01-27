@@ -1,14 +1,14 @@
-#chart-wrapper {
-    width: 500px;
-}
-
 #talk-box {
-    width: calc(100% + 30px);
+    width: calc(100% + 40px);
     background: url(/images/posts/char-lm/text-box-background.jpg) no-repeat;
     background-size: cover;
+    background-attachment: fixed;
     padding: 30px;
     text-align: center;
-    margin: 0 -15px 10px -15px;
+    margin: 0 -20px 10px -20px;
+    -webkit-box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
+    box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
 }
 
 #talk-box table {
@@ -58,7 +58,7 @@
 
 #text-input {
     float: left;
-    min-width: 20px;
+    min-width: 2px;
 }
 
 #text-output {
@@ -69,6 +69,7 @@
 
 #text-input-output-bridge {
     float: left;
+    margin-left: 5px;
 }
 
 #talk-box td {
@@ -78,4 +79,16 @@
 
 #send-button {
     margin-top: 5px;
+}
+
+.chart-form-group > div:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.chart-form-group label {
+    display: block;
+}
+
+.chart-form-group .irs {
+    margin: 0 2px;
 }

@@ -1,11 +1,52 @@
 const ANIMATE_INTERVAL_MILLIS = 50;
+const DATASET_DEFAULTS = {
+    wiki: {
+        steps: 500,
+        maxSentences: 3,
+        prime: 'The'
+    },
+    congress: {
+        steps: 500,
+        maxSentences: 50,
+        prime: 'The'
+    },
+    southPark: {
+        steps: 500,
+        maxSentences: 3,
+        prime: 'Kenny'
+    },
+    sherlock: {
+        steps: 500,
+        maxSentences: 3,
+        prime: 'Suddenly'
+    },
+    goethe: {
+        steps: 500,
+        maxSentences: 50,
+        prime: 'Der'
+    }
+};
 
 const TEXT_INPUT = $('#text-input');
 const TEXT_OUTPUT = $('#text-output');
 const TEXT_BRIDGE = $('#text-input-output-bridge');
+const TALK_BOX_HEADING = $('#talk-box-heading');
 
+let selectedDataset = null;
 let pendingRequestId = null;
 let result = null;
+selectDataset('wiki');
+
+// TODO: Stop the animation on an exception
+
+function selectDataset(name) {
+    selectedDataset = name;
+    TALK_BOX_HEADING.find('button.active').removeClass('active');
+    TALK_BOX_HEADING.find('button[value="' + name + '"]').addClass('active');
+    TEXT_INPUT.html(DATASET_DEFAULTS[name].prime);
+    TEXT_OUTPUT.html('');
+    focusOnInput();
+}
 
 function onInput() {
     // Interpret an enter stroke at the end as a send click.
@@ -41,14 +82,21 @@ function getCleanInput() {
 function completeText() {
     $('#send-button').focus();
     let prime = $.trim(getCleanInput());
+    if (!prime.length) return;
 
     const requestId = PostUtil.generateUUID();
     pendingRequestId = requestId;
     animateWaiting(requestId);
 
     console.log('Sending request', prime);
+    const defaultParams = DATASET_DEFAULTS[selectedDataset];
     $.get('http://ec2-35-167-199-162.us-west-2.compute.amazonaws.com/sample',
-        {prime: prime, steps: 500, max_sentences: 50, dataset_name: 'sherlock'})
+        {
+            prime: prime,
+            steps: defaultParams.steps,
+            maxSentences: defaultParams.maxSentences,
+            datasetName: selectedDataset
+        })
         .then(sampled => {
             if (pendingRequestId == requestId) {
                 result = sampled;
@@ -90,6 +138,7 @@ function animateResult(result, deadline) {
     // Exit, if the deadline was reached
     if (missingMillis <= 0) {
         TEXT_OUTPUT.html(result);
+        focusOnInput();
         return;
     }
 
@@ -147,4 +196,8 @@ function refreshAnimateWaiting(requestId) {
         const deadline = new Date(new Date().getTime() + 1000);
         animateResult(result, deadline);
     }
+}
+
+function focusOnInput() {
+    if (!TEXT_INPUT.is(":focus")) PostUtil.placeCaretAtEnd(TEXT_INPUT.get(0));
 }
