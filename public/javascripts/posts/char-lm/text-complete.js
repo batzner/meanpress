@@ -38,6 +38,7 @@ let result = null;
 selectDataset('wiki');
 
 // TODO: Stop the animation on an exception
+// TODO: Add postprocessing: Remove _PAD and remove multiple blank lines
 
 function selectDataset(name) {
     selectedDataset = name;

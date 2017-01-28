@@ -263,26 +263,6 @@ h1 a, h1 a:hover, h1 a:active, h1 a:focus {
     white-space: nowrap;
 }
 
-/* Select Box Styles: bavotasan.com Method (with special adaptations by ericrasch.com) */
-/* Source: http://bavotasan.com/2011/style-select-box-using-only-css/ */
-.styled-select {
-    background: url(http://i62.tinypic.com/15xvbd5.png) no-repeat 96% 0;
-    background-color: #f1f1f1;
-    border-radius: 4px;
-    height: 29px;
-    overflow: hidden;
-    width: 200px;
-}
-
-.styled-select select {
-    background: transparent;
-    border: none;
-    font-size: 14px;
-    height: 29px;
-    padding: 5px; /* If you add too much padding here, the options won't show in IE */
-    width: 268px;
-}
-
 .no-stretch {
     width: 1%;
     white-space: nowrap;
@@ -322,6 +302,10 @@ h1 a, h1 a:hover, h1 a:active, h1 a:focus {
 .dropdown-full-width .caret {
     float: right;
     margin-top: 8px;
+}
+
+.detail {
+    display:none;
 }
 
 @media only screen and (max-width: 767px) {

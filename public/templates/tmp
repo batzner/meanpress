@@ -1,0 +1,216 @@
+High-level description what I did
+
+<Result div with Text Input>
+
+Low-level description -> Char LM, LSTM, TensorFlow.
+- Idea not new, inspired by Karpathy
+- Implementation not notesworthy, TensorFlow newbie, but Flask ist quite new
+- Hyperparameter search / odyssee is new
+
+0. Setup:
+Using RMSprop as an optimizer, which is still SGD, but with an improvement: it uses a different learning rate for each parameter, which depends on the last gradients of that parameter. Thus, parameters that recently had multiple large updates get a smaller learning rate.
+http://sebastianruder.com/optimizing-gradient-descent/index.html
+
+Dataset: Sherlock Holmes
+Write exact metrics for every dataset, number of words, chars, bytes etc.
+
+4 mio chars as validation set???
+
+1. Batch Size:
+
+<Plot with Training and Validation Losses>
+<Minutes per Epoch>
+
+generally unfair to compare the batch sizes with the same learning rate. Because the steps, which the optimizer takes with larger batch sizes, are more stable, it can use a higher learning rate. Thus, each batch_size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.
+
+1/10/20 definitely too inefficient
+1/10 overfit faster, because they only see a small portion of the text at every step so they lose the sense for the whole text???
+500/2000 seem to get stuck in low local minima, because their minima don’t change as fast as with small batch_sizes
+
+Why can't we just scale the batch size to whatever fits in the memory?
+Good answer: https://www.quora.com/Intuitively-how-does-mini-batch-size-affect-the-performance-of-stochastic-gradient-descent/answer/Brian-Wong-21
+While the gradient of a single data point is a lot noisier than the gradient of a 100-batch, the gradient of a 100-batch is not that much noisier than that of a 100,000-batch. So the additional 99,900 samples in that batch are useless, because we can use the almost the same step size with the 100-batch.
+Also, noisiness prevent getting stuck in low local minima, because the error function and therefore the minima change for every batch.
+
+"But noisiness isn't all bad. In particular, suppose that our error function is particularly pernicious and has a bunch of little valleys. If we used the entire training set to compute each gradient, our model would get stuck in the first valley it fell into (since it would register a gradient of 0 at this point). If we use smaller mini-batches, on the other hand, we'll get more noise in our estimate of the gradient. This noise might be enough to push us out of some of the shallow valleys in the error function.
+
+There is thus an important trade-off to consider between being able to jump out of shallow minima and making sure that you eventually converge to some minimum instead of bouncing around.
+
+In practice, small to moderate mini-batches (10-500) are generally used, combined with a decaying learning rate, which guarantees long run convergence while maintaining the power to jump out of shallow minima that are encountered early on."
+
+-> Choose 200 as batch size for future experiments, because it has a similar time per epoch, but it converges faster.
+Also, 2000 or 500 could be potential overkill, because we will increase the networks number of neurons and the timesteps later.
+Also, think about batch training a language model on a text
+<Graphic on splitting up the text into batches>
+How does batch processing work for character-level language model generation? How can we split up the dataset without destroying the logical dependencies between characters? You just start each batch at equidistant points in the dataset, so that the chars within a batch are never split up. See ptb_iterator(...) here for an implementation.
+Lower batch size prevents splitting up the text into too many small parts and therefore destroying the logical connections between those parts.
+
+LESSON LEARNED: Choose a good batch size first, because it affects the training time of future experiments. Also, the optimal value for the learning rate depends on the batch size.
+
+Autocomplete of the 200 batch net: "The house which had been the strange problem which had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the stran"
+
+2. Learning Rate
+
+<Plot with Training and Validation Losses>
+
+Stupidly, I decided to go for 0.01 as the learning rate, because it had the lowest validation loss. We'll see soon, why that was stupid.
+
+3. Learning Rate Decay
+
+<Plot with Training and Validation Losses>
+
+Seems to make no difference. Chose 0.8 for future experiments.
+
+Using a learning rate decay does affect the convergence of RMSprop / Adam, but It usually does not make sense to decay the learning rate manually (source: http://stackoverflow.com/questions/39517431/should-we-do-learningrate-decay-for-adam-optimizer).
+
+4. Number of timesteps
+
+<Plot with Training and Validation Losses>
+<Minutes per Epoch>
+
+Surprisingly, the number of timesteps did not increase the time per epoch. I guess its because for 1000 chars = 1 epoch it can either go back 20 steps 50 times (num_timesteps=20) or go back 50 steps 20 times (num_timesteps=50). So where should be the difference.
+The only thing that num_timesteps directly affects is the memory footprint of course, because the computational graph that TensorFlow creates increases proportionally.
+Note that 200 vs. 500 timesteps did make a difference on South Park (or Congress). But why???
+
+160 does not yield a huge improvement, but our net is generally quite dumb now, so it cannot make use of that many timesteps.
+
+5. Learning Rate, again
+
+Wanted to compare using 1024 neurons per layer to using 512, but 1024 performed terrible. With double the neurons, the learning rate 0.01 and 0.005 exploded initially. Reason is that the learning rate depends on the number of layers and number of neurons per layer. Was used to high values (0.05 - 0.5) with SGD, but for RMSprop 0.01 was a way too large value:
+
+<Plot with Training and Validation Losses>
+
+Researched RMSprop only to find out that Geoffrey Hinton suggests a learning rate of 0.001 in the Coursera class, where he proposed RMSprop. 0.001 seems to be a good value for most problems, so I should have just kept it instad of going for the marginally lower validation loss with lr=0.01.
+
+LESSON LEARNED: For optimizers that use an adaptive learning rate for each parameter (Adadelta, Adam, RMSprop), it is quite safe to use the recommended values and focus on other hyperparameters.
+
+Adagrad, RMSprop etc. need more memory!
+http://stackoverflow.com/a/37843152/2628369
+Adam needs 2M, RMSprop needs 1M of additional memory for 1M parameters.
+
+6. Number of Neurons
+
+Finally could test if increasing the number of neurons in the net decreases the loss.
+
+<Plot with Training and Validation Losses>
+
+While both 512 and 1024 reach the same validation error of 1.18, the 1024 overfits, so I went for 1024 and tried to overcome the overfitting with dropout.
+
+<Generated Sentences with 512 and 1024> Beware of overfitting -> sounds wonderful, but validation loss is a better indicator of the model quality. Training on a smaller dataset -> model will just remember the training data (Goethe)
+
+7. Dropout
+
+<Plot with Training and Validation Losses>
+
+Seems like 0.5 overcomes the overfitting. Validation loss is still at 1.18 though :(
+
+<Generated sentence with 0.5 is now worse again, but way to go. See below for more info on overfitting.
+
+Dropout:
+The hand of the Baskervilles at the Cornish Street All and the Barrymores of the Baskervilles the Brixton
+vs
+The house with the constable was an interesting constable with the strange statement of the country. I ha
+Did it just read the Hound of the Baskervilles?
+
+Interesting: 50% results in the maximum amount of regularization: https://www.reddit.com/r/MachineLearning/comments/3oztvk/why_50_when_using_dropout/
+
+8. Number of Layers
+
+Keeping the number of parameters the same, I tried to see if increasing the network's depth helps. My intuition is that a deeper network helps to learn complex dependencies in the data. Having a lot of neurons in a layer helps to remember a lot of *different* patterns. For example on Sherlock follows Holmes and on Mrs. follows Hudson etc.
+
+Values for each of the layers
+<Formula for calculating the degrees of freedom>
+2-512:
+4*(512*(97+512) + 512) + 4*(512*1024 + 512) + 97*512 + 97
+= 3.4 Mio
+
+2-1024:
+4*(1024*(97+1024) + 1024) + 4*(1024*2048 + 1024) + 97*1024 + 97
+= 13 Mio
+
+3-795:
+4*(795*(97+ 795) + 795) + 2*(4*(795* 795 *2 + 795)) + 97* 795 + 97
+= 13 Mio
+
+4-675:
+4*(675*(97+ 675) + 675) + 3*4*(675* 675 *2 + 675) + 97* 675 + 97
+= 13 Mio
+
+Here are the results:
+
+<Plot with Training and Validation Losses>
+
+Especially with regard to the training loss, it seems like 3 layers with 795 neurons each is a good compromise between depth and wideness.
+
+Using the same number of neurons per layer seems strange. From convolutional neural networks, I was used to decrease the layer size with depth. However, Sutskever et al. use 3 layers with 1024 neurons each for their translation LSTMs.
+
+"The house was a strange strange strange strange strange strange strange strange strange strange strange s" is actually terrifying.
+
+9. Reset state interval tokens
+
+Don't reset never, but also not always, as explained in that post: <url>
+
+Instead, we go for resetting it after 1120 tokens. Finally the output of the model is:
+
+"The house was a small path which had been seen at the time of the country that the stranger was a strange confession. The strange hand was a small book which was a small path which had been seen at the time of the country that the stranger was a strange confession. The strange hand was a small book which was a small path which had been seen at the time of the country that the stranger was a strange confession. He was a man of a man who had been a little too much to see the man who had been seen and"
+
+which I admit sounds stupid, but here is why:
+
+overall, letting the network overfit is tempting, because it yields so nice sentences, but as mentioned above then the LSTM doesn't model the language best.
+ Compare human with 0.8 probability of seeing a name and 0.2 probability of 'the man' / 'the woman'. human will replace the name with an arbitrary name, net will use the man because it is the most probable single choice. What sounds better.
+ 'The man told the man to go to the woman' or 'Holmes told the man to go to Mrs. Hudson'
+
+ Compare reset_state/never/retrained step 4000 (valid loss minimum) with step 8198.
+
+ (optional)
+ if the probability of the next nomen == Senator XY = 0.9 and next nomen == the Senate = 0.1, the model is smarter if it outputs the Senate
+ because the name of the senator could be everything, for each name there is only a probability of 0.001 for example
+ So it outputs S and if it then gets WRONG! M, it can still guess McCain
+ Whereas if a human were given the whole transcript corpus and told to output a typical sentence, it would focus on the 0.9 probabilty of a senator name and just choose a random senator name
+
+--
+
+General notes:
+
+Interpreting the loss numbers:
+Perplexity - the wtf metric
+https://en.wikipedia.org/wiki/Perplexity
+1. cross entropy = number of bits
+2. for probability model, cross entropy = number of bits for given test events with optimal code based on model. here, test events = characters
+3. n bits -> 2^n possibilities -> as confused as if it had to choose randomly and indepently between 2^n possibilities
+
+What I learned: Don’t use too many epochs for initial optimization. Search rough values with rough epochs and then do the fine tuning later. Optimizing for 0.01 better error is not worth it.
+Order of scores for different hyperparameter values stays the same already after an early time in training -> can abort early during search
+
+3 layers net 1024 with strange strange strange output just wasn't trained long enough:
+"I had a considerable statement to be able to see the station at the top of the stair. I was able to see that the man was a strange constable who had been a little too late.  "'I have a considerable statement to be able to see you again, then, and I will see that you have been able to see him. I have a considerable statement to make a considerable statement to me. I have no doubt that I am able to see you all the time. I have a considerable statement to make my own statement to the conclusion that the man was a stranger to him. I have no doubt that I am able to see you. I have a considerable statement to make me as a matter of any consequence."
+
+It is more fun and more effective to optimize the architecture first with dropout=1 and usual values (learning rate etc.) and then do the fine tuning later. Also, it makes sense to start with a number of degrees of freedom that is at the max of the reasonable computing capacity (provided that the dataset is large enough).
+
+Also:
+sampling with 'the' and then expecting normal sentences is also a bit like telling a race car driver to just drive and expecting him to drive with the pattern of a race track
+ it's like telling a race car driver to just drive and expecting the path to look like a race track
+ the model learned that it can get quite a good loss, if it gets corrected every now and then with one letter
+ The Senate will be a supporter of the Senate to support the Senate to support the Senate OR The Senate will be supporter of the S[WRONG -> B(ill)] and now the model is back on track with just one wrong letter
+--
+
+Overall the hyperparameter tuning yielded only marginal improvements, but consider the stupid loss function. A marginal loss decrease can mean that it chose the correct word a couple of more times (Senator instead of Penator), even if it only got rewarded for choosing the right letter.
+
+ another bad thing about char level:
+ timesteps = 300 -> ram explodes
+ but is necessry to cover a sentence / paragraph
+
+Overall:
+- stupid loss function
+- exploding ram
+- model optimization not related to producing nice sentences
+    - uses man instead of Mr holmes (at least if it is not trained long enough???)
+    - starting with The leads to the race driver problem
+
+Before continuing with word level, we will test a thing that we cannot test for word level
+
+Different datasets
+Write exact metrics for every dataset, number of words, chars, bytes etc.
+Here, the optimal values of course change. For Wikipedia overfitting is not that dangerous, so we can increase the output keep probability.
+
+US Congress better because more consistent topics -> "What I wan" is quite clear

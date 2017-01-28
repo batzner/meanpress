@@ -1,48 +1,13 @@
-Chart.defaults.global.maintainAspectRatio = false;
-Chart.defaults.global.elements.line.fill = false;
-Chart.defaults.global.elements.line.tension = 0;
-Chart.defaults.global.elements.point.radius = 0;
-
-const runGroupValues = {
-    batch_size: ['1', '10', '20', '50', '100', '200', '500', '2000'],
-    learning_rate_512: ['0.001', '0.005', '0.01', '0.05'],
-    learning_rate_decay: ['0.5', '0.8', '0.9', '0.97'],
-    num_timesteps: ['40', '80', '120', '160'],
-    num_neurons_1024_failed_starts: ['01-first-naive', '02-lr=0.005', '03-lr=0.001', '04-init_scale=0.005'],
-    learning_rate_1024: ['0.01', '0.001', '0.005'],
-    num_neurons: ['512', '1024'],
-    output_keep_prob: ['0.3', '0.5', '0.8'],
-    num_layers: ['2', '3', '4'],
-    reset_state_interval_tokens: ['never', 'always', '320', '1120', '2080'],
-    wiki: ['small', 'medium', 'medium-with-reset']
-};
-
-const BATCH_SIZE_EPOCH_MINUTES = {
-    '1': 29.8,
-    '10': 13.8,
-    '20': 7.3,
-    '50': 3.1,
-    '100': 1.9,
-    '200': 1.5,
-    '500': 1.1,
-    '2000': 0.87
-};
-
-const BATCH_SIZE_COLORS = {
-    '1': '#FFCDD2',
-    '10': '#E57373',
-    '20': '#C8E6C9',
-    '50': '#66BB6A',
-    '100': '#2E7D32',
-    '200': '#123317',
-    '500': '#BBDEFB',
-    '2000': '#2196F3'
-};
+const BATCH_SIZE_DECAY_CHART = {"type":"line","data":{"datasets":[{"label":"1","data":[{"x":0.16753848333333332,"y":22.904740737706476},{"x":5.017288983333333,"y":4.733729148516935},{"x":10.047070666666666,"y":5.904344115623014},{"x":15.0612236,"y":12.293139777569525},{"x":20.076260133333335,"y":21.356935979695074}],"borderColor":"#FFCDD2","backgroundColor":"#FFCDD2"},{"label":"10","data":[{"x":0.16787481666666665,"y":23.601711273229043},{"x":5.157420166666666,"y":2.8583514997790584},{"x":10.160458166666666,"y":2.789373549380782},{"x":15.160854183333333,"y":2.7013207047905183},{"x":20.162448016666666,"y":2.752552065460471},{"x":30.012759933333346,"y":2.7776919872392685},{"x":35.01641998333334,"y":2.8300417507669797},{"x":40.01782715,"y":2.879827635578882},{"x":45.01794176666666,"y":2.9131560648211505},{"x":50.01888041666666,"y":3.0677534321819944},{"x":55.02016526666666,"y":3.253032625606013},{"x":60.020997949999995,"y":3.6708321639796426},{"x":65.02121143333333,"y":4.770581042792301},{"x":70.02278618333331,"y":6.5534965168123565},{"x":75.02476594999999,"y":9.645544177256305},{"x":80.02327098333328,"y":18.626839472070007}],"borderColor":"#E57373","backgroundColor":"#E57373"},{"label":"20","data":[{"x":0.19685056666666664,"y":23.59513284653845},{"x":5.341293550000001,"y":2.760902865984198},{"x":10.356527833333333,"y":2.6674982937372813},{"x":15.342418966666669,"y":2.6117166493499306},{"x":20.361199050000003,"y":2.626088614117293},{"x":25.343662716666675,"y":2.5971233829012927},{"x":30.361447850000012,"y":2.577453908725072},{"x":35.345484950000014,"y":2.5822415288550595},{"x":40.363093400000004,"y":2.564029623074992},{"x":45.34379440000001,"y":2.551861985701525},{"x":50.36747501666668,"y":2.583875818769021},{"x":55.34808884999999,"y":2.5590772885909225},{"x":60.20515831666664,"y":2.5523627712810333},{"x":65.34548221666664,"y":2.5723347474873495},{"x":70.3459103166666,"y":2.559409239764978},{"x":75.3468365333333,"y":2.5477009349881463},{"x":80.34786116666662,"y":2.5577475639823146},{"x":85.3480462333333,"y":2.556280873876662},{"x":90.34909063333333,"y":2.5315313599259777}],"borderColor":"#C8E6C9","backgroundColor":"#C8E6C9"},{"label":"50","data":[{"x":0.19216105,"y":23.66394064058768},{"x":5.334734283333335,"y":2.60235903143983},{"x":10.356906150000002,"y":2.5520830672980126},{"x":15.335697700000003,"y":2.5274994318886717},{"x":20.35774108333333,"y":2.5097679299837132},{"x":25.338292516666662,"y":2.4821705301936143},{"x":30.360363783333323,"y":2.4850187961948214},{"x":35.33725365,"y":2.4731179357638933},{"x":40.364412750000014,"y":2.479600045346517},{"x":45.339493066666684,"y":2.457156743290286},{"x":50.363311183333344,"y":2.4577235159184476},{"x":55.34355271666667,"y":2.442955219028239},{"x":60.366522633333325,"y":2.445457779654651},{"x":65.34362971666665,"y":2.4415215719625807},{"x":70.37031278333332,"y":2.4411921885460837},{"x":75.34651579999995,"y":2.428616203244052},{"x":80.37024046666662,"y":2.4280315597593605},{"x":85.34954149999996,"y":2.438680442625064}],"borderColor":"#66BB6A","backgroundColor":"#66BB6A"},{"label":"100","data":[{"x":0.20935466666666666,"y":23.63115971524124},{"x":5.346748566666667,"y":2.6018537052978736},{"x":10.360533883333337,"y":2.522850691215854},{"x":15.374280899999999,"y":2.5137420901925474},{"x":20.350748000000003,"y":2.4894403990249594},{"x":25.367913716666667,"y":2.482298450345404},{"x":30.35344239999999,"y":2.4809844821354603},{"x":35.38246385,"y":2.4767323932564955},{"x":40.35452763333334,"y":2.4671678019760064},{"x":45.371496900000004,"y":2.4827253963060385},{"x":50.35524139999999,"y":2.4554262306946613}],"borderColor":"#2E7D32","backgroundColor":"#2E7D32"},{"label":"200","data":[{"x":0.19986821666666668,"y":23.62172294042323},{"x":5.342632016666667,"y":2.580011687795171},{"x":10.341505549999999,"y":2.5061819834491628},{"x":15.3443239,"y":2.4936394655327976},{"x":20.344268066666668,"y":2.493525936378836},{"x":25.347570100000006,"y":2.49679846266944},{"x":30.348824150000006,"y":2.4814356562153552},{"x":35.35093821666668,"y":2.481293642040285},{"x":40.3510199,"y":2.4856808355912503}],"borderColor":"#123317","backgroundColor":"#123317"},{"label":"500","data":[{"x":0.1688479,"y":23.582618238514502},{"x":5.166092099999999,"y":6.006188844824464},{"x":10.173062966666665,"y":2.5343228919208944},{"x":15.17910036666666,"y":2.493929664383168},{"x":20.17915063333332,"y":2.5025753600106273},{"x":25.181524733333326,"y":2.488285316681784}],"borderColor":"#BBDEFB","backgroundColor":"#BBDEFB"},{"label":"2000","data":[{"x":0.18129663333333335,"y":23.62810718544363},{"x":5.041774766666666,"y":10.215276943709245},{"x":10.219517266666665,"y":8.634614503835172}],"borderColor":"#2196F3","backgroundColor":"#2196F3"}]},"options":{"scales":{"xAxes":[{"type":"linear","position":"bottom","scaleLabel":{"display":true,"labelString":"Training Time [min]"}}],"yAxes":[{"type":"logarithmic","ticks":{"min":2.4280315597593605,"max":24},"scaleLabel":{"display":true,"labelString":"Validation Perplexity"}}]}}};
+const ALL_CHARTS = [BATCH_SIZE_DECAY_CHART];
+ALL_CHARTS.forEach(chartConfig => {
+    chartConfig.options.scales.yAxes[0].ticks.callback = value => value.toFixed(2)
+});
 
 plotBatchSizeDecay();
 plotBatchSizeEpochDuration();
 function plotBatchSizeDecay() {
-
+    new Chart('batch-size-decay-chart', BATCH_SIZE_DECAY_CHART);
 }
 
 function plotBatchSizeEpochDuration() {
@@ -75,115 +40,6 @@ function plotBatchSizeEpochDuration() {
             },
             legend: {
                 display: false
-            }
-        }
-    });
-}
-
-plot();
-//getLogs('batch_size', [1, 10, 20, 50, 100, 200, 500, 2000]).then(plotLogs);
-//getLogs('learning_rate_512', ['0.001', '0.005', '0.01', '0.05']).then(plotLogs);
-//getLogs('learning_rate_decay', ['0.5', '0.8', '0.9', '0.97']).then(plotLogs);
-//getLogs('num_timesteps', ['40', '80', '120', '160']).then(plotLogs);
-//getLogs('num_neurons/1024/failed_starts', ['01-first-naive', '02-lr=0.005', '03-lr=0.001',
-//    '04-init_scale=0.005']).then(plotLogs);
-//getLogs('learning_rate_1024', ['0.01', '0.001', '0.005']).then(plotLogs);
-//getLogs('num_neurons', ['512', '1024']).then(plotLogs);
-//getLogs('output_keep_prob', ['0.3', '0.5', '0.8']).then(plotLogs);
-//getLogs('num_layers', ['2', '3', '4']).then(plotLogs);
-//getLogs('reset_state_interval_tokens', ['never', 'always', '320', '1120', '2080']).then(plotLogs);
-
-function plot() {
-    getLogs($('#run-group-select').val()).then(plotLogs);
-}
-
-function getLogs(runGroup) {
-    const values = runGroupValues[runGroup];
-    // Store the data locally so that we don't interfere with the global logs until all data are loaded.
-    let data = {};
-    return Promise.all(values.map(value => {
-        // get the data and push the trainstates
-        return $.getJSON(`assets/posts/char-lm/data/${runGroup}/${value}/model.trainstate.json`)
-            .then(trainstate => {
-                data[value] = PostUtil.getPreprocessedLog(trainstate.log);
-            });
-    })).then(() => {
-        return data;
-    });
-}
-
-function getEquidistantPoints(data, numPoints) {
-    if (data.length <= numPoints) return data;
-
-    // Get the range
-    const {minX, maxX} = data.reduce((reduced, point) => {
-        if (point.x < reduced.minX) reduced.minX = point.x;
-        if (point.x > reduced.maxX) reduced.maxX = point.x;
-        return reduced;
-    }, {minX: data[0].x, maxX: data[0].x});
-
-    // Sample the points
-    let points = [];
-    const stepSize = (maxX - minX) / (numPoints - 1);
-    data.sort((a, b) => a.x - b.x).forEach(point => {
-        if (point.x >= minX + points.length * stepSize - 10 ** -8) {
-            points.push(point);
-        }
-    });
-    return points;
-}
-
-function getData(log, xKey, yKey) {
-    let dataMap = PostUtil.replaceClosestKeys(log[yKey], log[xKey]);
-    let data = [];
-    dataMap.forEach((value, key) => {
-        data.push({x: key, y: value});
-    });
-    return data;
-}
-
-function plotLogs(logs) {
-    const xKey = $('#x-axis-select').val();
-    const yKey = $('#y-axis-select').val();
-
-    const runValues = Object.keys(logs);
-    const datasets = runValues.map((value, index) => {
-        let data = getData(logs[value], xKey, yKey);
-        data = data.filter(point => point.y < 25);
-        data = getEquidistantPoints(data, 30);
-
-        return {
-            label: value,
-            data: data,
-            borderColor: BATCH_SIZE_COLORS[value],
-            backgroundColor: BATCH_SIZE_COLORS[value]
-        };
-    });
-    const yRange = PostUtil.getYRange(datasets);
-
-    new Chart('batch-size-decay-chart', {
-        type: 'line',
-        data: {
-            datasets: datasets
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    type: 'linear',
-                    position: 'bottom',
-                    scaleLabel: {
-                        display: true,
-                        labelString: 'Training time [m]'
-                    }
-                }],
-                yAxes: [{
-                    type: 'logarithmic',
-                    ticks: {
-                        min: yRange.min,
-                        max: yRange.max,
-                        callback: value => value.toFixed(2)
-                    }
-                }]
             }
         }
     });

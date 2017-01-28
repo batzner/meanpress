@@ -58,9 +58,7 @@ class PostCtrl extends InjectionReceiver {
         this.loadScripts();
 
         // Wrap tables to make them responsive.
-        this.$document.ready(() => {
-            $('table').wrap("<div class='table-container'></div>");
-        });
+        $('table').wrap("<div class='table-container'></div>");
 
         // TODO: Bring the bootstrap dropdowns to life
     }

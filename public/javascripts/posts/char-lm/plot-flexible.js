@@ -17,6 +17,13 @@ const runGroupValues = {
     wiki: ['small', 'medium', 'medium-with-reset']
 };
 
+const AXIS_LABELS = {
+    lossesValid: 'Validation Perplexity',
+    lossesTrain: 'Training Perplexity',
+    minutesSinceStart: 'Training Time [min]',
+    epochs: 'Epoch'
+};
+
 const BATCH_SIZE_EPOCH_MINUTES = {
     '1': 29.8,
     '10': 13.8,
@@ -41,7 +48,9 @@ const BATCH_SIZE_COLORS = {
 
 const Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
 
-$(function (){
+let chartExport = null;
+
+$(function () {
     // Initialize the range slider
     Y_AXIS_RANGE_SLIDER.ionRangeSlider({
         type: 'double',
@@ -52,6 +61,10 @@ $(function (){
 
     plot();
 });
+
+function exportChart() {
+    console.log(chartExport);
+}
 //getLogs('batch_size', [1, 10, 20, 50, 100, 200, 500, 2000]).then(plotLogs);
 //getLogs('learning_rate_512', ['0.001', '0.005', '0.01', '0.05']).then(plotLogs);
 //getLogs('learning_rate_decay', ['0.5', '0.8', '0.9', '0.97']).then(plotLogs);
@@ -157,7 +170,7 @@ function plotLogs(logs) {
     updateSlider(yRange.min, yRange.max);
 
     PostUtil.clearChart('flexible-chart');
-    new Chart('flexible-chart', {
+    const chartParams = {
         type: 'line',
         data: {
             datasets: datasets
@@ -166,7 +179,11 @@ function plotLogs(logs) {
             scales: {
                 xAxes: [{
                     type: 'linear',
-                    position: 'bottom'
+                    position: 'bottom',
+                    scaleLabel: {
+                        display: true,
+                        labelString: AXIS_LABELS[xKey]
+                    }
                 }],
                 yAxes: [{
                     type: 'logarithmic',
@@ -174,9 +191,16 @@ function plotLogs(logs) {
                         min: Math.max(yRange.min, yRangeSliderMin),
                         max: Math.min(yRange.max, yRangeSliderMax),
                         callback: value => value.toFixed(2)
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: AXIS_LABELS[yKey]
                     }
                 }]
             }
         }
-    });
+    };
+    // chartParams will be modified by chartjs, so we need to copy them
+    chartExport = JSON.stringify(chartParams);
+    new Chart('flexible-chart', chartParams);
 }

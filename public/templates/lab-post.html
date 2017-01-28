@@ -1,4 +1,5 @@
-<p>High-level description what I did</p>
+<p>I let a neural network read long texts one letter at a time. Its task was to predict the next letter based on those it had seen so far. Over time, it recognized patterns between letters. Find out, what it learned, by feeding it some letters below. When you click the send button on the right, it will read your text and auto-complete it.</p>
+<p>You can choose between networks that read a lot of Wikipedia or US Congress transcripts etc.</p>
 
 <div id="talk-box">
     <table>
@@ -34,12 +35,47 @@
     </table>
 </div>
 
-<p>Low-level description -> Char LM, LSTM, TensorFlow.
-    - Idea not new, inspired by Karpathy
-    - Implementation not notesworthy, TensorFlow newbie, but Flask ist quite new
-    - Hyperparameter search / odyssee is new</p>
+<p>Here is the detailed description of what I did and what this post is about: I used a specific form of recurrent neural networks, the <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">LSTM (Long Short-Term Memory)</a>, to generate a language model for a given text corpus. Because I fed it one letter at a time, it generated a character-level language model. For implementation, I used <a href="https://www.tensorflow.org/">TensorFlow</a>.</p>
+<p>Now, why do I write a blog post about that?</p>
 
-<h3>0. Setup:</h3>
+<ul>
+    <li>The idea is not new at all. I was inspired by <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">this popular blog post</a> by Andrej Karpathy. If you would like to know more about the theory behind this post, this is an excellent resource. He also trained his network on character-level on Shakespeare, Wikipedia, Linux Source Code etc. The results are quite funny.</li>
+    <li>I implemented the LSTM from scratch with TensorFlow. You can check out the <a href="https://github.com/batzner/tensorflow-pet-projects">GitHub repository</a>. However, since it was my first TensorFlow project, I don't think the code is noteworthy. For implementing character-level language models with LSTMs in Tensorflow, <a href="https://github.com/sherjilozair/char-rnn-tensorflow">this repo</a> and <a href="https://github.com/tensorflow/models/blob/master/tutorials/rnn/ptb/ptb_word_lm.py">this TensorFlow example</a> might be better points to start. Nevertheless, my code proves that five TensorFlow models with about 10 million parameters each can run simultaneously on a single <a href="https://aws.amazon.com/ec2/instance-types/#instance-type-matrix">AWS t2.micro</a> instance with only 1 GiB of RAM.</li>
+    <li>What <strong>is</strong> new about this post is that, firstly, it contains an interactive text box where you can find the strengths and weaknesses of the trained models and, secondly, I am publishing my complete hyperparameter odyssey. Below, I will explain, how I found the hyperparameters (batch size, learning rate, number of layers etc.) for the final networks - what mistakes I made and what I learned from them. So if hyperparameter-tuning of neural networks is a bit of a mystery to you, this post might save you some time and money spent on the inefficient training of your models.</li>
+</ul>
+
+<p>I will also explain why the networks from the box above behave like they do. For example, why the US Congress net performs quite well while the Wikipedia net always changes the subject of the sentence to the United States.</p>
+
+<p><a href="https://github.com/batzner/tensorflow-pet-projects">Code to this post</a></p>
+
+<h3>Setup</h3>
+<h5>Dataset</h5>
+<p>I chose a small dataset hoping that my findings would transfer to large datasets as well. The dataset consists of the whole Sherlock Holmes corpus by Sir Arthur Conan Doyle. It is a <a href="https://sherlock-holm.es/stories/plain-text/cano.txt">.txt file</a> (3.6 MB) containing roughly 3.6 million characters and 650 thousand words after preprocessing. The only preprocessing I did was to remove indentation. I kept all line breaks even if their only purpose was formatting. I split the dataset into 90% training and 10% validation.</p>
+<h5>Model</h5>
+<p>To feed the text to the model, I one-hot encoded each character to a vector. The corpus contains 97 different characters causing input vectors of length 97. In the net, a softmax layer follows the LSTM layers and serves as a output layer. Its 97 neurons are fully connected to the last LSTM layer. The softmax layer outputs a 97-dimensional vector containing the predicted probability for each character being the next one.</p>
+<p>For optimization, I used <a href="http://sebastianruder.com/optimizing-gradient-descent/index.html#rmsprop">RMSprop</a>. It is an enhancement of the classic Stochastic Gradient Descent with the improvement that it uses a different learning rate for every single parameter. This learning rate depends on the last gradients of that parameter. Parameters that recently had multiple large updates get a smaller learning rate to avoid oscillation around minima of the loss function. That brings us to our loss function:</p>
+<h5>Perplexity - the WTF metric</h5>
+<p>As a loss function I chose the cross-entropy loss based on the prediction the model made at each step / for each character. However, in the charts below I exponentiated each loss value with base 2. This makes the values easier to interpret, because: the cross-entropy \(H\) can be interpreted as the average number of bits that the model would need to encode the next letter at each step.
+    <button class="show-more" data-target-id="perplexity-explanation" data-show-text="Why?" data-hide-text="OK, got it.">Why?</button>
+</p>
+<div id="perplexity-explanation" class="detail">
+    <p>Say the model's task is to encode the text to bits and its aim is to minimize the number of bits it needs. For example, it might have recognized some likely characters, so it gives them a low number of bits. It encodes A to 01 and X to 00101. That is smart because A occurs way more often than X, so why spend an equal amount of bits on X as on A? So the better the model is at predicting the next character the less bits it will need to encode the text. This makes the cross-entropy a good error measure / loss function to optimize. See <a href="http://stats.stackexchange.com/questions/80967/qualitively-what-is-cross-entropy">this excellent answer on StackOverflow</a> for more info.</p>
+    <p>Because our model learns patterns between characters in sentences it would not just look at the probability of each letter based on the number of occurrences in the text. Instead, it is smarter and uses the current position in the text for encoding and decoding. For example, if the whole text is a repetition of the pattern ABCDABCD, it wouldn't have to give each letter 2 bits based on its direct probability of 0.25. Instead, it would just have to encode the first letter, the rest of the text would be directly determined by that. So, it needs 2 bits <strong>for the whole text.</strong></p>
+    <p>Anyhow, why exponentiate the cross-entropy? So remember that the cross-entropy \(H\) gives us the average number of bits the model would need to encode the next letter at each step.</p>
+</div>
+<p>Thus, \(2^{H}\) gives us the average number of possibilities it has to choose from. Say our input data consists of 1000 characters and the model achieves a cross-entropy of 3.322 bits per character. This would mean a perplexity of \(2^{3.322} = 10\). So, the model is as confused on the input data as if it had to choose uniformly and independently among 10 possibilities for each character (example taken from <a href="https://en.wikipedia.org/wiki/Perplexity">this Wiki article</a>).</p>
+<h5>Initial Hyperparameters</h5>
+<ul>
+    <li>Number of LSTM layers: 2</li>
+    <li>Number of neurons per layer: 512</li>
+    <li>Batch size: 1</li>
+    <li></li>
+</ul>
+<p>Small details:</p>
+<li>
+    <ul>I <a href="http://www.wildml.com/deep-learning-glossary/#gradient-clipping">clipped the gradients</a> to an L2 norm of 5.</ul>
+</li>
+
 <p>Using RMSprop as an optimizer, which is still SGD, but with an improvement: it uses a different learning rate for each parameter, which depends on the last gradients of that parameter. Thus, parameters that recently had multiple large updates get a smaller learning rate.
     http://sebastianruder.com/optimizing-gradient-descent/index.html
 
@@ -144,9 +180,11 @@
             <label for="y-axis-range">Y Axis Range</label>
             <input id="y-axis-range">
         </div>
+        <div>
+            <button id="export-button" type="button" class="btn btn-default" onclick="exportChart()">Export Chart</button>
+        </div>
     </div>
 </div>
 
 <input id="stylesheets-input" value="stylesheets/posts/char-lm.css" style="display: none;">
-<!--  javascripts/posts/char-lm/batch-size.js javascripts/posts/char-lm/plot.js -->
-<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js" style="display: none;">
+<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot.js" style="display: none;">

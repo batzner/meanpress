@@ -13,26 +13,41 @@ class LabCtrl extends InjectionReceiver {
     constructor(...injections) {
         super(...injections); // Set the injections on this.
 
-        this.$document.ready(() => {
-            this.loadScripts();
+        this.$document.ready(() => this.fillTemplate());
+    }
 
-            // Wrap tables to make them responsive.
-            $('table').wrap('<div class="table-container"></div>');
+    fillTemplate() {
+        // Do some general DOM manipulation on the post content
+        this.loadScripts();
 
-            // Wrap each chart in a div to be able to safely clear the chart.js iframe junk
-            $('canvas.chart').wrap('<div></div>')
+        // Wrap tables to make them responsive.
+        $('table').wrap('<div class="table-container"></div>');
 
-            // Bring the bootstrap dropdowns to life
-            $('.dropdown-menu li a').click(function () {
-                const elem = $(this);
-                const buttonElem = elem.closest('.btn-group').find('button').first();
-                const choiceElem = buttonElem.find('.choice');
-                // Set the text on the span
-                choiceElem.html(elem.text());
-                // Set the selected value on the button
-                buttonElem.val(elem.data('value'));
-                buttonElem.change();
-            });
+        // Wrap each chart in a div to be able to safely clear the chart.js iframe junk
+        $('canvas.chart').wrap('<div></div>');
+
+        // Bring the bootstrap dropdowns to life
+        $('.dropdown-menu li a').click(function () {
+            const elem = $(this);
+            const buttonElem = elem.closest('.btn-group').find('button').first();
+            const choiceElem = buttonElem.find('.choice');
+            // Set the text on the span
+            choiceElem.html(elem.text());
+            // Set the selected value on the button
+            buttonElem.val(elem.data('value'));
+            buttonElem.change();
+        });
+
+        // Activate the show more toggles
+        $('.show-more').click($event => {
+            // Expand / hide additional information
+            const button = $($event.target);
+            const target = $('#' + button.data('target-id'));
+            const showText = button.data('show-text') || 'Show more';
+            const hideText = button.data('hide-text') || 'Show less';
+            // If the target is visible, it won't be after this block.
+            button.html(target.is(':visible') ? showText : hideText);
+            target.slideToggle();
         });
     }
 
