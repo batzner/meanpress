@@ -69,57 +69,49 @@
     <li>Number of LSTM layers: 2</li>
     <li>Number of neurons per layer: 512</li>
     <li>Batch size: 1</li>
-    <li></li>
+    <li>Number of timesteps for each backpropagation: 40<br/>This means the data is given in chunks of 40 characters. For each character, the model looks compares its output with the correct output. Then it does backpropagation from the current step to the start of the chunk of characters to see whether it would have made a better prediction if it had behaved differently in an earlier step. Consequently, the network optimizes its parameters looking 1-40 timesteps into the past.</li>
+    <li>Learning rate: 0.005</li>
+    <li>Learning rate decay: 0.9</li>
+    <li>Probability of keeping the output: 0.8<br/>This refers to the dropout technique, in which each LSTM cell either keeps its calculated output or outputs zero.</li>
 </ul>
 <p>Small details:</p>
-<li>
-    <ul>I <a href="http://www.wildml.com/deep-learning-glossary/#gradient-clipping">clipped the gradients</a> to an L2 norm of 5.</ul>
-</li>
+<ul>
+    <li>I <a href="http://www.wildml.com/deep-learning-glossary/#gradient-clipping">clipped the gradients</a> to an L2 norm of 5.</li>
+    <li><p>The hidden state of the LSTM never gets reset during training. Even though each backpropagation run is only done within chunks of 40 characters, the model can use the last hidden state of the last chunk when predicting the first character of the current chunk. Thus, the hidden state is zero at the very start of training, but then only changes as a result of the LSTM's update rules.</p>
+        <p>This behavior will change later, as it leads to suboptimal results.</p></li>
+</ul>
 
-<p>Using RMSprop as an optimizer, which is still SGD, but with an improvement: it uses a different learning rate for each parameter, which depends on the last gradients of that parameter. Thus, parameters that recently had multiple large updates get a smaller learning rate.
-    http://sebastianruder.com/optimizing-gradient-descent/index.html
-
-    Dataset: Sherlock Holmes
-    Write exact metrics for every dataset, number of words, chars, bytes etc.
-
-    4 mio chars as validation set???</p>
-
-<h3>1. Batch Size:</h3>
+<h3>1. Batch Size</h3>
+<p>I thought, it might be smart to start with the batch size, because it will influence, how fast and efficient the training will be in future experiments. For a batch size of \(n\), I split up the text into \(n\) parts and fed these parts simultaneously to the model. Thus, each LSTM layer had \(n\) different and independent hidden states, one for each part of the text. The network's parameters however were shared, used simultaneously for all batches and optimized on all of them - just like in regular mini-batch learning. Splitting up the text leads to minor distortions of the data, because each batch starts without any context and probably in the middle of a word or sentence, but I assume this has no noticeable effect on the loss.</p>
+<p>Here you can see validation losses and the minutes per epoch for different batch sizes.</p>
 <div class="col-xs-9 no-padding">
     <canvas id="batch-size-decay-chart" class="chart" width="600" height="300"></canvas>
 </div>
 <div class="col-xs-3 no-padding">
     <canvas id="batch-size-epoch-duration-chart" width="200" height="300"></canvas>
 </div>
+<p>Before interpreting the results, I should note that it is unfair to compare different batch sizes with the same learning rate. For larger batch sizes, the steps that the optimizer takes are more stable, because it optimizes / generalizes on multiple samples at once. Thus, we can use a higher learning rate with higher batch sizes meaning each batch size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.</p>
+<p>As for the interpretation:</p>
+<ul>
+    <li>We can see that batch sizes of 1, 10 and 20 are definitely too inefficient. I also concluded that 1 and 10 overfit because they see too little sentences at the same time. This means that the parameters get optimized too much on the current sentence instead of on the whole text. This could be compensated by a lower learning rate though.</li>
+    <li><p>We can also see that batch sizes of 500 and 2000 converge slower - both in terms of epochs and actual training time. I attribute this to the limited effect that increasing the batch size has on the stability of the gradient step. Calculating a gradient step on just one sample is much noisier than calculating it on 100 samples combined. But a gradient step calculated on 100,000 samples might not be much more stable than the step calculated on the 100 samples. The error function based on the 100 samples might already approximate the error function of the whole dataset quite well. Thus, calculating the gradient w.r.t. the 99,900 other samples is a waste of time, because it results in more or less the same gradient step.</p>
+        <p>In the chart above, the x axis is the number of epochs. Say, the 2000-batch-size model does 100 steps per epoch while the 50-batch-size model does 4,000 steps per epoch. If we now assume that both models take gradient steps with more or less the same stability, it makes sense that models with a batch size < 2000 converge much faster, because they take more steps per epoch. The speed uplift of using a batch size of 2000 cannot compensate this disadvantage.</p>
+        <p>For more info on the effect of batch sizes on the convergence, you can read <a href="https://www.quora.com/Intuitively-how-does-mini-batch-size-affect-the-performance-of-stochastic-gradient-descent/answer/Brian-Wong-21">this excellent answer</a>.</p></li>
+</ul>
 
-<p>generally unfair to compare the batch sizes with the same learning rate. Because the steps, which the optimizer takes with larger batch sizes, are more stable, it can use a higher learning rate. Thus, each batch_size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.
+<p>I chose 200 as a batch size, because it causes a low time per epoch and a fast convergence - when measuring the training time instead of epochs, batch sizes of 50, 100 and 200 led to roughly the same convergence.</p>
 
-    1/10/20 definitely too inefficient
-    1/10 overfit faster, because they only see a small portion of the text at every step so they lose the sense for the whole text???
-    500/2000 seem to get stuck in low local minima, because their minima don’t change as fast as with small batch_sizes
+<div class="alert alert-info">
+    <strong>Lesson Learned:</strong> Choose a good batch size first, because it affects the training time of future experiments.
+</div>
 
-    Why can't we just scale the batch size to whatever fits in the memory?
-    Good answer: https://www.quora.com/Intuitively-how-does-mini-batch-size-affect-the-performance-of-stochastic-gradient-descent/answer/Brian-Wong-21
-    While the gradient of a single data point is a lot noisier than the gradient of a 100-batch, the gradient of a 100-batch is not that much noisier than that of a 100,000-batch. So the additional 99,900 samples in that batch are useless, because we can use the almost the same step size with the 100-batch.
-    Also, noisiness prevent getting stuck in low local minima, because the error function and therefore the minima change for every batch.
+<p>Throughout the training of all experiments, I let the models complete a sentence started with "The " every now and then. This was a good evaluation metric in addition to the validation loss. Here is the output of the model with a batch size of 200 after training:</p>
 
-    "But noisiness isn't all bad. In particular, suppose that our error function is particularly pernicious and has a bunch of little valleys. If we used the entire training set to compute each gradient, our model would get stuck in the first valley it fell into (since it would register a gradient of 0 at this point). If we use smaller mini-batches, on the other hand, we'll get more noise in our estimate of the gradient. This noise might be enough to push us out of some of the shallow valleys in the error function.
+<blockquote>The house which had been the strange problem which had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the stran...</blockquote>
 
-    There is thus an important trade-off to consider between being able to jump out of shallow minima and making sure that you eventually converge to some minimum instead of bouncing around.
+<p>We can use this as a baseline to evaluate the impact of the following hyperparameter tuning.</p>
 
-    In practice, small to moderate mini-batches (10-500) are generally used, combined with a decaying learning rate, which guarantees long run convergence while maintaining the power to jump out of shallow minima that are encountered early on."
-
-    -> Choose 200 as batch size for future experiments, because it has a similar time per epoch, but it converges faster.
-    Also, think about batch training a language model on a text
-    Graphic on splitting up the text into batches
-
-    How does batch processing work for character-level language model generation? How can we split up the dataset without destroying the logical dependencies between characters? You just start each batch at equidistant points in the dataset, so that the chars within a batch are never split up. See ptb_iterator(...) here for an implementation.
-    Lower batch size prevents splitting up the text into too many small parts and therefore destroying the logical connections between those parts.
-
-    LESSON LEARNED: Choose a good batch size first, because it affects the training time of future experiments. Also, the optimal value for the learning rate depends on the batch size.
-
-    Autocomplete of the 200 batch net: "The house which had been the strange problem which had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the strange of the man who had been the stran"</p>
-
+<h3>2. Learning Rate</h3>
 
 <h3>All Experiments</h3>
 <div class="col-xs-9">
