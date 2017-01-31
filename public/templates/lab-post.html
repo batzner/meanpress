@@ -69,7 +69,7 @@
     <li>Number of LSTM layers: 2</li>
     <li>Number of neurons per layer: 512</li>
     <li>Batch size: 1</li>
-    <li>Number of timesteps for each backpropagation: 40<br/>This means the data is given in chunks of 40 characters. For each character, the model looks compares its output with the correct output. Then it does backpropagation from the current step to the start of the chunk of characters to see whether it would have made a better prediction if it had behaved differently in an earlier step. Consequently, the network optimizes its parameters looking 1-40 timesteps into the past.</li>
+    <li>Number of time steps for each backpropagation: 40<br/>This means the data is given in chunks of 40 characters. For each character, the model looks compares its output with the correct output. Then it does backpropagation from the current step to the start of the chunk of characters to see whether it would have made a better prediction if it had behaved differently in an earlier step. Consequently, the network optimizes its parameters looking 1-40 time steps into the past.</li>
     <li>Learning rate: 0.005</li>
     <li>Learning rate decay: 0.9</li>
     <li>Probability of keeping the output: 0.8<br/>This refers to the dropout technique, in which each LSTM cell either keeps its calculated output or outputs zero.</li>
@@ -88,7 +88,7 @@
     <canvas id="batch-size-decay-chart" class="chart" width="600" height="300"></canvas>
 </div>
 <div class="col-xs-3 no-padding">
-    <canvas id="batch-size-epoch-duration-chart" width="200" height="300"></canvas>
+    <canvas id="batch-size-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
 </div>
 <p>Before interpreting the results, I should note that it is unfair to compare different batch sizes with the same learning rate. For larger batch sizes, the steps that the optimizer takes are more stable, because it optimizes / generalizes on multiple samples at once. Thus, we can use a higher learning rate with higher batch sizes meaning each batch size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.</p>
 <p>As for the interpretation:</p>
@@ -114,7 +114,32 @@
 <h3>2. Learning Rate</h3>
 <figure><canvas id="learning-rate-first-chart" class="chart" width="600" height="300"></canvas></figure>
 
-<p>Carelessly, I went for 0.01 as the future learning rate, because of a marginally better validation loss. I regretted that choice later when I expanded the model to use more neurons per layer (section 5). Then, 0.01 was everything but the optimal learning rate. I should have read more about the RMSProp method before optimizing its parameters. (Nämlich) In the slides, where Geoffrey Hinton proposed RMSprop, he states that 0.001 is a good initial learning rate for most problems. </p>
+<p>Carelessly, I went for 0.01 as the future learning rate, because of a marginally better validation loss. I regretted that choice later when I expanded the model to use more neurons per layer (section 4). Then, 0.01 was everything but the optimal learning rate. I should have read more about the RMSProp method before optimizing its parameters. In the <button class="show-more" data-target-id="rmsprop-slides" data-show-text="slides" data-hide-text="slides">slides</button><span id="rmsprop-slides" class="detail">(Coursera: Neural Networks for Machine Learning Lecture 6)</span> where Geoffrey Hinton proposed RMSprop, he states that 0.001 is a good initial learning rate for most problems.</p>
+
+<h3>3. Number of Time Steps</h3>
+<p>As explained above, this is the maximum number of past steps that the optimizer considers for backpropagation. Put differently, it is the number of steps that we unroll the LSTM for. Theoretically, a linearly growing number of time steps leads to:</p>
+<ul>
+    <li>An increased ability to learn long-range dependencies between letters.</li>
+    <li>A linearly growing graph size and thus a linearly growing memory footprint during training. The number of parameters stays the same.</li>
+    <li><p>A linearly growing training time per epoch. <button class="show-more" data-target-id="timesteps-complexity" data-show-text="Why?" data-hide-text="Ok, got it!">Why?</button></p>
+    <div id="timesteps-complexity" class="detail">
+        <p>Say, our text is 10 characters long. With <code>num_timesteps = 2</code>, we run backpropagation 5 times. Each time, we go back 1 time step for the first character and then 2 time steps for the second character. There, we also take into account if a different hidden state after the first character would have helped us at predicting the second. This means a total of \(5 \cdot (1+2) = 15\) steps.</p>
+        <p>With <code>num_timesteps = 5</code>, we run backpropagation 2 times. For the 5 characters per run, we need to go 1, 2, 3, 4 and 5 time steps back. This means a total of \(2 \cdot (1+2+3+4+5) = 30\) steps.</p>
+        <p>Generally, the backpropagation runs decrease linearly while the complexity of each run increases quadratically. For a constant text size \(S\) and a number of time steps \(t\) we get a total of roughly $$\frac{S}{t} \cdot \frac{t \cdot (t-1)}{2}$$ time steps per epoch. Therefore, the complexity and training time per epoch grows linearly.</p>
+    </div></li>
+</ul>
+<div class="col-xs-9 no-padding">
+    <canvas id="num-timesteps-decay-chart" class="chart" width="600" height="300"></canvas>
+</div>
+<div class="col-xs-3 no-padding">
+    <canvas id="num-timesteps-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
+</div>
+
+<p>As one might expect, the validation loss improves with more time steps. However, the model's output still sounds quite dumb as it has a high chance of getting stuck in endless loops ("the man, who saw the man, who saw...'). So, it apparently doesn't pay too much attention to what it output 160 steps ago.</p>
+<p>What surprised me was the constant training time per epoch. This also occurred with other datasets and a higher number of time steps (200 and 500). I attribute this to an efficient gradient calculation in TensorFlow. Instead of feeding single letters, I feed the model chunks of size <code>num_timesteps</code>. TensorFlow calculates and derives the loss for the whole chunk at once. It seems like the complexity per chunk only grows linearly with the chunk size. As the number of chunks per epoch decreases at the sime time, the total time per epoch remains constant.</p>
+<p>All in all, increasing the number of time steps leads to (decreasingly) better results while having no effect on the training time. I stopped at 160 time steps though to keep the memory footprint low.</p>
+
+<h3>4. Learning Rate, again</h3>
 
 <h3>All Experiments</h3>
 <div class="col-xs-9">
@@ -131,8 +156,7 @@
                 <ul class="dropdown-menu">
                     <li><a href="#" data-value="batch_size">Batch Size</a></li>
                     <li><a href="#" data-value="learning_rate_512">Learning Rate</a></li>
-                    <li><a href="#" data-value="learning_rate_decay">Learning Rate Decay</a></li>
-                    <li><a href="#" data-value="num_timesteps">Number of Timesteps</a></li>
+                    <li><a href="#" data-value="num_timesteps">Number of Time Steps</a></li>
                     <li><a href="#" data-value="num_neurons_1024_failed_starts">1024 Neurons Failed Starts</a></li>
                     <li><a href="#" data-value="learning_rate_1024">Learning Rate (1024 Neurons)</a></li>
                     <li><a href="#" data-value="num_neurons">Neurons per Layer</a></li>

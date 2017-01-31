@@ -6,10 +6,9 @@ Chart.defaults.global.elements.point.radius = 0;
 const runGroupValues = {
     batch_size: ['1', '10', '20', '50', '100', '200', '500', '2000'],
     learning_rate_512: ['0.05', '0.01', '0.005', '0.001'],
-    learning_rate_decay: ['0.5', '0.8', '0.9', '0.97'],
     num_timesteps: ['40', '80', '120', '160'],
     num_neurons_1024_failed_starts: ['01-first-naive', '02-lr=0.005', '03-lr=0.001', '04-init_scale=0.005'],
-    learning_rate_1024: ['0.01', '0.001', '0.005'],
+    learning_rate_1024: ['0.01', '0.005', '0.001'],
     num_neurons: ['512', '1024'],
     output_keep_prob: ['0.3', '0.5', '0.8'],
     num_layers: ['2', '3', '4'],
@@ -32,6 +31,17 @@ const RUN_GROUP_COLORS = {
         '0.05': PostUtil.CHART_COLORS_BLUE[0],
         '0.01': PostUtil.CHART_COLORS_BLUE[1],
         '0.005': PostUtil.CHART_COLORS_BLUE[3],
+        '0.001': PostUtil.CHART_COLORS_BLUE[4]
+    },
+    num_timesteps : {
+        '40': PostUtil.CHART_COLORS_BLUE[0],
+        '80': PostUtil.CHART_COLORS_BLUE[1],
+        '120': PostUtil.CHART_COLORS_BLUE[3],
+        '160': PostUtil.CHART_COLORS_BLUE[4]
+    },
+    learning_rate_1024: {
+        '0.01': PostUtil.CHART_COLORS_BLUE[0],
+        '0.005': PostUtil.CHART_COLORS_BLUE[2],
         '0.001': PostUtil.CHART_COLORS_BLUE[4]
     }
 };

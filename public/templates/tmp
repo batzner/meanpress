@@ -54,14 +54,7 @@ Autocomplete of the 200 batch net: "The house which had been the strange problem
 <Plot with Training and Validation Losses>
 
 Stupidly, I decided to go for 0.01 as the learning rate, because it had the lowest validation loss. We'll see soon, why that was stupid.
-
-3. Learning Rate Decay
-
-<Plot with Training and Validation Losses>
-
-Seems to make no difference. Chose 0.8 for future experiments.
-
-Using a learning rate decay does affect the convergence of RMSprop / Adam, but It usually does not make sense to decay the learning rate manually (source: http://stackoverflow.com/questions/39517431/should-we-do-learningrate-decay-for-adam-optimizer).
+$$$
 
 4. Number of timesteps
 
@@ -70,7 +63,6 @@ Using a learning rate decay does affect the convergence of RMSprop / Adam, but I
 
 Surprisingly, the number of timesteps did not increase the time per epoch. I guess its because for 1000 chars = 1 epoch it can either go back 20 steps 50 times (num_timesteps=20) or go back 50 steps 20 times (num_timesteps=50). So where should be the difference.
 The only thing that num_timesteps directly affects is the memory footprint of course, because the computational graph that TensorFlow creates increases proportionally.
-Note that 200 vs. 500 timesteps did make a difference on South Park (or Congress). But why???
 
 160 does not yield a huge improvement, but our net is generally quite dumb now, so it cannot make use of that many timesteps.
 
