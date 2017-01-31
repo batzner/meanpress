@@ -5,7 +5,7 @@ Chart.defaults.global.elements.point.radius = 0;
 
 const runGroupValues = {
     batch_size: ['1', '10', '20', '50', '100', '200', '500', '2000'],
-    learning_rate_512: ['0.001', '0.005', '0.01', '0.05'],
+    learning_rate_512: ['0.05', '0.01', '0.005', '0.001'],
     learning_rate_decay: ['0.5', '0.8', '0.9', '0.97'],
     num_timesteps: ['40', '80', '120', '160'],
     num_neurons_1024_failed_starts: ['01-first-naive', '02-lr=0.005', '03-lr=0.001', '04-init_scale=0.005'],
@@ -17,33 +17,30 @@ const runGroupValues = {
     wiki: ['small', 'medium', 'medium-with-reset']
 };
 
+const RUN_GROUP_COLORS = {
+    batch_size: {
+        '1': '#FFCDD2',
+        '10': '#E57373',
+        '20': '#C8E6C9',
+        '50': '#66BB6A',
+        '100': '#2E7D32',
+        '200': '#123317',
+        '500': '#BBDEFB',
+        '2000': '#2196F3'
+    },
+    learning_rate_512: {
+        '0.05': PostUtil.CHART_COLORS_BLUE[0],
+        '0.01': PostUtil.CHART_COLORS_BLUE[1],
+        '0.005': PostUtil.CHART_COLORS_BLUE[3],
+        '0.001': PostUtil.CHART_COLORS_BLUE[4]
+    }
+};
+
 const AXIS_LABELS = {
     lossesValid: 'Validation Perplexity',
     lossesTrain: 'Training Perplexity',
     minutesSinceStart: 'Training Time [min]',
     epochs: 'Epoch'
-};
-
-const BATCH_SIZE_EPOCH_MINUTES = {
-    '1': 29.8,
-    '10': 13.8,
-    '20': 7.3,
-    '50': 3.1,
-    '100': 1.9,
-    '200': 1.5,
-    '500': 1.1,
-    '2000': 0.87
-};
-
-const BATCH_SIZE_COLORS = {
-    '1': '#FFCDD2',
-    '10': '#E57373',
-    '20': '#C8E6C9',
-    '50': '#66BB6A',
-    '100': '#2E7D32',
-    '200': '#123317',
-    '500': '#BBDEFB',
-    '2000': '#2196F3'
 };
 
 const Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
@@ -54,36 +51,25 @@ $(function () {
     // Initialize the range slider
     Y_AXIS_RANGE_SLIDER.ionRangeSlider({
         type: 'double',
-        min: 0,
-        max: 100,
-        onFinish: plot
+        min: 2,
+        max: 24,
+        onFinish: () => plot()
     });
-
-    plot();
 });
 
 function exportChart() {
     console.log(chartExport);
 }
-//getLogs('batch_size', [1, 10, 20, 50, 100, 200, 500, 2000]).then(plotLogs);
-//getLogs('learning_rate_512', ['0.001', '0.005', '0.01', '0.05']).then(plotLogs);
-//getLogs('learning_rate_decay', ['0.5', '0.8', '0.9', '0.97']).then(plotLogs);
-//getLogs('num_timesteps', ['40', '80', '120', '160']).then(plotLogs);
-//getLogs('num_neurons/1024/failed_starts', ['01-first-naive', '02-lr=0.005', '03-lr=0.001',
-//    '04-init_scale=0.005']).then(plotLogs);
-//getLogs('learning_rate_1024', ['0.01', '0.001', '0.005']).then(plotLogs);
-//getLogs('num_neurons', ['512', '1024']).then(plotLogs);
-//getLogs('output_keep_prob', ['0.3', '0.5', '0.8']).then(plotLogs);
-//getLogs('num_layers', ['2', '3', '4']).then(plotLogs);
-//getLogs('reset_state_interval_tokens', ['never', 'always', '320', '1120', '2080']).then(plotLogs);
 
-function plot() {
-    getLogs($('#run-group-select').val()).then(plotLogs);
+function plot(resetYRange = false) {
+    const runGroupName = $('#run-group-select').val();
+    getLogs(runGroupName).then(logs => plotLogs(logs, runGroupName, resetYRange));
 }
 
 function getLogs(runGroup) {
     const values = runGroupValues[runGroup];
-    // Store the data locally so that we don't interfere with the global logs until all data are loaded.
+    // Store the data locally so that we don't interfere with the global logs until all data are
+    // loaded.
     let data = {};
     return Promise.all(values.map(value => {
         // get the data and push the trainstates
@@ -126,24 +112,26 @@ function getData(log, xKey, yKey) {
     return data;
 }
 
-function updateSlider(yMin, yMax) {
-    // Force some absolute limits on the slider values
-    yMax = Math.min(30, yMax);
-
+function resetSlider(yMin, yMax) {
     const decimals = yMax - yMin > 2 ? 0 : 1;
-    $('#y-axis-range').data('ionRangeSlider').update({
-        min: yMin.toFixed(decimals),
-        max: yMax.toFixed(decimals)
-    })
+    const slider = $('#y-axis-range').data('ionRangeSlider');
+    const decimalShift = Math.pow(10, decimals);
+    yMin = (Math.floor(yMin * decimalShift) / decimalShift).toFixed(decimals);
+    yMax = (Math.ceil(yMax * decimalShift) / decimalShift).toFixed(decimals);
+    slider.update({
+        min: yMin,
+        max: yMax,
+        from: yMin,
+        to: yMax
+    });
 }
 
-function plotLogs(logs) {
+function plotLogs(logs, runGroupName, resetYRange = false) {
     const xKey = $('#x-axis-select').val();
     const yKey = $('#y-axis-select').val();
 
     // Filter the data points with the y-axis range slider
-    const yRangeSliderMin = Y_AXIS_RANGE_SLIDER.data('ionRangeSlider').result.from;
-    const yRangeSliderMax = Y_AXIS_RANGE_SLIDER.data('ionRangeSlider').result.to;
+    let slider = Y_AXIS_RANGE_SLIDER.data('ionRangeSlider');
     // Record the data's min and max to update the slider limits
     let yRange = {min: null, max: null};
 
@@ -152,22 +140,25 @@ function plotLogs(logs) {
         let data = getData(logs[value], xKey, yKey);
 
         data = data.filter(point => {
+            // Ignore and filter outliers completely
+            if (point.y > 30 || point.y < 0.01) return false;
+
             if (yRange.min == null || point.y < yRange.min) yRange.min = point.y;
             if (yRange.max == null || point.y > yRange.max) yRange.max = point.y;
             // Return the actual filter condition
-            return yRangeSliderMin <= point.y && point.y <= yRangeSliderMax;
+            return resetYRange || (slider.result.from <= point.y && point.y <= slider.result.to);
         });
         data = getEquidistantPoints(data, 30);
 
         return {
             label: value,
             data: data,
-            borderColor: BATCH_SIZE_COLORS[value],
-            backgroundColor: BATCH_SIZE_COLORS[value]
+            borderColor: RUN_GROUP_COLORS[runGroupName][value],
+            backgroundColor: RUN_GROUP_COLORS[runGroupName][value]
         };
     });
 
-    updateSlider(yRange.min, yRange.max);
+    if (resetYRange) resetSlider(yRange.min, yRange.max);
 
     PostUtil.clearChart('flexible-chart');
     const chartParams = {
@@ -188,8 +179,8 @@ function plotLogs(logs) {
                 yAxes: [{
                     type: 'logarithmic',
                     ticks: {
-                        min: Math.max(yRange.min, yRangeSliderMin),
-                        max: Math.min(yRange.max, yRangeSliderMax),
+                        min: resetYRange ? yRange.min : slider.result.from,
+                        max: resetYRange ? yRange.max : slider.result.to,
                         callback: value => value.toFixed(2)
                     },
                     scaleLabel: {
