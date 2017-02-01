@@ -1,6 +1,7 @@
 printEpochTimes('batch_size', [1, 10, 20, 50, 100, 200, 500, 2000]);
 printEpochTimes('num_timesteps', [40, 80, 120, 160]);
 printEpochTimes('south_park', ['2017-01-18T10-32-14','num_timesteps/200/2017-01-18T13-56-50']);
+printEpochTimes('num_neurons', ['512', '1024']);
 
 function printEpochTimes(parameter, values) {
     values.map(value => {

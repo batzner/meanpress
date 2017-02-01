@@ -79,6 +79,7 @@
     <li>I <a href="http://www.wildml.com/deep-learning-glossary/#gradient-clipping">clipped the gradients</a> to an L2 norm of 5.</li>
     <li><p>The hidden state of the LSTM never gets reset during training. Even though each backpropagation run is only done within chunks of 40 characters, the model can use the last hidden state of the last chunk when predicting the first character of the current chunk. Thus, the hidden state is zero at the very start of training, but then only changes as a result of the LSTM's update rules.</p>
         <p>This behavior will change later, as it leads to suboptimal results.</p></li>
+    <li>I used the Xavier method for weight initialization.</li>
 </ul>
 
 <h3>1. Batch Size</h3>
@@ -101,7 +102,7 @@
 
 <p>I chose 200 as a batch size, because it causes a low time per epoch and a fast convergence - when measuring the training time instead of epochs, batch sizes of 50, 100 and 200 led to roughly the same convergence.</p>
 
-<div class="alert alert-info">
+<div class="lesson-learned">
     <strong>Lesson Learned:</strong> Choose a good batch size first, because it affects the training time of future experiments.
 </div>
 
@@ -112,21 +113,40 @@
 <p>We can use this as a baseline to evaluate the impact of the following hyperparameter tuning.</p>
 
 <h3>2. Learning Rate</h3>
-<figure><canvas id="learning-rate-first-chart" class="chart" width="600" height="300"></canvas></figure>
+<figure>
+    <canvas id="learning-rate-chart" class="chart" width="600" height="300"></canvas>
+</figure>
 
-<p>Carelessly, I went for 0.01 as the future learning rate, because of a marginally better validation loss. I regretted that choice later when I expanded the model to use more neurons per layer (section 4). Then, 0.01 was everything but the optimal learning rate. I should have read more about the RMSProp method before optimizing its parameters. In the <button class="show-more" data-target-id="rmsprop-slides" data-show-text="slides" data-hide-text="slides">slides</button><span id="rmsprop-slides" class="detail">(Coursera: Neural Networks for Machine Learning Lecture 6)</span> where Geoffrey Hinton proposed RMSprop, he states that 0.001 is a good initial learning rate for most problems.</p>
+<p>Carelessly, I went for 0.01 as the future learning rate, because of a marginally better validation loss. I regretted that choice later when I expanded the model to use more neurons per layer (section 4). Then, 0.01 was everything but the optimal learning rate. Also values like 0.05 or 0.005 yielded far inferior results. I should have read more about the RMSProp method before optimizing its parameters. In the
+    <button class="show-more" data-target-id="rmsprop-slides" data-show-text="slides" data-hide-text="slides">slides</button>
+    <span id="rmsprop-slides" class="detail">(Coursera: Neural Networks for Machine Learning Lecture 6)</span> where Geoffrey Hinton proposed RMSprop, he states that 0.001 is a good initial learning rate for most problems. This turned out to be the case for a network with 1024 instead of 512 neurons per layer.
+</p>
+
+<div class="lesson-learned">
+    <strong>Lessons Learned:</strong>
+    <ul>
+        <li>For optimizers that use an adaptive learning rate for each parameter (Adadelta, Adam, RMSprop) it is quite safe to use the recommended values and focus on other hyperparameters.</li>
+        <li>The learning rate should be optimized once the size of the network is fixed.</li>
+    </ul>
+</div>
+
+<p>One disadvantage of the popular RMSprop and Adam optimizers is that they need more memory space during training, because they store additional values for each parameter. For 1M parameters, RMSprop needs 1M and Adam needs 2M of additional memory space. Thus, for situations where a larger network will yield better results than adaptive learning rates, vanilla SGD is the better choice.</p>
 
 <h3>3. Number of Time Steps</h3>
 <p>As explained above, this is the maximum number of past steps that the optimizer considers for backpropagation. Put differently, it is the number of steps that we unroll the LSTM for. Theoretically, a linearly growing number of time steps leads to:</p>
 <ul>
     <li>An increased ability to learn long-range dependencies between letters.</li>
     <li>A linearly growing graph size and thus a linearly growing memory footprint during training. The number of parameters stays the same.</li>
-    <li><p>A linearly growing training time per epoch. <button class="show-more" data-target-id="timesteps-complexity" data-show-text="Why?" data-hide-text="Ok, got it!">Why?</button></p>
-    <div id="timesteps-complexity" class="detail">
-        <p>Say, our text is 10 characters long. With <code>num_timesteps = 2</code>, we run backpropagation 5 times. Each time, we go back 1 time step for the first character and then 2 time steps for the second character. There, we also take into account if a different hidden state after the first character would have helped us at predicting the second. This means a total of \(5 \cdot (1+2) = 15\) steps.</p>
-        <p>With <code>num_timesteps = 5</code>, we run backpropagation 2 times. For the 5 characters per run, we need to go 1, 2, 3, 4 and 5 time steps back. This means a total of \(2 \cdot (1+2+3+4+5) = 30\) steps.</p>
-        <p>Generally, the backpropagation runs decrease linearly while the complexity of each run increases quadratically. For a constant text size \(S\) and a number of time steps \(t\) we get a total of roughly $$\frac{S}{t} \cdot \frac{t \cdot (t-1)}{2}$$ time steps per epoch. Therefore, the complexity and training time per epoch grows linearly.</p>
-    </div></li>
+    <li>
+        <p>A linearly growing training time per epoch.
+            <button class="show-more" data-target-id="timesteps-complexity" data-show-text="Why?" data-hide-text="Ok, got it!">Why?</button>
+        </p>
+        <div id="timesteps-complexity" class="detail">
+            <p>Say, our text is 10 characters long. With <code>num_timesteps = 2</code>, we run backpropagation 5 times. Each time, we go back 1 time step for the first character and then 2 time steps for the second character. There, we also take into account if a different hidden state after the first character would have helped us at predicting the second. This means a total of 5 &middot; (1+2) = 15 steps.</p>
+            <p>With <code>num_timesteps = 5</code>, we run backpropagation 2 times. For the 5 characters per run, we need to go 1, 2, 3, 4 and 5 time steps back. This means a total of 2 &middot; (1+2+3+4+5) = 30 steps.</p>
+            <p>Generally, the backpropagation runs decrease linearly while the complexity of each run increases quadratically. For a constant text size \(S\) and a number of time steps \(t\) we get a total of roughly $$\frac{S}{t} \cdot \frac{t \cdot (t-1)}{2}$$ time steps per epoch. Therefore, the complexity and training time per epoch grows linearly.</p>
+        </div>
+    </li>
 </ul>
 <div class="col-xs-9 no-padding">
     <canvas id="num-timesteps-decay-chart" class="chart" width="600" height="300"></canvas>
@@ -139,7 +159,34 @@
 <p>What surprised me was the constant training time per epoch. This also occurred with other datasets and a higher number of time steps (200 and 500). I attribute this to an efficient gradient calculation in TensorFlow. Instead of feeding single letters, I feed the model chunks of size <code>num_timesteps</code>. TensorFlow calculates and derives the loss for the whole chunk at once. It seems like the complexity per chunk only grows linearly with the chunk size. As the number of chunks per epoch decreases at the sime time, the total time per epoch remains constant.</p>
 <p>All in all, increasing the number of time steps leads to (decreasingly) better results while having no effect on the training time. I stopped at 160 time steps though to keep the memory footprint low.</p>
 
-<h3>4. Learning Rate, again</h3>
+<h3>4. Number of Neurons</h3>
+
+<p>Next, I tried increasing the model's parameters. Given a vocabulary size \(V\), here is the formula for the total number of parameters \(p_{total}\) based on the number of LSTM layers \(l\) and the neurons per layer \(n\):
+
+$$p_{total} = p_{input} + l \cdot p_{hidden} + p_{softmax}$$
+$$= 4 \cdot (n \cdot (V+n) + n) + (l-1) \cdot 4 \cdot (n \cdot 2 \cdot n + n) + V \cdot n + V$$
+
+For the calculation of a single layer's parameters, take a look at the formulas in <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">this blog post</a>. For 512 neurons per layer, we get ca. 3.4M parameters. For 1024 neurons per layer, we get ca. 13M parameters. Here is how that affected the validation loss and training time:</p>
+
+<div class="col-xs-9 no-padding">
+    <canvas id="num-neurons-decay-chart" class="chart" width="600" height="300"></canvas>
+</div>
+<div class="col-xs-3 no-padding">
+    <canvas id="num-neurons-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
+</div>
+
+<p>While both models reach the same validation perplexity of 2.26, the larger neural network overfits after 80 minutes /  20 epochs. So, I went for 1024 neurons per layer and tried to tackle the overfitting with dropout.</p>
+
+<h3>4. Dropout</h3>
+
+I tested three probabilites to keep the output value of a neuron:
+<figure>
+    <canvas id="dropout-chart" class="chart" width="600" height="300"></canvas>
+</figure>
+<button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button>
+
+<p id="peaks-explanation" class="detail">The initial peaks in the validation perplexity were caused by padding. Because I used mini-batch learning, I split the text into 200 parts. These parts likely have unequal sizes and are also not multiples of 160, our number of timesteps. Thus, when the program reaches the end of the parts at the end of an epoch, it pads all chunks in the batch with PAD tokens. Then, all chunks have an equal length of 160 tokens. In the worst case, however, this means that the model might see about 200 &middot; 160 = 32000 PAD tokens. This has a large influence in the early phase of training. So, when we validate the model just at the end of an epoch, it will be confused, because the validation text, does not solely constist of PAD tokens. I also let the model complete a sentence started with "The" after every validation. At each of the peaks, the model's output was "The PADPADPADPAD...". In retrospective, it would have been better to just skip the last batch of the text. But as for the interpretation of the chart:</p>
+<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. </p>
 
 <h3>All Experiments</h3>
 <div class="col-xs-9">
@@ -157,7 +204,6 @@
                     <li><a href="#" data-value="batch_size">Batch Size</a></li>
                     <li><a href="#" data-value="learning_rate_512">Learning Rate</a></li>
                     <li><a href="#" data-value="num_timesteps">Number of Time Steps</a></li>
-                    <li><a href="#" data-value="num_neurons_1024_failed_starts">1024 Neurons Failed Starts</a></li>
                     <li><a href="#" data-value="learning_rate_1024">Learning Rate (1024 Neurons)</a></li>
                     <li><a href="#" data-value="num_neurons">Neurons per Layer</a></li>
                     <li><a href="#" data-value="output_keep_prob">Output Keep Prob.</a></li>

@@ -54,7 +54,6 @@ Autocomplete of the 200 batch net: "The house which had been the strange problem
 <Plot with Training and Validation Losses>
 
 Stupidly, I decided to go for 0.01 as the learning rate, because it had the lowest validation loss. We'll see soon, why that was stupid.
-$$$
 
 4. Number of timesteps
 
@@ -87,6 +86,7 @@ Finally could test if increasing the number of neurons in the net decreases the 
 <Plot with Training and Validation Losses>
 
 While both 512 and 1024 reach the same validation error of 1.18, the 1024 overfits, so I went for 1024 and tried to overcome the overfitting with dropout.
+$$$
 
 <Generated Sentences with 512 and 1024> Beware of overfitting -> sounds wonderful, but validation loss is a better indicator of the model quality. Training on a smaller dataset -> model will just remember the training data (Goethe)
 

@@ -7,7 +7,6 @@ const runGroupValues = {
     batch_size: ['1', '10', '20', '50', '100', '200', '500', '2000'],
     learning_rate_512: ['0.05', '0.01', '0.005', '0.001'],
     num_timesteps: ['40', '80', '120', '160'],
-    num_neurons_1024_failed_starts: ['01-first-naive', '02-lr=0.005', '03-lr=0.001', '04-init_scale=0.005'],
     learning_rate_1024: ['0.01', '0.005', '0.001'],
     num_neurons: ['512', '1024'],
     output_keep_prob: ['0.3', '0.5', '0.8'],
@@ -24,8 +23,8 @@ const RUN_GROUP_COLORS = {
         '50': '#66BB6A',
         '100': '#2E7D32',
         '200': '#123317',
-        '500': '#BBDEFB',
-        '2000': '#2196F3'
+        '500': '#FFECB3',
+        '2000': '#FFC107'
     },
     learning_rate_512: {
         '0.05': PostUtil.CHART_COLORS_BLUE[0],
@@ -43,6 +42,15 @@ const RUN_GROUP_COLORS = {
         '0.01': PostUtil.CHART_COLORS_BLUE[0],
         '0.005': PostUtil.CHART_COLORS_BLUE[2],
         '0.001': PostUtil.CHART_COLORS_BLUE[4]
+    },
+    num_neurons: {
+        '512': PostUtil.CHART_COLORS_BLUE[1],
+        '1024': PostUtil.CHART_COLORS_BLUE[4]
+    },
+    output_keep_prob: {
+        '0.3': PostUtil.CHART_COLORS_BLUE[0],
+        '0.5': PostUtil.CHART_COLORS_BLUE[2],
+        '0.8': PostUtil.CHART_COLORS_BLUE[4]
     }
 };
 
