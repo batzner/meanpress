@@ -108,7 +108,7 @@ Interesting: 50% results in the maximum amount of regularization: https://www.re
 
 8. Number of Layers
 
-Keeping the number of parameters the same, I tried to see if increasing the network's depth helps. My intuition is that a deeper network helps to learn complex dependencies in the data. Having a lot of neurons in a layer helps to remember a lot of *different* patterns. For example on Sherlock follows Holmes and on Mrs. follows Hudson etc.
+Keeping the number of parameters the same I tried to see if increasing the network's depth helps. My intuition is that a deeper network helps to learn complex dependencies in the data. Having a lot of neurons in a layer helps to remember a lot of *different* patterns. For example on Sherlock follows Holmes and on Mrs. follows Hudson etc.
 
 Values for each of the layers
 <Formula for calculating the degrees of freedom>
@@ -164,6 +164,12 @@ overall, letting the network overfit is tempting, because it yields so nice sent
 
 General notes:
 
+unten:
+- frustrating loss function
+- ineffective
+- again, sampling is different from the problem, we are trying to solve during training. during training, we correct the model's output every now and then. during sampling we just let it do anything without correction.
+- race car driver
+
 Interpreting the loss numbers:
 Perplexity - the wtf metric
 https://en.wikipedia.org/wiki/Perplexity
@@ -185,6 +191,29 @@ sampling with 'the' and then expecting normal sentences is also a bit like telli
  the model learned that it can get quite a good loss, if it gets corrected every now and then with one letter
  The Senate will be a supporter of the Senate to support the Senate to support the Senate OR The Senate will be supporter of the S[WRONG -> B(ill)] and now the model is back on track with just one wrong letter
 --
+Overall the hyperparameter tuning yielded only marginal improvements, but consider the stupid loss function. A marginal loss decrease can mean that it chose the correct word a couple of more times (Senator instead of Penator), even if it only got rewarded for choosing the right letter.
+
+- frustrating loss function
+- ineffective
+- again, sampling is different from the problem, we are trying to solve during training. during training, we correct the model's output every now and then. during sampling we just let it do anything without correction.
+- race car driver
+
+ another bad thing about char level:
+ timesteps = 300 -> ram explodes
+ but is necessry to cover a sentence / paragraph
+
+What I learned: Don’t use too many epochs for initial optimization. Search rough values with rough epochs and then do the fine tuning later. Optimizing for 0.01 better error is not worth it.
+It is more fun and more effective to optimize the architecture first with dropout=1 and usual values (learning rate etc.) and then do the fine tuning later. Also, it makes sense to start with a number of degrees of freedom that is at the max of the reasonable computing capacity (provided that the dataset is large enough).
+
+Overall:
+- stupid loss function
+- exploding ram
+- model optimization not related to producing nice sentences
+    - uses man instead of Mr holmes
+    - starting with "The" leads to the race driver problem
+
+Before continuing with word level, we will test a thing that we cannot test for word level
+- remove until here
 
 Overall the hyperparameter tuning yielded only marginal improvements, but consider the stupid loss function. A marginal loss decrease can mean that it chose the correct word a couple of more times (Senator instead of Penator), even if it only got rewarded for choosing the right letter.
 

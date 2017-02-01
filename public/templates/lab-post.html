@@ -44,8 +44,6 @@
     <li>What <strong>is</strong> new about this post is that, firstly, it contains an interactive text box where you can find the strengths and weaknesses of the trained models and, secondly, I am publishing my complete hyperparameter odyssey. Below, I will explain, how I found the hyperparameters (batch size, learning rate, number of layers etc.) for the final networks - what mistakes I made and what I learned from them. So if hyperparameter-tuning of neural networks is a bit of a mystery to you, this post might save you some time and money spent on the inefficient training of your models.</li>
 </ul>
 
-<p>I will also explain why the networks from the box above behave like they do. For example, why the US Congress net performs quite well while the Wikipedia net always changes the subject of the sentence to the United States.</p>
-
 <p><a href="https://github.com/batzner/tensorflow-pet-projects">Code to this post</a></p>
 
 <h3>Setup</h3>
@@ -80,6 +78,7 @@
     <li><p>The hidden state of the LSTM never gets reset during training. Even though each backpropagation run is only done within chunks of 40 characters, the model can use the last hidden state of the last chunk when predicting the first character of the current chunk. Thus, the hidden state is zero at the very start of training, but then only changes as a result of the LSTM's update rules.</p>
         <p>This behavior will change later, as it leads to suboptimal results.</p></li>
     <li>I used the Xavier method for weight initialization.</li>
+    <li>I trained all models on an AWS p2.xlarge instance ($0.2 per hour).</li>
 </ul>
 
 <h3>1. Batch Size</h3>
@@ -163,7 +162,7 @@
 
 <p>Next, I tried increasing the model's parameters. Given a vocabulary size \(V\), here is the formula for the total number of parameters \(p_{total}\) based on the number of LSTM layers \(l\) and the neurons per layer \(n\):
 
-$$p_{total} = p_{input} + l \cdot p_{hidden} + p_{softmax}$$
+$$p_{total} = p_{first~hidden} + (l-1) \cdot p_{hidden} + p_{softmax}$$
 $$= 4 \cdot (n \cdot (V+n) + n) + (l-1) \cdot 4 \cdot (n \cdot 2 \cdot n + n) + V \cdot n + V$$
 
 For the calculation of a single layer's parameters, take a look at the formulas in <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">this blog post</a>. For 512 neurons per layer, we get ca. 3.4M parameters. For 1024 neurons per layer, we get ca. 13M parameters. Here is how that affected the validation loss and training time:</p>
@@ -175,7 +174,28 @@ For the calculation of a single layer's parameters, take a look at the formulas 
     <canvas id="num-neurons-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
 </div>
 
-<p>While both models reach the same validation perplexity of 2.26, the larger neural network overfits after 80 minutes /  20 epochs. So, I went for 1024 neurons per layer and tried to tackle the overfitting with dropout.</p>
+<p>While both models reach the same validation perplexity of 2.26, the larger neural network overfits after 80 minutes /  20 epochs. So, I went for 1024 neurons per layer and tried to tackle the overfitting with dropout. But before trying to prevent overfitting, we need to dicuss, if it even is a problem.</p>
+
+<h3>The Allure of Overfitting</h3>
+
+<p>Our goal is to build a language model. The purpose of a language model is to assign probabilities to sequences of characters. So, if a model generates realistic sentences it should also be able to distinguish real sentences from fake ones, right? Take a look at these sentences that two different models generated:
+</p>
+
+<blockquote>The hand of the man who had been the same as the other. The man was still sent to him that he had not been...</blockquote>
+<blockquote>The house of Dr. Mortimer, who was a man of excellent character, which was the most profound feeling of...</blockquote>
+
+<p>Which one sounds more like an actual Sherlock Holmes excerpt? In my opinion the second one, because it uses an actual name instead of just talking about a man and another man. Both sentences were sampled during the training of the model with 1024 neurons per layer. But while the second one was sampled at the end with a validation perplexity of 2.47, the first sentence was generated when the model reached its lowest validation perplexity of 2.26. So the more realistic sounding model is actually more confused when we reading unseen Sherlock Holmes text. It assigns comparatively low probability to it meaning it is a worse language model.</p>
+
+<p>I think it is reasonable that the better non-overfitting model generates such generic sentences. Say that for each noun describing a person in the Sherlock Holmes corpus there is a 20% probability of it being "man", 20% for "woman", 10% for "Sherlock Holmes", 5% for "Mrs. Watson", 5% for "Dr. Mortimer", 5% for "Watson", 5% for "Dr. Moriarty and so on. Now, if a human were given the task to generate a sentence he / she would use names, because there is a 60% probability of the noun being a name and a 40% probability of the noun being "man" or "woman". But during training, we don't let the model generate sentences. We only ask it for the next character / word. So, if the model knows that the next word will be a noun describing a person it has the choice between multiple different nouns. Each name of these nouns might have a 5% probability, but "man" has 20%, so it goes for "man".</p>
+<p>While this behavior is understandable, it is not optimal. An optimal model would have learned that while the probability of "man" is high, the probability of a sentence using only "man" to describe what persons are doing is low. But until our model gets so smart, we have to forgive generic sentences and resists the temptation of overfitting.</p>
+
+<div class="lesson-learned">
+    <strong>Lessons Learned:</strong>
+    <ul>
+        <li>Overfitting is tempting for impressing people with your language model, but it makes it worse.</li>
+        <li>Realistic generated sentences are not necessarily an indication of a good language model</li>
+    </ul>
+</div>
 
 <h3>4. Dropout</h3>
 
@@ -183,12 +203,104 @@ I tested three probabilites to keep the output value of a neuron:
 <figure>
     <canvas id="dropout-chart" class="chart" width="600" height="300"></canvas>
 </figure>
-<button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button>
 
-<p id="peaks-explanation" class="detail">The initial peaks in the validation perplexity were caused by padding. Because I used mini-batch learning, I split the text into 200 parts. These parts likely have unequal sizes and are also not multiples of 160, our number of timesteps. Thus, when the program reaches the end of the parts at the end of an epoch, it pads all chunks in the batch with PAD tokens. Then, all chunks have an equal length of 160 tokens. In the worst case, however, this means that the model might see about 200 &middot; 160 = 32000 PAD tokens. This has a large influence in the early phase of training. So, when we validate the model just at the end of an epoch, it will be confused, because the validation text, does not solely constist of PAD tokens. I also let the model complete a sentence started with "The" after every validation. At each of the peaks, the model's output was "The PADPADPADPAD...". In retrospective, it would have been better to just skip the last batch of the text. But as for the interpretation of the chart:</p>
-<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. </p>
 
-<h3>All Experiments</h3>
+<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. I chose 0.5 for future experiments. The validation perplexity is still at 2.26 though - just like with 512 neurons per layer. Let's see if a deeper architecture can fix that.<button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button></p>
+<p>For more info on tuning the dropout probability, I can recommend <a href="https://www.reddit.com/r/MachineLearning/comments/3oztvk/why_50_when_using_dropout/">this thread</a>.</p>
+
+<p id="peaks-explanation" class="detail">The initial peaks in the validation perplexity were caused by padding. Because I used mini-batch learning, I split the text into 200 parts. These parts likely have unequal sizes and are also not multiples of 160, our number of timesteps. Thus, when the program reaches the end of the parts at the end of an epoch, it pads all chunks in the batch with PAD tokens. Then, all chunks have an equal length of 160 tokens. In the worst case, however, this means that the model might see about 200 &middot; 160 = 32000 PAD tokens. This has a large influence in the early phase of training. So, when we validate the model just at the end of an epoch, it will be confused, because the validation text, does not solely constist of PAD tokens. I also let the model complete a sentence started with "The" after every validation. At each of the peaks, the model's output was "The PADPADPADPAD...". In retrospective, it would have been better to just skip the last batch of the text.</p>
+
+<h3>5. Number of LSTM layers</h3>
+
+<p>Keeping the number of parameters the same I tried to see if increasing the network's depth helps. My intuition is that a deeper network helps to learn complex dependencies in the data. On the other hand, having a lot of neurons in a layer helps to remember a lot of <strong>different</strong> patterns. For example "Sherlock" -> "Holmes" and "Mrs." -> "Hudson", not to mention all the character-level patterns for building words. So there is a trade-off between the complexity and the number of the learned patterns.</p>
+
+<p>With a constant number of 13M parameters, the resulting architectures are:<p>
+<ul>
+    <li>2 LSTM layers with 1024 neurons each</li>
+    <li>3 layers with 795 neurons each</li>
+    <li>4 layers with 675 neurons each</li>
+</ul>
+<p>Here are the results:</p>
+
+<div class="col-xs-6 no-padding">
+    <canvas id="num-layers-training-chart" class="chart" width="400" height="300"></canvas>
+</div>
+<div class="col-xs-6 no-padding">
+    <canvas id="num-layers-validation-chart" class="chart" width="400" height="300"></canvas>
+</div>
+
+<p>The training time per epoch was roughly the same for each run. As for the model's performance, it seems that depth does not improve the validation perplexity. Looking at the training perplexity, 3 layers seems to be a good compromise between the number and the complexity of the patterns that the model can learn.</p>
+
+<p>A small note on the number of neurons: from convolutional neural networks I was used to decrease the layer size with depth. So, using the same number of neurons per layer seems strange. However, it seems to be a common practice for LSTMs. <a href="https://arxiv.org/pdf/1409.3215v3.pdf">Sutskever et al.</a>, for example, use 3 layers with 1024 neurons each for their translation LSTMs.</p>
+
+<h3>Resetting the LSTM state</h3>
+<p>There is one last experiment that I did, which was related to resetting the LSTM's internal hidden state. So far the internal state never got reset during training. It worked fine for the Sherlock dataset, but when training on Wikipedia articles, the model always generated something like this:</p>
+<blockquote>The Victorian Artist of the Year 1943) was a student of the University of California...<br/>The Victorian Army and the United States Congress of the United States and the United States) and the Committee of the American...</blockquote>
+
+<p>Sounds good except for that closing bracket in every sentence. I assume that happens, because the model only sees a zero hidden state once during training - at the very beginning. After that, the state never gets reset to a zero vector. Thus, the model can safely store information in the hidden state and even attribute information to a zero hidden state, such as "I need to close the bracket soon". For validation and sampling, however, the model starts again with a zero state, so it closes the bracket that was never opened.</p>
+<p>Resetting the hidden state to zero every now and then solves this problem. I tested different token intervals on Sherlock. "always" means that the state got reset after each backpropagation run (160 tokens). Similarly, 320 means that the state got reset after 320 tokens per batch / 2 backpropagation runs.</p>
+
+<figure>
+    <canvas id="reset-state-chart" class="chart" width="600" height="300"></canvas>
+</figure>
+
+<p>We can see that resetting the state every now and then does not have a major influence on the validation perplexity. It did, however, make the models more more robust to interpreting a zero hidden state - especially for datasets with more punctuation. The reason why that does not get reflected in the validation perplexity is that the validation set consists of 360,000 characters. Like in training, the model sees a zero state only at the start. So, it depends on how we evaluate the performance of a language models. We can give it a lot of independent sentences, paragraphs or, like we did, whole books.<br/>For experiments on other datasets, I went with resetting the state every 3000 tokens.</p>
+
+
+<h3>Other Datasets</h3>
+
+<p>I also tried some other datasets:</p>
+<strong>Wikipedia</strong>
+<ul>
+    <li>447M characters from about 140,000 articles (4.6% of the English Wikipedia)</li>
+    <li>Trained for 2 days, but already converged after about 20 hours / 3 epochs</li>
+</ul>
+<strong>US Congress</strong>
+<ul>
+    <li>488M characters from transcripts of the United States Senate's congressional record</li>
+    <li>Trained for 2 days, but already converged after about 21 hours / 3 epochs</li>
+</ul>
+<strong>Goethe</strong>
+<ul>
+    <li>1.5M characters from all poems by Johann Wolfgang von Goethe</li>
+    <li>I used 2 layers with 795 neurons to prevent overfitting. With 3 layers, the network completely remembered whole poems.</li>
+    <li>Trained for 2 hours; overfitted a bit in the end</li>
+</ul>
+<strong>South Park</strong>
+<ul>
+    <li>4.7M characters from all 277 South Park episodes</li>
+    <li>Used 2 layers with 795 neurons to prevent overfitting</li>
+    <li>Trained for 2 hours; overfitted a bit in the end</li>
+</ul>
+
+<div class="col-xs-9">
+    <canvas id="dataset-chart" class="chart" data-width="600" data-height="300"></canvas>
+</div>
+<div class="col-xs-3">
+    <div class="chart-form-group">
+        <div>
+            <label for="dataset-select">Dataset</label>
+            <div class="btn-group dropdown-full-width">
+                <button id="dataset-select" type="button" value="south_park" class="btn btn-default dropdown-toggle" onchange="plotDataset()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="choice">South Park</span> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" data-value="wiki">Wikipedia</a></li>
+                    <li><a href="#" data-value="congress">Congress Transcripts</a></li>
+                    <li><a href="#" data-value="goethe">Goethe Poems</a></li>
+                    <li><a href="#" data-value="south_park">South Park</a></li>
+                    <li><a href="#" data-value="sherlock">Sherlock</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+
+<h3>Final Remarks</h3>
+
+
+<h3>Appendix: All Sherlock Experiments</h3>
 <div class="col-xs-9">
     <canvas id="flexible-chart" class="chart" data-width="600" data-height="300"></canvas>
 </div>
@@ -209,11 +321,6 @@ I tested three probabilites to keep the output value of a neuron:
                     <li><a href="#" data-value="output_keep_prob">Output Keep Prob.</a></li>
                     <li><a href="#" data-value="num_layers">Number of Layers</a></li>
                     <li><a href="#" data-value="reset_state_interval_tokens">Reset State after Tokens</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#" data-value="wiki">Wikipedia</a></li>
-                    <li><a href="#" data-value="south_park">South Park</a></li>
-                    <li><a href="#" data-value="congress">Congress Transcripts</a></li>
-                    <li><a href="#" data-value="goethe">Goethe Poems</a></li>
                 </ul>
             </div>
         </div>
@@ -252,4 +359,4 @@ I tested three probabilites to keep the output value of a neuron:
 </div>
 
 <input id="stylesheets-input" value="stylesheets/posts/char-lm.css" style="display: none;">
-<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot.js" style="display: none;">
+<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot-datasets.js javascripts/posts/char-lm/plot.js" style="display: none;">

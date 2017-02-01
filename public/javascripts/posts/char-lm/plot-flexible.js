@@ -51,6 +51,18 @@ const RUN_GROUP_COLORS = {
         '0.3': PostUtil.CHART_COLORS_BLUE[0],
         '0.5': PostUtil.CHART_COLORS_BLUE[2],
         '0.8': PostUtil.CHART_COLORS_BLUE[4]
+    },
+    num_layers: {
+        '2': PostUtil.CHART_COLORS_BLUE[0],
+        '3': PostUtil.CHART_COLORS_BLUE[2],
+        '4': PostUtil.CHART_COLORS_BLUE[4]
+    },
+    reset_state_interval_tokens: {
+        'always': PostUtil.CHART_COLORS_BLUE[0],
+        '320': PostUtil.CHART_COLORS_BLUE[1],
+        '1120': PostUtil.CHART_COLORS_BLUE[2],
+        '2080': PostUtil.CHART_COLORS_BLUE[3],
+        'never': PostUtil.CHART_COLORS_BLUE[4]
     }
 };
 
