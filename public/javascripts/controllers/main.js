@@ -19,7 +19,7 @@ class MainCtrl extends InjectionReceiver {
         this.$rootScope.log = console.log;
 
         // Highlight the content
-        Util.highlightContinuously(this.$rootScope, this.angularLoad);
+        Util.processPageContinuously(this.$rootScope, this.angularLoad);
 
         // $viewContentLoaded will be broadcastet twice. Once for the root view and once for
         // the ui-view. We only want to fetch the posts once.

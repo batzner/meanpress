@@ -37,11 +37,6 @@ class HomeCtrl extends InjectionReceiver {
         this.usSpinnerService.stop('spinner');
 
         this.$scope.posts.forEach(post => post.getDisplayVersion().loadCss(this.angularLoad));
-
-        // Wrap tables to make them responsive.
-        this.$document.ready(() => {
-            $('table').wrap("<div class='table-container'></div>");
-        });
     }
 }
 
