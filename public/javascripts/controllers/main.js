@@ -22,7 +22,7 @@ class MainCtrl extends InjectionReceiver {
         Util.highlightContinuously(this.$rootScope, this.angularLoad);
 
         // $viewContentLoaded will be broadcastet twice. Once for the root view and once for
-        // the ui-view. We only want to fetch the posts.
+        // the ui-view. We only want to fetch the posts once.
         let fetchingPosts = false;
         this.$rootScope.$on('$viewContentLoaded', () => {
             // Scroll to the top on new pages
