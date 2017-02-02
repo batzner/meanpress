@@ -1,111 +1,124 @@
 #navigation {
-    height: 100%;
-    width: 220px;
     position: fixed;
-    font-family: 'Oswald', sans-serif;
+    width: 100%;
     z-index: 1;
+    font-family: 'Oswald', sans-serif;
     box-shadow: #999 2px 0 10px;
     background: #242745; /* For browsers that do not support gradients */
     background: -webkit-linear-gradient(left, #212433, #232636); /* For Safari 5.1 to 6.0 */
     background: -o-linear-gradient(right, #212433, #232636); /* For Opera 11.1 to 12.0 */
     background: -moz-linear-gradient(right, #212433, #232636); /* For Firefox 3.6 to 15 */
     background: linear-gradient(to right, #212433, #26293B); /* Standard syntax */
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    border: none;
 }
 
-.brand, #sidebar {
-    padding: 20px 30px;
+.navbar-brand {
+    width: 120px;
+    padding: 10px 30px;
 }
 
-.brand {
-    top: 0;
-    height: 130px;
-    color: #eeeeee;
+.navbar-brand #logo-title img {
+    width: 60px;
 }
 
-#sidebar {
-    top: 130px;
-    bottom: 0;
-    padding-top: 40px;
+.navbar-brand #logo-subtitle {
+    display: none;
 }
 
-.brand a {
-    color: inherit;
+.navbar-header {
+    border-bottom: none;
 }
 
-.brand #logo-title img {
-    width: 130px;
-    margin-bottom: 5px;
+.navbar-default .navbar-collapse {
+    border-color: transparent;
 }
 
-.brand #logo-subtitle {
-    font-size: 1.1em;
-}
-
-.sidebar-nav {
-    list-style: none;
-    padding: 0;
-}
-
-.sidebar-nav a {
-    color: #dddddd;
+.navbar-nav > li {
     font-size: 1.1rem;
-    line-height: 2.5;
+    float: none;
+    overflow: hidden;
 }
 
-.sidebar-nav a .fa {
+.navbar-nav > li > a {
+    white-space: nowrap;
+    padding: 10px 0;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: #dddddd;
+}
+
+.navbar-default .navbar-nav > li > a.active, .navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+    color: #ffffff;
+}
+
+.nav a .fa {
+    margin-top: 0.2rem;
     margin-right: 15px;
     width: 16px;
 }
 
-.sidebar-nav a.active, .sidebar-nav a:hover {
-    color: #ffffff;
+.navbar-nav > li > a div {
+    vertical-align: top;
+    white-space: normal;
+    display: inline-block;
+    line-height: 1.3;
 }
 
-@media only screen and (min-width: 411px) and (max-width: 767px) {
-    #navigation {
-        height: 50px;
-        width: 100%;
-    }
-
-    .brand {
-        width: 120px;
-        padding: 10px 30px;
-        float: left;
-    }
-
-    .brand #logo-title img {
-        width: 60px;
-    }
-
-    #sidebar {
-        margin-left: 120px;
-        padding: 4px 30px;
-    }
-
-    .brand #logo-subtitle {
-        display: none;
-    }
-
-    .sidebar-nav {
-        overflow: hidden;
-    }
-
-    .sidebar-nav li {
-        float: left;
-        margin-right: 20px;
-    }
-
-    .sidebar-nav li:last-child {
-        margin-right: 0;
-    }
-
-    .sidebar-nav a .fa {
-        display: none;
-    }
+.navbar-default .navbar-toggle {
+    border: none;
 }
 
-@media only screen and (max-width: 410px) {
+.navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
+    background-color: transparent;
+}
+
+.navbar-default .navbar-toggle .icon-bar {
+    background-color: #eeeeee;
+}
+
+.navbar-nav {
+    padding: 20px 0 20px 15px;
+    list-style: none;
+    margin: 0;
+}
+
+/* Transform the top navbar to a sidebar */
+@media only screen and (min-width: 768px) {
     #navigation {
-        display: none;
+        height: 100%;
+        width: 220px;
+        position: fixed;
+    }
+
+    .navbar-brand {
+        width: 220px;
+        padding: 20px 30px;
+        top: 0;
+        height: 130px;
+    }
+
+    .navbar-brand #logo-title img {
+        width: 130px;
+        margin-bottom: 5px;
+    }
+
+    .navbar-brand #logo-subtitle {
+        margin-top: 2px;
+        color: #eeeeee;
+        display: block;
+    }
+
+    .navbar-nav {
+        top: 130px;
+        padding: 40px 0 10px 20px;
+    }
+
+    .navbar-nav > li > a div {
+        max-width: 160px;
     }
 }
