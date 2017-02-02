@@ -115,10 +115,10 @@
 
     .navbar-nav {
         top: 130px;
-        padding: 40px 0 10px 20px;
+        padding: 40px 0 10px 15px;
     }
 
     .navbar-nav > li > a div {
-        max-width: 160px;
+        max-width: 120px;
     }
 }
