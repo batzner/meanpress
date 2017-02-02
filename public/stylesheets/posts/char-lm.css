@@ -1,54 +1,76 @@
-#talk-box {
+.talk-box {
     width: calc(100% + 40px);
     background: url(/images/posts/char-lm/text-box-background.jpg) no-repeat;
     background-size: cover;
     background-attachment: fixed;
-    padding: 30px;
+    padding: 30px 0;
     text-align: center;
     margin: 0 -20px 10px -20px;
     -webkit-box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
     -moz-box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
     box-shadow: inset 0px 0px 20px 0px rgba(0,0,0,0.5);
-}
-
-#talk-box table {
-    margin: 0 auto;
     color: #fff;
 }
 
-#talk-box td {
-    vertical-align: top;
+.mobile.talk-box{
+    display:none;
+    padding-left: 40px;
+    padding-right: 40px;
 }
 
-#talk-box-heading {
+.talk-box table {
+    color: #fff;
+    margin: 0 auto;
+}
+
+.talk-box td {
+    vertical-align: top;
+    border: transparent solid 10px;
+    padding: 0;
+}
+
+.talk-box-heading {
     text-align: center;
 }
 
-#talk-box-heading .text {
+.talk-box-heading .text {
     padding-top: 2px;
     font-size: 1rem;
 }
 
-#talk-box-heading .btn-group {
+.talk-box-heading .btn-group {
     display: inline-block;
     margin-top: 20px;
 }
 
-#talk-box-heading .btn-group .btn {
+.mobile .talk-box-heading .btn-group, .mobile .talk-box-heading .dropdown-menu,
+.mobile .talk-box-body .send-button {
+    width: 100%;
+}
+
+.talk-box-heading .btn-group .btn {
     font-size: 1rem;
     color: #eee;
     min-width: 100px;
 }
 
-#talk-box-heading .btn-group .btn.active, #talk-box-heading .btn-group .btn:hover {
+.talk-box-heading .btn-group .btn.active, .talk-box-heading .btn-group .btn:hover {
     color: #fff;
 }
 
-#talk-box-body {
+.talk-box-body {
     padding-bottom: 30px;
 }
 
-#talk-box-input {
+.mobile .talk-box-body {
+    margin-top: 20px;
+}
+
+.mobile .talk-box-body .send-button {
+    margin-top: 10px;
+}
+
+.talk-box-input {
     border-radius: 4px;
     background-color: rgba(0, 0, 0, 0.4);
     padding: 15px;
@@ -56,39 +78,38 @@
     overflow: hidden;
 }
 
-#text-input {
+.text-input {
     float: left;
     min-width: 2px;
 }
 
-#text-output {
+.text-output {
     margin-left: 10px;
     color: #ddd;
     white-space: pre-wrap;
 }
 
-#text-input-output-bridge {
+.text-input-output-bridge {
     float: left;
     margin-left: 5px;
 }
 
-#talk-box td {
-    border: transparent solid 10px;
-    padding: 0;
-}
-
-#send-button {
+.send-button {
     margin-top: 5px;
 }
 
-.chart-form-group > div:not(:last-child) {
-    margin-bottom: 10px;
+.mobile .send-button {
+    font-size: 1rem;
+    color: #eee;
+    min-width: 100px;
 }
 
-.chart-form-group label {
-    display: block;
-}
-
-.chart-form-group .irs {
-    margin: 0 2px;
+@media only screen and (max-width: 670px),
+       only screen and (min-width: 768px) and (max-width: 904px) {
+    .talk-box {
+        display: none;
+    }
+    .talk-box.mobile {
+        display: block;
+    }
 }

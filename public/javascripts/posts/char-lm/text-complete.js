@@ -27,10 +27,11 @@ const DATASET_DEFAULTS = {
     }
 };
 
-const TEXT_INPUT = $('#text-input');
-const TEXT_OUTPUT = $('#text-output');
-const TEXT_BRIDGE = $('#text-input-output-bridge');
-const TALK_BOX_HEADING = $('#talk-box-heading');
+const TEXT_INPUT = $('.text-input');
+const TEXT_OUTPUT = $('.text-output');
+const TEXT_BRIDGE = $('.text-input-output-bridge');
+const TALK_BOX_HEADING = $('.talk-box-heading');
+const DATASET_DROPDOWN = $('#talk-box-dataset-dropdown');
 
 let selectedDataset = null;
 let pendingRequestId = null;
@@ -41,10 +42,18 @@ selectDataset('wiki');
 // TODO: Add postprocessing: Remove _PAD and remove multiple blank lines
 
 function selectDataset(name) {
-    selectedDataset = name;
+    // If name == null, the event comes from the dropdown.
+    selectedDataset = name == null ? DATASET_DROPDOWN.find('.dropdown-toggle').val() : name;
+
+    // Update the normal talk box
     TALK_BOX_HEADING.find('button.active').removeClass('active');
-    TALK_BOX_HEADING.find('button[value="' + name + '"]').addClass('active');
-    TEXT_INPUT.html(DATASET_DEFAULTS[name].prime);
+    TALK_BOX_HEADING.find('button[value="' + selectedDataset + '"]').addClass('active');
+
+    // Update the mobile talk box
+    let dropdownItem = DATASET_DROPDOWN.find('a[data-value="' + selectedDataset + '"]');
+    selectDropdownItem(dropdownItem, false);
+
+    TEXT_INPUT.html(DATASET_DEFAULTS[selectedDataset].prime);
     TEXT_OUTPUT.html('');
     focusOnInput();
 }

@@ -1,7 +1,7 @@
 $(() => plotDataset());
 
 function plotDataset() {
-    const datasetName = $('#dataset-select').val();
+    const datasetName = $('#dataset-dropdown').find('.dropdown-toggle').val();
     $.getJSON(`assets/posts/char-lm/data/${datasetName}/model.trainstate.json`)
         .then(trainstate => {
             plotDatasetLog(PostUtil.getPreprocessedLog(trainstate.log));

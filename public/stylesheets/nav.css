@@ -120,5 +120,6 @@
 
     .navbar-nav > li > a div {
         max-width: 120px;
+        margin-left: -2px;
     }
 }

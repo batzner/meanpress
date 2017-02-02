@@ -2,6 +2,22 @@
     margin-bottom: 10px;
 }
 
+.chart-form-group {
+    padding-left: 10px;
+}
+
+.chart-form-group > div:not(:last-child) {
+    margin-bottom: 10px;
+}
+
+.chart-form-group label {
+    display: block;
+}
+
+.chart-form-group .irs {
+    margin: 0 2px;
+}
+
 .content-9 {
     width: 75%;
     float: left;
@@ -22,6 +38,10 @@
     .content-9, .content-6, .content-3 {
         width: 100%;
         float: none;
+    }
+
+    .chart-form-group {
+        padding-left: 0;
     }
 }
 
@@ -74,15 +94,28 @@
     margin-left: -3px;
 }
 
-.btn-default.dark, .btn-default.dark:hover, .btn-default.dark:focus {
+.btn-default.dark, .btn-default.dark:hover, .btn-default.dark:focus,
+.open>.dropdown-toggle.btn-default.dark {
     color: white;
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-.btn-default.dark.active, .btn-default.dark:hover {
+.btn-default.dark.active, .btn-default.dark:hover, .open>.dropdown-toggle.btn-default.dark {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
 .btn-default.dark {
     background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dropdown-menu.dark {
+    background-color: rgba(25, 25, 25, 0.9);
+}
+
+.dropdown-menu.dark>li>a {
+    color: white;
+}
+
+.dropdown-menu.dark>li>a:hover, .dropdown-menu.dark>li>a:focus {
+    background-color: rgba(0, 0, 0, 0.8);
 }

@@ -28,14 +28,7 @@ class LabCtrl extends InjectionReceiver {
 
         // Bring the bootstrap dropdowns to life
         $('.dropdown-menu li a').click(function () {
-            const elem = $(this);
-            const buttonElem = elem.closest('.btn-group').find('button').first();
-            const choiceElem = buttonElem.find('.choice');
-            // Set the text on the span
-            choiceElem.html(elem.text());
-            // Set the selected value on the button
-            buttonElem.val(elem.data('value'));
-            buttonElem.change();
+            selectDropdownItem($(this));
         });
 
         // Activate the show more toggles

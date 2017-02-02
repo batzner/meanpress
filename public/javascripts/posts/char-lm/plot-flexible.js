@@ -92,7 +92,7 @@ function exportChart() {
 }
 
 function plot(resetYRange = false) {
-    const runGroupName = $('#run-group-select').val();
+    const runGroupName = $('#run-group-dropdown').find('.dropdown-toggle').val();
     getLogs(runGroupName).then(logs => plotLogs(logs, runGroupName, resetYRange));
 }
 
@@ -157,8 +157,8 @@ function resetSlider(yMin, yMax) {
 }
 
 function plotLogs(logs, runGroupName, resetYRange = false) {
-    const xKey = $('#x-axis-select').val();
-    const yKey = $('#y-axis-select').val();
+    const xKey = $('#x-axis-dropdown').find('.dropdown-toggle').val();
+    const yKey = $('#y-axis-dropdown').find('.dropdown-toggle').val();
 
     // Filter the data points with the y-axis range slider
     let slider = Y_AXIS_RANGE_SLIDER.data('ionRangeSlider');

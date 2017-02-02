@@ -1,9 +1,9 @@
 <p>I let a neural network read long texts one letter at a time. Its task was to predict the next letter based on those it had seen so far. Over time, it recognized patterns between letters. Find out, what it learned, by feeding it some letters below. When you click the send button on the right, it will read your text and auto-complete it.</p>
 <p>You can choose between networks that read a lot of Wikipedia or US Congress transcripts etc.</p>
 
-<div id="talk-box">
+<div class="talk-box">
     <table>
-        <tr id="talk-box-heading">
+        <tr class="talk-box-heading">
             <td></td>
             <td class="no-stretch">
                 <div>Generate text from</div>
@@ -17,22 +17,50 @@
             </td>
             <td></td>
         </tr>
-        <tr id="talk-box-body">
+        <tr class="talk-box-body">
             <td></td>
             <td>
-                <div id="talk-box-input" onclick="focusOnInput()">
-                    <div id="text-input" contentEditable="true" oninput="onInput()"></div>
-                    <div id="text-input-output-bridge">...</div>
-                    <span id="text-output"></span>
+                <div class="talk-box-input" onclick="focusOnInput()">
+                    <div class="text-input" contentEditable="true" oninput="onInput()"></div>
+                    <div class="text-input-output-bridge">...</div>
+                    <span class="text-output"></span>
                 </div>
             </td>
             <td>
-                <button id="send-button" type="button" class="btn btn-default round btn-icon" onclick="completeText()">
+                <button type="button" class="send-button btn btn-default round btn-icon" onclick="completeText()">
                     <span class="fa fa-paper-plane"></span>
                 </button>
             </td>
         </tr>
     </table>
+</div>
+
+<div class="talk-box mobile">
+    <div class="talk-box-heading">
+        <div>Generate text from</div>
+        <div id="talk-box-dataset-dropdown" class="btn-group dropdown-full-width">
+            <button type="button" value="wiki" class="btn btn-default dropdown-toggle dark" onchange="selectDataset(null)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="choice">Wikipedia</span> <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dark">
+                <li><a href="#" data-value="wiki">Wikipedia</a></li>
+                <li><a href="#" data-value="congress">US Congress</a></li>
+                <li><a href="#" data-value="sherlock">Sherlock Holmes</a></li>
+                <li><a href="#" data-value="southPark">South Park</a></li>
+                <li><a href="#" data-value="goethe">Goethe Poems</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="talk-box-body">
+        <div class="talk-box-input" onclick="focusOnInput()">
+            <div class="text-input" contentEditable="true" oninput="onInput()"></div>
+            <div class="text-input-output-bridge">...</div>
+            <span class="text-output"></span>
+        </div>
+        <button type="button" class="send-button btn btn-default dark" onclick="completeText()">
+            Send
+        </button>
+    </div>
 </div>
 
 <p>Here is the detailed description of what I did and what this post is about: I used a specific form of recurrent neural networks, the <a href="http://colah.github.io/posts/2015-08-Understanding-LSTMs/">LSTM (Long Short-Term Memory)</a>, to generate a language model for a given text corpus. Because I fed it one letter at a time, it generated a character-level language model. For implementation, I used <a href="https://www.tensorflow.org/">TensorFlow</a>.</p>
@@ -84,10 +112,10 @@
 <h3>1. Batch Size</h3>
 <p>I thought it might be smart to start with the batch size, because it will influence, how fast and efficient the training will be in future experiments. For a batch size of \(n\), I split up the text into \(n\) parts and fed these parts simultaneously to the model. Thus, each LSTM layer had \(n\) different and independent hidden states, one for each part of the text. The network's parameters however were shared, used simultaneously for all batches and optimized on all of them - just like in regular mini-batch learning. Splitting up the text leads to minor distortions of the data, because each batch starts without any context and probably in the middle of a word or sentence, but I assume this has no noticeable effect on the loss.</p>
 <p>Here you can see validation losses and the minutes per epoch for different batch sizes.</p>
-<div class="col-xs-9 no-padding">
+<div class="content-9">
     <canvas id="batch-size-decay-chart" class="chart" width="600" height="300"></canvas>
 </div>
-<div class="col-xs-3 no-padding">
+<div class="content-3">
     <canvas id="batch-size-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
 </div>
 <p>Before interpreting the results, I should note that it is unfair to compare different batch sizes with the same learning rate. For larger batch sizes, the steps that the optimizer takes are more stable, because it optimizes / generalizes on multiple samples at once. Thus, we can use a higher learning rate with higher batch sizes meaning each batch size has a different optimal learning rate. This is to some extent compensated by the RMSProp optimizer, which adapts the learning rate over time.</p>
@@ -147,10 +175,10 @@
         </div>
     </li>
 </ul>
-<div class="col-xs-9 no-padding">
+<div class="content-9">
     <canvas id="num-timesteps-decay-chart" class="chart" width="600" height="300"></canvas>
 </div>
-<div class="col-xs-3 no-padding">
+<div class="content-3">
     <canvas id="num-timesteps-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
 </div>
 
@@ -167,10 +195,10 @@ $$= 4 \cdot (n \cdot (V+n) + n) + (l-1) \cdot 4 \cdot (n \cdot 2 \cdot n + n) + 
 
 For the calculation of a single layer's parameters, take a look at the formulas in <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">this blog post</a>. For 512 neurons per layer, we get ca. 3.4M parameters. For 1024 neurons per layer, we get ca. 13M parameters. Here is how that affected the validation loss and training time:</p>
 
-<div class="col-xs-9 no-padding">
+<div class="content-9">
     <canvas id="num-neurons-decay-chart" class="chart" width="600" height="300"></canvas>
 </div>
-<div class="col-xs-3 no-padding">
+<div class="content-3">
     <canvas id="num-neurons-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
 </div>
 
@@ -222,10 +250,10 @@ I tested three probabilites to keep the output value of a neuron:
 </ul>
 <p>Here are the results:</p>
 
-<div class="col-xs-6 no-padding">
+<div class="content-6">
     <canvas id="num-layers-training-chart" class="chart" width="400" height="300"></canvas>
 </div>
-<div class="col-xs-6 no-padding">
+<div class="content-6">
     <canvas id="num-layers-validation-chart" class="chart" width="400" height="300"></canvas>
 </div>
 
@@ -273,15 +301,15 @@ I tested three probabilites to keep the output value of a neuron:
     <li>Trained for 2 hours; overfitted a bit in the end</li>
 </ul>
 
-<div class="col-xs-9">
+<div class="content-9">
     <canvas id="dataset-chart" class="chart" data-width="600" data-height="300"></canvas>
 </div>
-<div class="col-xs-3">
+<div class="content-3">
     <div class="chart-form-group">
         <div>
-            <label for="dataset-select">Dataset</label>
-            <div class="btn-group dropdown-full-width">
-                <button id="dataset-select" type="button" value="south_park" class="btn btn-default dropdown-toggle" onchange="plotDataset()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <label for="dataset-dropdown">Dataset</label>
+            <div id="dataset-dropdown" class="btn-group dropdown-full-width">
+                <button type="button" value="south_park" class="btn btn-default dropdown-toggle" onchange="plotDataset()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="choice">South Park</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -301,15 +329,15 @@ I tested three probabilites to keep the output value of a neuron:
 
 
 <h3>Appendix: All Sherlock Experiments</h3>
-<div class="col-xs-9">
+<div class="content-9">
     <canvas id="flexible-chart" class="chart" data-width="600" data-height="300"></canvas>
 </div>
-<div class="col-xs-3">
+<div class="content-3">
     <div class="chart-form-group">
         <div>
-            <label for="run-group-select">Experiment</label>
-            <div class="btn-group dropdown-full-width">
-                <button id="run-group-select" type="button" value="batch_size" class="btn btn-default dropdown-toggle" onchange="plot(true)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <label for="run-group-dropdown">Experiment</label>
+            <div id="run-group-dropdown" class="btn-group dropdown-full-width">
+                <button type="button" value="batch_size" class="btn btn-default dropdown-toggle" onchange="plot(true)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="choice">Batch Size</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -325,9 +353,9 @@ I tested three probabilites to keep the output value of a neuron:
             </div>
         </div>
         <div>
-            <label>X Axis</label>
-            <div class="btn-group dropdown-full-width">
-                <button id="x-axis-select" type="button" value="minutesSinceStart" class="btn btn-default dropdown-toggle" onchange="plot()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <label for="x-axis-dropdown">X Axis</label>
+            <div id="x-axis-dropdown" class="btn-group dropdown-full-width">
+                <button type="button" value="minutesSinceStart" class="btn btn-default dropdown-toggle" onchange="plot()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="choice">Training Time</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -337,9 +365,9 @@ I tested three probabilites to keep the output value of a neuron:
             </div>
         </div>
         <div>
-            <label for="y-axis-select">Y Axis</label>
-            <div class="btn-group dropdown-full-width">
-                <button id="y-axis-select" type="button" value="lossesValid" class="btn btn-default dropdown-toggle" onchange="plot(true)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <label for="y-axis-dropdown">Y Axis</label>
+            <div id="y-axis-dropdown" class="btn-group dropdown-full-width">
+                <button type="button" value="lossesValid" class="btn btn-default dropdown-toggle" onchange="plot(true)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="choice">Validation Loss</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
