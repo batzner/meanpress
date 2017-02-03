@@ -239,7 +239,7 @@ footer {
 .panel-default > .panel-heading h5 .fa {
     margin-right: 5px;
     vertical-align: top;
-    margin-top: 5px;
+    margin-top: 0.35rem;
 }
 
 h1 a, h1 a:hover, h1 a:active, h1 a:focus {
