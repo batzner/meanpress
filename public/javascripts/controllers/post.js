@@ -7,7 +7,7 @@ class PostCtrl extends InjectionReceiver {
     static get $inject() {
         return ['$scope', '$stateParams', '$location', '$state', '$sce', '$document', '$rootScope',
             'angularLoad', 'usSpinnerService',
-            'PostService'];
+            'PostService', 'CategoryService'];
     }
 
     constructor(...injections) {
@@ -49,11 +49,15 @@ class PostCtrl extends InjectionReceiver {
         } else {
             this.$scope.postVersion = this.post.getDisplayVersion();
         }
+        this.$scope.editUrl = this.$state.href('edit', {slug: this.$stateParams.slug});
+        let category = this.CategoryService.findCategoryByName(this.$scope.postVersion.category);
+        if (category && category.isSeries) {
+            this.$scope.categoryTitle = category.title;
+        }
 
         this.$rootScope.htmlTitle = (this.$scope.postVersion.htmlTitle
             || this.$scope.postVersion.title);
         this.$rootScope.metaDescription = this.$scope.postVersion.metaDescription;
-        this.$scope.editUrl = this.$state.href('edit', {slug: this.$stateParams.slug});
 
         this.loadScripts();
         this.loadDisqus();
@@ -89,12 +93,16 @@ class PostCtrl extends InjectionReceiver {
             this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
         };
 
-        (function() { // DON'T EDIT BELOW THIS LINE
-        var d = document, s = d.createElement('script');
-        s.src = '//mlowl.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
+        if (window.DISQUS) {
+            DISQUS.reset({reload: true, config: disqus_config});
+        } else {
+            (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = '//mlowl.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+            })();
+        }
     }
 }
 

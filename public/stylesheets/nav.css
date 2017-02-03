@@ -60,6 +60,8 @@
     margin-top: 0.2rem;
     margin-right: 15px;
     width: 16px;
+    color: inherit;
+    font-size: inherit;
 }
 
 .navbar-nav > li > a div {
