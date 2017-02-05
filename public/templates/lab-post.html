@@ -233,7 +233,7 @@ I tested three probabilites to keep the output value of a neuron:
 </figure>
 
 
-<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. I chose 0.5 for future experiments. The validation perplexity is still at 2.26 though - just like with 512 neurons per layer. Let's see if a deeper architecture can fix that.<button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button></p>
+<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. I chose 0.5 for future experiments. The validation perplexity is still at 2.26 though - just like with 512 neurons per layer. Let's see if a deeper architecture can fix that. <button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button></p>
 <p>For more info on tuning the dropout probability, I can recommend <a href="https://www.reddit.com/r/MachineLearning/comments/3oztvk/why_50_when_using_dropout/">this thread</a>.</p>
 
 <p id="peaks-explanation" class="detail">The initial peaks in the validation perplexity were caused by padding. Because I used mini-batch learning, I split the text into 200 parts. These parts likely have unequal sizes and are also not multiples of 160, our number of timesteps. Thus, when the program reaches the end of the parts at the end of an epoch, it pads all chunks in the batch with PAD tokens. Then, all chunks have an equal length of 160 tokens. In the worst case, however, this means that the model might see about 200 &middot; 160 = 32000 PAD tokens. This has a large influence in the early phase of training. So, when we validate the model just at the end of an epoch, it will be confused, because the validation text, does not solely constist of PAD tokens. I also let the model complete a sentence started with "The" after every validation. At each of the peaks, the model's output was "The PADPADPADPAD...". In retrospective, it would have been better to just skip the last batch of the text.</p>
@@ -316,7 +316,7 @@ I tested three probabilites to keep the output value of a neuron:
                     <li><a href="#" data-value="wiki">Wikipedia</a></li>
                     <li><a href="#" data-value="congress">Congress Transcripts</a></li>
                     <li><a href="#" data-value="goethe">Goethe Poems</a></li>
-                    <li><a href="#" data-value="south_park">South Park</a></li>
+                    <li><a href="#" data-value="southPark">South Park</a></li>
                     <li><a href="#" data-value="sherlock">Sherlock</a></li>
                 </ul>
             </div>
@@ -325,7 +325,32 @@ I tested three probabilites to keep the output value of a neuron:
 </div>
 <div class="clearfix"></div>
 
-<h3>Final Remarks</h3>
+<div class="lesson-learned">
+    <strong>General Lessons Learned:</strong>
+    <ul>
+        <li>Don't spend too many epochs for optimizing hyperparameters in the early stages of the tuning. Search rough values with a small training budget and do the fine tuning later.</li>
+        <li>Start with a model size that is at the maximum of the reasonable and available computing capacity. Then, optimize the model's architecture (number of layers etc.) with standard hyperparameter values (learning rate=0.001 etc.). After that, you can do the finetuning.</li>
+        <li>Don't activate dropout until the model overfits.</li>
+    </ul>
+</div>
+
+<h3>The reasonable ineffectiveness of character-level language models</h3>
+
+<p>Overall, the hyperparameter tuning seemingly yielded only marginal results. I improved the validation perplexity from 2.48 to 2.11. That is to some extent due to the loss function I used. It penalizes wrong letters instead of words. In addition to that, I even told the model if it was about to generate a wrong word directly after the first wrong character. Say, the model wants to output 'house', but the correct word would be 'street'. It starts with 'h', gets corrected with the 's' and can then continue with 'treet'. In the end, its output is 'htreet', meaning 83% were correct when, in fact, it's initial choice was completely wrong. This makes the training ineffective and the evaluation metric less meaningful. But it also means that the hyperparameter tuning was more effective than it seems.</p>
+
+<p>What also troubles me is that building a good language model and generating realistic sentences are slightly different tasks. I explained this discrepancy above with respect to overfitting. In addition to that, the way that I trained and sampled from the model increases that discrepancy: during training, I immediately corrected the model when it was wrong. During sampling, it just generated freely without correction. To me that feels like telling a race-car driver to 'just drive' and expecting the path to look like a race track.</p>
+
+<p>Another factor for the generic non-sense that the model outputs is the inefficient use of past time steps. It often gets stuck in loops like<p>
+<blockquote>the Senate of the United States of the United States of the United States [...]</blockquote>
+<p>With <code>num_timesteps=300</code>, it looks back 300 characters during training. So, you might think that should be enough for the model to know what it is currently talking about. But even with LSTMs, gradients still vanish the further the backpropagation goes through time. Naturally, recent time steps have the greatest impact on the current prediction of the model. After 'of the United States', 20 time steps have passed, so it is likely that the model lost sense of what it was talking about before. On word-level, that would have been only 4 time steps.</p>
+
+<p>In conclusion, modelling a language on character-level comes with a couple of drawbacks:</p>
+
+<ul>
+    <li>The model spends a lot of its parameters on building a vocabulary. For example, on 'lone' might follow 'ly' but on 'alone' never follows 'ly'.</li>
+    <li>It needs to do backpropagation with a high number of time steps in order to cover the last words that were given to the model. That causes a large computational graph.</li>
+    <li>With a high number of time steps the backpropagated gradients vanish and the model loses sense of what it was talking about - even after only a few words.</li>
+</ul>
 
 
 <h3>Appendix: All Sherlock Experiments</h3>

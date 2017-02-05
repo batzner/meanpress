@@ -164,12 +164,6 @@ overall, letting the network overfit is tempting, because it yields so nice sent
 
 General notes:
 
-unten:
-- frustrating loss function
-- ineffective
-- again, sampling is different from the problem, we are trying to solve during training. during training, we correct the model's output every now and then. during sampling we just let it do anything without correction.
-- race car driver
-
 Interpreting the loss numbers:
 Perplexity - the wtf metric
 https://en.wikipedia.org/wiki/Perplexity
@@ -179,18 +173,17 @@ https://en.wikipedia.org/wiki/Perplexity
 
 What I learned: Don’t use too many epochs for initial optimization. Search rough values with rough epochs and then do the fine tuning later. Optimizing for 0.01 better error is not worth it.
 Order of scores for different hyperparameter values stays the same already after an early time in training -> can abort early during search
+It is more fun and more effective to optimize the architecture first with dropout=1 and usual values (learning rate etc.) and then do the fine tuning later. Also, it makes sense to start with a number of degrees of freedom that is at the max of the reasonable computing capacity (provided that the dataset is large enough).
 
 3 layers net 1024 with strange strange strange output just wasn't trained long enough:
 "I had a considerable statement to be able to see the station at the top of the stair. I was able to see that the man was a strange constable who had been a little too late.  "'I have a considerable statement to be able to see you again, then, and I will see that you have been able to see him. I have a considerable statement to make a considerable statement to me. I have no doubt that I am able to see you all the time. I have a considerable statement to make my own statement to the conclusion that the man was a stranger to him. I have no doubt that I am able to see you. I have a considerable statement to make me as a matter of any consequence."
-
-It is more fun and more effective to optimize the architecture first with dropout=1 and usual values (learning rate etc.) and then do the fine tuning later. Also, it makes sense to start with a number of degrees of freedom that is at the max of the reasonable computing capacity (provided that the dataset is large enough).
 
 Also:
 sampling with 'the' and then expecting normal sentences is also a bit like telling a race car driver to just drive and expecting him to drive with the pattern of a race track
  it's like telling a race car driver to just drive and expecting the path to look like a race track
  the model learned that it can get quite a good loss, if it gets corrected every now and then with one letter
  The Senate will be a supporter of the Senate to support the Senate to support the Senate OR The Senate will be supporter of the S[WRONG -> B(ill)] and now the model is back on track with just one wrong letter
---
+
 Overall the hyperparameter tuning yielded only marginal improvements, but consider the stupid loss function. A marginal loss decrease can mean that it chose the correct word a couple of more times (Senator instead of Penator), even if it only got rewarded for choosing the right letter.
 
 - frustrating loss function
@@ -199,11 +192,8 @@ Overall the hyperparameter tuning yielded only marginal improvements, but consid
 - race car driver
 
  another bad thing about char level:
- timesteps = 300 -> ram explodes
+ timesteps = 300 -> ram explodes, corner of the corner of the corner
  but is necessry to cover a sentence / paragraph
-
-What I learned: Don’t use too many epochs for initial optimization. Search rough values with rough epochs and then do the fine tuning later. Optimizing for 0.01 better error is not worth it.
-It is more fun and more effective to optimize the architecture first with dropout=1 and usual values (learning rate etc.) and then do the fine tuning later. Also, it makes sense to start with a number of degrees of freedom that is at the max of the reasonable computing capacity (provided that the dataset is large enough).
 
 Overall:
 - stupid loss function
@@ -213,25 +203,3 @@ Overall:
     - starting with "The" leads to the race driver problem
 
 Before continuing with word level, we will test a thing that we cannot test for word level
-- remove until here
-
-Overall the hyperparameter tuning yielded only marginal improvements, but consider the stupid loss function. A marginal loss decrease can mean that it chose the correct word a couple of more times (Senator instead of Penator), even if it only got rewarded for choosing the right letter.
-
- another bad thing about char level:
- timesteps = 300 -> ram explodes
- but is necessry to cover a sentence / paragraph
-
-Overall:
-- stupid loss function
-- exploding ram
-- model optimization not related to producing nice sentences
-    - uses man instead of Mr holmes (at least if it is not trained long enough???)
-    - starting with The leads to the race driver problem
-
-Before continuing with word level, we will test a thing that we cannot test for word level
-
-Different datasets
-Write exact metrics for every dataset, number of words, chars, bytes etc.
-Here, the optimal values of course change. For Wikipedia overfitting is not that dangerous, so we can increase the output keep probability.
-
-US Congress better because more consistent topics -> "What I wan" is quite clear
