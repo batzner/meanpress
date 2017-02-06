@@ -179,6 +179,11 @@ figcaption {
     font-size: 0.85em;
 }
 
+.fa {
+    font-size: 0.8rem;
+    color: #666;
+}
+
 .wrapper, footer {
     margin-left: 220px;
 }
@@ -228,6 +233,19 @@ footer {
 .panel-default > .panel-heading h5 {
     text-transform: none;
     font-weight: lighter;
+}
+
+.panel-default > .panel-heading h5 a {
+}
+
+.panel-default > .panel-heading h5 > span:not(:first-of-type) {
+    margin-left: 10px;
+}
+
+.panel-default > .panel-heading h5 .fa {
+    margin-right: 5px;
+    vertical-align: top;
+    margin-top: 0.35rem;
 }
 
 h1 a, h1 a:hover, h1 a:active, h1 a:focus {

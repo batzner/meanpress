@@ -17,7 +17,7 @@
             <div class="panel-heading">
                 <div class="headings">
                     <h1><a href="post/{{post.getDisplayVersion().slug}}/"><span ng-show="category.isSeries">Part {{$index+1}} - </span>{{post.getDisplayVersion().title}}</a></h1>
-                    <h5 ng-bind="post.getDisplayVersion().publishedAt | date:'longDate'"></h5>
+                    <h5><span><i class="fa fa-calendar-o"></i><span ng-bind="post.getDisplayVersion().publishedAt | date:'longDate'"></span></span></h5>
                     <h5 ng-hide="post.getDisplayVersion().isPublished()">Unpublished</h5>
                 </div>
 
