@@ -1,6 +1,5 @@
 <p>I let a neural network read long texts one letter at a time. Its task was to predict the next letter based on those it had seen so far. Over time, it recognized patterns between letters. Find out, what it learned, by feeding it some letters below. When you click the send button on the right, it will read your text and auto-complete it.</p>
 <p>You can choose between networks that read a lot of Wikipedia or US Congress transcripts etc.</p>
-
 <div class="talk-box">
     <table>
         <tr class="talk-box-heading">
@@ -304,23 +303,24 @@ I tested three probabilites to keep the output value of a neuron:
     <li>Trained for 2 hours; overfitted a bit in the end</li>
 </ul>
 
+
+
 <div class="content-9">
     <div id="dataset-card">
         <div class="front">
             <canvas id="dataset-chart" class="chart" data-width="600" data-height="300"></canvas>
         </div>
         <div class="back">
-            Back content
+            <blockquote id="dataset-excerpt"></blockquote>
         </div>
     </div>
-
 </div>
 <div class="content-3">
     <div class="chart-form-group">
         <div>
             <label for="dataset-dropdown">Dataset</label>
             <div id="dataset-dropdown" class="btn-group dropdown-full-width">
-                <button type="button" value="southPark" class="btn btn-default dropdown-toggle" onchange="plotDataset()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" value="southPark" class="btn btn-default dropdown-toggle" onchange="onDatasetChanged()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="choice">South Park</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -485,4 +485,4 @@ I tested three probabilites to keep the output value of a neuron:
 </div>
 
 <input id="stylesheets-input" value="stylesheets/posts/char-lm.css" style="display: none;">
-<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot.js javascripts/posts/char-lm/plot-datasets.js https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js" style="display: none;">
+<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot.js javascripts/posts/char-lm/plot-datasets.js" style="display: none;">

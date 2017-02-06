@@ -108,6 +108,25 @@
     border: none;
 }
 
+#flip-dataset-card-button {
+    width: 100%;
+}
+
+#dataset-card {
+    height: 300px;
+    margin-bottom: 20px;
+}
+
+#dataset-card .front, #dataset-card .back {
+    background-color: white;
+}
+
+#dataset-excerpt {
+    height: 300px;
+    white-space: pre-wrap;
+    overflow-y: scroll;
+}
+
 @media only screen and (max-width: 670px),
        only screen and (min-width: 768px) and (max-width: 904px) {
     .talk-box {

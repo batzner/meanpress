@@ -42,12 +42,14 @@
 
     .chart-form-group {
         padding-left: 0;
+        margin-bottom: 20px;
     }
 }
 
 .lesson-learned {
     padding: 15px;
     margin-bottom: 20px;
+    margin-top: 20px;
     border-radius: 4px;
     color: #31708f;
     background-color: #eef7fc;
