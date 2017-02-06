@@ -154,6 +154,36 @@ class Util {
         }, start);
     }
 
+    static colorCellsByLogValue() {
+        $('[data-transform="color-cells-by-log-value"]').each((index, element) => {
+            const cells = $(element).find('td');
+
+            // Determine the min and max log values
+            let min = null;
+            let max = null;
+            cells.each((index, cell) => {
+                cell = $(cell);
+                let val = parseFloat(cell.html());
+                if (!isNaN(val)) {
+                    val = Math.log(val);
+                    min = min ? Math.min(min, val) : val;
+                    max = max ? Math.max(max, val) : val;
+                }
+            });
+
+            // Color each cell based on its value
+            cells.each((index, cell) => {
+                cell = $(cell);
+                let val = parseFloat(cell.html());
+                if (!isNaN(val)) {
+                    val = Math.log(val);
+                    let percentage = (val-min) / (max-min);
+                    cell.css('background-color', 'rgba(229,115,115,'+percentage+')');
+                }
+            });
+        });
+    }
+
     static processPageElements() {
         console.log('Processing Page');
         // Wrap tables to make them responsive.
@@ -180,6 +210,9 @@ class Util {
             button.html(target.is(':visible') ? showText : hideText);
             target.slideToggle();
         });
+
+        // Apply the transforms
+        Util.colorCellsByLogValue();
 
         Util.runHighlighting();
     }

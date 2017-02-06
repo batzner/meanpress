@@ -104,6 +104,10 @@
     min-width: 100px;
 }
 
+#perplexity-table td {
+    border: none;
+}
+
 @media only screen and (max-width: 670px),
        only screen and (min-width: 768px) and (max-width: 904px) {
     .talk-box {

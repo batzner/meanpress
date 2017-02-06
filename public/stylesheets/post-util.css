@@ -119,3 +119,8 @@
 .dropdown-menu.dark>li>a:hover, .dropdown-menu.dark>li>a:focus {
     background-color: rgba(0, 0, 0, 0.8);
 }
+
+.table-heading-columns {
+    text-align: center;
+    padding: 0;
+}

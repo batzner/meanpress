@@ -190,10 +190,10 @@
 
 <p>Next, I tried increasing the model's parameters. Given a vocabulary size \(V\), here is the formula for the total number of parameters \(p_{total}\) based on the number of LSTM layers \(l\) and the neurons per layer \(n\):
 
-$$p_{total} = p_{first~hidden} + (l-1) \cdot p_{hidden} + p_{softmax}$$
-$$= 4 \cdot (n \cdot (V+n) + n) + (l-1) \cdot 4 \cdot (n \cdot 2 \cdot n + n) + V \cdot n + V$$
+    $$p_{total} = p_{first~hidden} + (l-1) \cdot p_{hidden} + p_{softmax}$$
+    $$= 4 \cdot (n \cdot (V+n) + n) + (l-1) \cdot 4 \cdot (n \cdot 2 \cdot n + n) + V \cdot n + V$$
 
-For the calculation of a single layer's parameters, take a look at the formulas in <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">this blog post</a>. For 512 neurons per layer, we get ca. 3.4M parameters. For 1024 neurons per layer, we get ca. 13M parameters. Here is how that affected the validation loss and training time:</p>
+    For the calculation of a single layer's parameters, take a look at the formulas in <a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/">this blog post</a>. For 512 neurons per layer, we get ca. 3.4M parameters. For 1024 neurons per layer, we get ca. 13M parameters. Here is how that affected the validation loss and training time:</p>
 
 <div class="content-9">
     <canvas id="num-neurons-decay-chart" class="chart" width="600" height="300"></canvas>
@@ -202,7 +202,7 @@ For the calculation of a single layer's parameters, take a look at the formulas 
     <canvas id="num-neurons-epoch-duration-chart" class="chart" width="200" height="300"></canvas>
 </div>
 
-<p>While both models reach the same validation perplexity of 2.26, the larger neural network overfits after 80 minutes /  20 epochs. So, I went for 1024 neurons per layer and tried to tackle the overfitting with dropout. But before trying to prevent overfitting, we need to dicuss, if it even is a problem.</p>
+<p>While both models reach the same validation perplexity of 2.26, the larger neural network overfits after 80 minutes / 20 epochs. So, I went for 1024 neurons per layer and tried to tackle the overfitting with dropout. But before trying to prevent overfitting, we need to dicuss, if it even is a problem.</p>
 
 <h3>The Allure of Overfitting</h3>
 
@@ -233,10 +233,13 @@ I tested three probabilites to keep the output value of a neuron:
 </figure>
 
 
-<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. I chose 0.5 for future experiments. The validation perplexity is still at 2.26 though - just like with 512 neurons per layer. Let's see if a deeper architecture can fix that. <button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button></p>
+<p>We see that a low keep-output probability / high dropout probability overcomes the overfitting. I chose 0.5 for future experiments. The validation perplexity is still at 2.26 though - just like with 512 neurons per layer. Let's see if a deeper architecture can fix that.
+    <button class="show-more" data-target-id="peaks-explanation" data-show-text="What's with the peaks?" data-hide-text="Ok, got it!">What's with the peaks?</button>
+</p>
 <p>For more info on tuning the dropout probability, I can recommend <a href="https://www.reddit.com/r/MachineLearning/comments/3oztvk/why_50_when_using_dropout/">this thread</a>.</p>
 
-<p id="peaks-explanation" class="detail">The initial peaks in the validation perplexity were caused by padding. Because I used mini-batch learning, I split the text into 200 parts. These parts likely have unequal sizes and are also not multiples of 160, our number of timesteps. Thus, when the program reaches the end of the parts at the end of an epoch, it pads all chunks in the batch with PAD tokens. Then, all chunks have an equal length of 160 tokens. In the worst case, however, this means that the model might see about 200 &middot; 160 = 32000 PAD tokens. This has a large influence in the early phase of training. So, when we validate the model just at the end of an epoch, it will be confused, because the validation text, does not solely constist of PAD tokens. I also let the model complete a sentence started with "The" after every validation. At each of the peaks, the model's output was "The PADPADPADPAD...". In retrospective, it would have been better to just skip the last batch of the text.</p>
+<p id="peaks-explanation" class="detail">The initial peaks in the validation perplexity were caused by padding. Because I used mini-batch learning, I split the text into 200 parts. These parts likely have unequal sizes and are also not multiples of 160, our number of timesteps. Thus, when the program reaches the end of the parts at the end of an epoch, it pads all chunks in the batch with PAD tokens. Then, all chunks have an equal length of 160 tokens. In the worst case, however, this means that the model might see about 200 &middot; 160 = 32000 PAD tokens. This has a large influence in the early phase of training. So, when we validate the model just at the end of an epoch, it will be confused, because the validation text, does not solely constist of PAD tokens. I also let the model complete a sentence started with "The" after every validation. At each of the peaks, the model's output was "The PADPADPADPAD...". In retrospective, it would have been better to just skip the last batch of
+    the text.</p>
 
 <h3>5. Number of LSTM layers</h3>
 
@@ -302,14 +305,22 @@ I tested three probabilites to keep the output value of a neuron:
 </ul>
 
 <div class="content-9">
-    <canvas id="dataset-chart" class="chart" data-width="600" data-height="300"></canvas>
+    <div id="dataset-card">
+        <div class="front">
+            <canvas id="dataset-chart" class="chart" data-width="600" data-height="300"></canvas>
+        </div>
+        <div class="back">
+            Back content
+        </div>
+    </div>
+
 </div>
 <div class="content-3">
     <div class="chart-form-group">
         <div>
             <label for="dataset-dropdown">Dataset</label>
             <div id="dataset-dropdown" class="btn-group dropdown-full-width">
-                <button type="button" value="south_park" class="btn btn-default dropdown-toggle" onchange="plotDataset()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" value="southPark" class="btn btn-default dropdown-toggle" onchange="plotDataset()" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="choice">South Park</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
@@ -321,9 +332,71 @@ I tested three probabilites to keep the output value of a neuron:
                 </ul>
             </div>
         </div>
+        <div>
+            <button type="button" value="showExcerpt" id="flip-dataset-card-button" class="btn btn-default" onclick="flipDatasetCard()">Show Excerpt</button>
+        </div>
     </div>
 </div>
 <div class="clearfix"></div>
+
+<p>I also fed every validation dataset to each of the models and measured their average perplexity. Here is how confused they were:</p>
+
+<table id="perplexity-table" data-transform="color-cells-by-log-value">
+    <tr>
+        <td></td>
+        <td colspan="5" class="table-heading-columns">Trained on</td>
+    </tr>
+    <tr>
+        <td>Evaluated on</td>
+        <th>Sherlock</th>
+        <th>Wikipedia</th>
+        <th>Congress</th>
+        <th>South Park</th>
+        <th>Goethe</th>
+    </tr>
+    <tr>
+        <th>Sherlock</th>
+        <td>2.11</td>
+        <td>4.32</td>
+        <td>3.14</td>
+        <td>3.56</td>
+        <td>37.01</td>
+    </tr>
+    <tr>
+        <th>Wikipedia</th>
+        <td>2.77</td>
+        <td>2.22</td>
+        <td>3.20</td>
+        <td>3.97</td>
+        <td>37.53</td>
+    </tr>
+    <tr>
+        <th>Congress</th>
+        <td>4.00</td>
+        <td>2.51</td>
+        <td>1.73</td>
+        <td>4.11</td>
+        <td>48.50</td>
+    </tr>
+    <tr>
+        <th>South Park</th>
+        <td>3.89</td>
+        <td>3.01</td>
+        <td>3.48</td>
+        <td>2.31</td>
+        <td>40.22</td>
+    </tr>
+    <tr>
+        <th>Goethe</th>
+        <td>18.38</td>
+        <td>6.36</td>
+        <td>11.88</td>
+        <td>14.93</td>
+        <td>3.20</td>
+    </tr>
+</table>
+
+<p>We can see that Goethe was quite confused by the English language. The Wikipedia model seems to generalize best. But considering its low perplexity even on the Goethe dataset, I think that the diversity of the Wikipedia dataset also cause the model to be generally unsure in its predictions. Thus, it is less confused, if it was wrong. Similarly, the strong homogeneity of Congress transcripts facilitates scoring a low perplexity.</p>
 
 <div class="lesson-learned">
     <strong>General Lessons Learned:</strong>
@@ -336,7 +409,7 @@ I tested three probabilites to keep the output value of a neuron:
 
 <h3>The reasonable ineffectiveness of character-level language models</h3>
 
-<p>Overall, the hyperparameter tuning seemingly yielded only marginal results. I improved the validation perplexity from 2.48 to 2.11. That is to some extent due to the loss function I used. It penalizes wrong letters instead of words. In addition to that, I even told the model if it was about to generate a wrong word directly after the first wrong character. Say, the model wants to output 'house', but the correct word would be 'street'. It starts with 'h', gets corrected with the 's' and can then continue with 'treet'. In the end, its output is 'htreet', meaning 83% were correct when, in fact, it's initial choice was completely wrong. This makes the training ineffective and the evaluation metric less meaningful. But it also means that the hyperparameter tuning was more effective than it seems.</p>
+<p>Overall, the hyperparameter tuning seemingly yielded only marginal results. I improved the Sherlock model's validation perplexity from 2.48 to 2.11. That is to some extent due to the loss function I used. It penalizes wrong letters instead of words. In addition to that, I even told the model if it was about to generate a wrong word directly after the first wrong character. Say, the model wants to output 'house', but the correct word would be 'street'. It starts with 'h', gets corrected with the 's' and can then continue with 'treet'. In the end, its output is 'htreet', meaning 83% were correct when, in fact, it's initial choice was completely wrong. This makes the training ineffective and the evaluation metric less meaningful. But it also means that the hyperparameter tuning was more effective than it seems.</p>
 
 <p>What also troubles me is that building a good language model and generating realistic sentences are slightly different tasks. I explained this discrepancy above with respect to overfitting. In addition to that, the way that I trained and sampled from the model increases that discrepancy: during training, I immediately corrected the model when it was wrong. During sampling, it just generated freely without correction. To me that feels like telling a race-car driver to 'just drive' and expecting the path to look like a race track.</p>
 
@@ -347,7 +420,7 @@ I tested three probabilites to keep the output value of a neuron:
 <p>In conclusion, modelling a language on character-level comes with a couple of drawbacks:</p>
 
 <ul>
-    <li>The model spends a lot of its parameters on building a vocabulary. For example, on 'lone' might follow 'ly' but on 'alone' never follows 'ly'.</li>
+    <li>The model spends a lot of its parameters on building a vocabulary. For example, on 'boo' might follow 'k' but on 'bamboo' never follows 'k'. Therefore, it has less parameters left to learn logical dependencies on word-level.</li>
     <li>It needs to do backpropagation with a high number of time steps in order to cover the last words that were given to the model. That causes a large computational graph.</li>
     <li>With a high number of time steps the backpropagated gradients vanish and the model loses sense of what it was talking about - even after only a few words.</li>
 </ul>
@@ -412,4 +485,4 @@ I tested three probabilites to keep the output value of a neuron:
 </div>
 
 <input id="stylesheets-input" value="stylesheets/posts/char-lm.css" style="display: none;">
-<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot-datasets.js javascripts/posts/char-lm/plot.js" style="display: none;">
+<input id="javascripts-input" value="https://cdnjs.cloudflare.com/ajax/libs/he/1.1.1/he.min.js javascripts/posts/char-lm/text-complete.js javascripts/posts/char-lm/plot-flexible.js javascripts/posts/char-lm/plot.js javascripts/posts/char-lm/plot-datasets.js https://cdn.rawgit.com/nnattawat/flip/master/dist/jquery.flip.min.js" style="display: none;">
