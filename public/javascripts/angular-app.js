@@ -42,7 +42,7 @@ app.config([
                 url: '/lab/',
                 templateUrl: '/templates/lab.html',
                 controller: 'LabCtrl as controller',
-                navItem: 'blog',
+                navItem: 'lab',
                 params: {
                     showSpinner: true
                 }

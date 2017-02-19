@@ -27,17 +27,24 @@ const DATASET_DEFAULTS = {
     }
 };
 
-const TEXT_INPUT = $('.text-input');
-const TEXT_OUTPUT = $('.text-output');
-const TEXT_BRIDGE = $('.text-input-output-bridge');
-const TALK_BOX_HEADING = $('.talk-box-heading');
-const DATASET_DROPDOWN = $('#talk-box-dataset-dropdown');
+// Pseudo-constant jquery elements (constant within the scope of the post)
+let TEXT_INPUT = $('.text-input');
+let TEXT_OUTPUT = $('.text-output');
+let TEXT_BRIDGE = $('.text-input-output-bridge');
+let TALK_BOX_HEADING = $('.talk-box-heading');
+let DATASET_DROPDOWN = $('#talk-box-dataset-dropdown');
 
 let selectedDataset = null;
 let pendingRequestId = null;
 let result = null;
 
 window.onContentReadyCallbacks.push(function () {
+    TEXT_INPUT = $('.text-input');
+    TEXT_OUTPUT = $('.text-output');
+    TEXT_BRIDGE = $('.text-input-output-bridge');
+    TALK_BOX_HEADING = $('.talk-box-heading');
+    DATASET_DROPDOWN = $('#talk-box-dataset-dropdown');
+
     selectedDataset = null;
     pendingRequestId = null;
     result = null;

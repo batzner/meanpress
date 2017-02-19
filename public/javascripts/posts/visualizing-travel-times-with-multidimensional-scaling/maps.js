@@ -2,15 +2,18 @@ var cityNames = [];
 var cityMarkers = [];
 var coordinateMarkers = [];
 
-function runPostScript() {
+window.onContentReadyCallbacks.push(function () {
     cityNames = ["San Francisco", "Sacramento", "Los Angeles", "Las Vegas"];
+    cityMarkers = [];
+    coordinateMarkers = [];
+
     try {
         initMap();
     } catch (e) {
         // Display the error beneath the interactive google maps
         displayError();
     }
-}
+});
 
 function displayError(message) {
     message = message || "Something went wrong with the Google Maps API. Please try reloading" +

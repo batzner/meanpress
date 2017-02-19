@@ -36,7 +36,18 @@ class LabCtrl extends InjectionReceiver {
             return () => this.angularLoad.loadScript(url);
         });
 
+        // If the scripts are already loaded, the callbacks won't be set again, so we need to use
+        // the old ones.
+        if (this.PostService.postCallbacks.has('lab')) {
+            window.onContentReadyCallbacks = this.PostService.postCallbacks.get('lab');
+        } else {
+            window.onContentReadyCallbacks = [];
+        }
+
         Util.chainPromiseBlocks(blocks).catch(console.error).then(() => {
+            // Save the callbacks for reloading of the page
+            this.PostService.postCallbacks.set('lab', window.onContentReadyCallbacks);
+
             // Execute the Post's scripts
             console.log('Executing the onContentReadyCallbacks. Count: '
                 + window.onContentReadyCallbacks.length);

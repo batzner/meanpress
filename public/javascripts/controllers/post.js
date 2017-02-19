@@ -56,7 +56,7 @@ class PostCtrl extends InjectionReceiver {
         }
 
         this.$rootScope.htmlTitle = (this.$scope.postVersion.htmlTitle
-            || this.$scope.postVersion.title);
+        || this.$scope.postVersion.title);
         this.$rootScope.metaDescription = this.$scope.postVersion.metaDescription;
 
         this.loadScripts();
@@ -76,18 +76,25 @@ class PostCtrl extends InjectionReceiver {
 
         // If the scripts are already loaded, the callbacks won't be set again, so we need to use
         // the old ones.
-        window.onContentReadyCallbacks = window.onContentReadyCallbacks || [];
+        if (this.PostService.postCallbacks.has(this.post._id)) {
+            window.onContentReadyCallbacks = this.PostService.postCallbacks.get(this.post._id);
+        } else {
+            window.onContentReadyCallbacks = [];
+        }
+
         // Load the JavaScripts when the page is loaded.
         this.$scope.postVersion.loadJs(this.angularLoad).then(() => {
-                // Execute the Post's scripts
-                window.onContentReadyCallbacks.forEach(func => func());
-            });
+            // Save the callbacks for reloading of the page
+            this.PostService.postCallbacks.set(this.post._id, window.onContentReadyCallbacks);
+            // Execute the Post's scripts
+            window.onContentReadyCallbacks.forEach(func => func());
+        });
     }
 
     loadDisqus() {
         /**
-        *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-        *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
 
         let PAGE_URL = window.location.href;
         let PAGE_IDENTIFIER = this.post._id;
@@ -99,11 +106,11 @@ class PostCtrl extends InjectionReceiver {
         if (window.DISQUS) {
             DISQUS.reset({reload: true, config: disqus_config});
         } else {
-            (function() { // DON'T EDIT BELOW THIS LINE
-            var d = document, s = d.createElement('script');
-            s.src = '//mlowl.disqus.com/embed.js';
-            s.setAttribute('data-timestamp', +new Date());
-            (d.head || d.body).appendChild(s);
+            (function () { // DON'T EDIT BELOW THIS LINE
+                var d = document, s = d.createElement('script');
+                s.src = '//mlowl.disqus.com/embed.js';
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
             })();
         }
     }
