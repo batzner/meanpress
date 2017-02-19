@@ -38,7 +38,10 @@ function getIdsToPopulate(posts, withUnpublished) {
 function removeOldPostVersions(posts, withUnpublished) {
     let idsToKeep = getIdsToPopulate(posts, withUnpublished);
     posts.forEach(post => {
-        post.versions = post.versions.filter(v => idsToKeep.indexOf(v._id) != -1);
+        post.versions = post.versions.filter(v => {
+            // Check, if any object id is equal to the version's id
+            return idsToKeep.some(idToKeep => idToKeep.equals(v._id));
+        });
     });
 }
 
