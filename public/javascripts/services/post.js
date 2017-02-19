@@ -12,6 +12,7 @@ class PostService extends InjectionReceiver {
     constructor(...injections) {
         super(...injections);
         this.posts = new BindableMap(); // Dictionary mapping uuid (string) to post object
+        this.postCallbacks = new Map(); // Dictionary mapping uuid (string) to array of functions
     }
 
     // HELPER METHODS

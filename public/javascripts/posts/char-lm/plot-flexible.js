@@ -68,8 +68,7 @@ const AXIS_LABELS = {
     epochs: 'Epoch'
 };
 
-const Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
-
+let Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
 let chartExport = null;
 
 window.onContentReadyCallbacks.push(function () {
@@ -78,6 +77,7 @@ window.onContentReadyCallbacks.push(function () {
     Chart.defaults.global.elements.line.tension = 0;
     Chart.defaults.global.elements.point.radius = 0;
 
+    Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
     chartExport = null;
 
     // Initialize the range slider
