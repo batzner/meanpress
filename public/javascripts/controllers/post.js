@@ -28,17 +28,19 @@ class PostCtrl extends InjectionReceiver {
             // Otherwise, the post version will be different from its post's post version,
             // because the post created a new post version but the old post version is still
             // referenced by this scope.
+            let loadJs = true;
             this.$scope.$on('posts:fetched', () => {
                 this.usSpinnerService.stop('spinner');
-                this.fillTemplate();
+                this.fillTemplate(loadJs);
+                loadJs = false;
             });
         } else {
-            this.fillTemplate();
+            this.fillTemplate(true);
         }
     }
 
 
-    fillTemplate() {
+    fillTemplate(loadJs) {
         this.post = this.PostService.findPostBySlug(this.$stateParams.slug);
 
         if (!this.post) return;
@@ -59,8 +61,10 @@ class PostCtrl extends InjectionReceiver {
         || this.$scope.postVersion.title);
         this.$rootScope.metaDescription = this.$scope.postVersion.metaDescription;
 
-        this.loadScripts();
-        this.loadDisqus();
+        if (loadJs) {
+            this.loadScripts();
+            this.loadDisqus();
+        }
     }
 
     deletePost() {
