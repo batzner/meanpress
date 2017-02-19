@@ -30,9 +30,16 @@ function getIdsToPopulate(posts, withUnpublished) {
     posts.forEach(post => {
         if (post.publishedVersion) ids.push(post.publishedVersion);
         const last = post.versions.length - 1;
-        if (withUnpublished && last >= 0) ids.push(post.versions[last]);
+        if (withUnpublished && last >= 0) ids.push(post.versions[last]._id);
     });
     return ids;
+}
+
+function removeOldPostVersions(posts, withUnpublished) {
+    let idsToKeep = getIdsToPopulate(posts, withUnpublished);
+    posts.forEach(post => {
+        post.versions = post.versions.filter(v => idsToKeep.indexOf(v._id) != -1);
+    });
 }
 
 function removeBody(post) {
@@ -64,30 +71,25 @@ router.post('/api/categories', auth, function (req, res, next) {
 
 function getPosts(req, res, next, withUnpublished = false) {
     // For each criterium, we need to find one post version fulfilling it
-    let criteria = [];
+    let postVersionQuery = {};
     if (req.query.category !== undefined) {
-        criteria.push({versions: {$elemMatch: {category: req.query.category}}});
+        postVersionQuery.category = req.query.category;
     }
     if (req.query.slug !== undefined) {
-        criteria.push({versions: {$elemMatch: {slug: req.query.slug}}});
+        postVersionQuery.slug = req.query.slug;
     }
-
-    let query = criteria.length ? {$and: criteria} : {};
 
     // Check for URL parameters
     const startDate = new Date();
-    Post.find(query)
-        .then(posts => {
-            // Only populate the published and the last version
-            let idsToPopulate = getIdsToPopulate(posts, withUnpublished);
-            return PostVersion.populate(posts, {
-                path: 'versions',
-                match: {
-                    _id: {$in: idsToPopulate}
-                }
-            });
+    Post.find({})
+        .populate({
+            path: 'versions',
+            match: postVersionQuery
         })
         .then(posts => {
+            // Remove old post versions / only keep the published and the last version.
+            removeOldPostVersions(posts, withUnpublished);
+
             // Filter posts that don't have a version at all after filtering the versions
             posts = posts.filter(post => post.versions.length);
 

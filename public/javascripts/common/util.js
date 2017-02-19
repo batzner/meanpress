@@ -185,7 +185,6 @@ class Util {
     }
 
     static processPageElements() {
-        console.log('Processing Page');
         // Wrap tables to make them responsive.
         $('table').filter((index, element) => !($(element).parent().hasClass('table-container')))
             .wrap('<div class="table-container"></div>');
