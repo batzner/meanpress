@@ -36,10 +36,15 @@ const DATASET_DROPDOWN = $('#talk-box-dataset-dropdown');
 let selectedDataset = null;
 let pendingRequestId = null;
 let result = null;
-selectDataset('wiki');
+
+window.onContentReadyCallbacks.push(function () {
+    selectedDataset = null;
+    pendingRequestId = null;
+    result = null;
+    selectDataset('wiki');
+});
 
 // TODO: Stop the animation on an exception
-// TODO: Add postprocessing: Remove _PAD and remove multiple blank lines
 
 function selectDataset(name) {
     // If name == null, the event comes from the dropdown.

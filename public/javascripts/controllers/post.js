@@ -71,14 +71,17 @@ class PostCtrl extends InjectionReceiver {
         // Load the css directly.
         this.$scope.postVersion.loadCss(this.angularLoad);
 
-        this.$document.ready(() => {
-            // Load the JavaScripts when the page is loaded.
-            this.$scope.postVersion.loadJs(this.angularLoad)
-                .then(() => {
-                    // Execute the Post's script
-                    if (window.runPostScript) runPostScript();
-                });
-        });
+        // TODO: Register the callbacks for this specific post and only call the callbacks for this
+        // post.
+
+        // If the scripts are already loaded, the callbacks won't be set again, so we need to use
+        // the old ones.
+        window.onContentReadyCallbacks = window.onContentReadyCallbacks || [];
+        // Load the JavaScripts when the page is loaded.
+        this.$scope.postVersion.loadJs(this.angularLoad).then(() => {
+                // Execute the Post's scripts
+                window.onContentReadyCallbacks.forEach(func => func());
+            });
     }
 
     loadDisqus() {

@@ -1,8 +1,3 @@
-Chart.defaults.global.maintainAspectRatio = false;
-Chart.defaults.global.elements.line.fill = false;
-Chart.defaults.global.elements.line.tension = 0;
-Chart.defaults.global.elements.point.radius = 0;
-
 const runGroupValues = {
     batch_size: ['1', '10', '20', '50', '100', '200', '500', '2000'],
     learning_rate_512: ['0.05', '0.01', '0.005', '0.001'],
@@ -77,7 +72,14 @@ const Y_AXIS_RANGE_SLIDER = $('#y-axis-range');
 
 let chartExport = null;
 
-$(function () {
+window.onContentReadyCallbacks.push(function () {
+    Chart.defaults.global.maintainAspectRatio = false;
+    Chart.defaults.global.elements.line.fill = false;
+    Chart.defaults.global.elements.line.tension = 0;
+    Chart.defaults.global.elements.point.radius = 0;
+
+    chartExport = null;
+
     // Initialize the range slider
     Y_AXIS_RANGE_SLIDER.ionRangeSlider({
         type: 'double',

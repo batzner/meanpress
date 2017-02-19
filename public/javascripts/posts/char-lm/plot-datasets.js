@@ -7,7 +7,7 @@ const EXCERPTS = {
 };
 const FLIP_DATASET_BUTTON = $('#flip-dataset-card-button');
 
-$(() => {
+window.onContentReadyCallbacks.push(function () {
     $('#dataset-card').flip({
       trigger: 'manual'
     });

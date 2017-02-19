@@ -37,8 +37,10 @@ class LabCtrl extends InjectionReceiver {
         });
 
         Util.chainPromiseBlocks(blocks).catch(console.error).then(() => {
-            // Execute the Post's script
-            if (window.runPostScript) runPostScript();
+            // Execute the Post's scripts
+            console.log('Executing the onContentReadyCallbacks. Count: '
+                + window.onContentReadyCallbacks.length);
+            window.onContentReadyCallbacks.forEach(func => func());
         });
     }
 }
