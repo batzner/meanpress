@@ -51,7 +51,7 @@ function getEquidistantPoints(data, numPoints) {
     let points = [];
     const stepSize = (maxX - minX) / (numPoints - 1);
     data.sort((a, b) => a.x - b.x).forEach(point => {
-        if (point.x >= minX + points.length * stepSize - 10 ** -8) {
+        if (point.x >= minX + points.length * stepSize - Math.pow(10, -8)) {
             points.push(point);
         }
     });
