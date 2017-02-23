@@ -195,6 +195,7 @@ figcaption {
 .wrapper {
     position: relative;
     padding: 10px 10px 30px 10px;
+    min-height: 90%;
 }
 
 #content {
