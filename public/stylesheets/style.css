@@ -184,14 +184,17 @@ figcaption {
     color: #666;
 }
 
+.no-highlight {
+    color: inherit;
+}
+
 .wrapper, footer {
     margin-left: 220px;
 }
 
 .wrapper {
     position: relative;
-    padding: 10px 10px 70px 10px;
-    min-height: 100%;
+    padding: 10px 10px 30px 10px;
 }
 
 #content {
@@ -203,7 +206,7 @@ figcaption {
 }
 
 footer {
-    margin-top: -50px;
+    margin-bottom: 20px;
     font-family: 'Source Sans Pro', sans-serif;
     text-align: center;
     font-size: 0.85em;

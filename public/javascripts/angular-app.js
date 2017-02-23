@@ -86,9 +86,12 @@ app.config([
             .state('about', {
                 url: '/about/',
                 templateUrl: '/templates/about.html',
-                controller: 'AboutCtrl as controller',
                 navItem: 'about',
                 css: 'stylesheets/about.css'
+            })
+            .state('legal', {
+                url: '/legal/',
+                templateUrl: '/templates/legal.html'
             })
             .state('login', {
                 url: '/login/',
