@@ -6,7 +6,7 @@
                     <h1>{{postVersion.title}}</a></h1>
                     <h5>
                         <span><i class="fa fa-calendar-o"></i><span ng-bind="postVersion.publishedAt | date:'longDate'"></span></span>
-                        <span ng-show="categoryTitle"><i class="fa fa-list-ol"></i><a href="/category/{{postVersion.category}}" ng-bind="categoryTitle"></a></span>
+                        <span ng-show="categoryTitle"><i class="fa fa-list-ol"></i><a href="/category/{{postVersion.category}}/" ng-bind="categoryTitle"></a></span>
                     </h5>
                     <h5 ng-hide="postVersion.isPublished()">Unpublished</h5>
                 </div>

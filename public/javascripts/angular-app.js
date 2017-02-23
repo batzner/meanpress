@@ -48,7 +48,7 @@ app.config([
                 }
             })
             .state('preview', {
-                url: '/post/{slug}/preview',
+                url: '/post/{slug}/preview/',
                 templateUrl: '/templates/post.html',
                 controller: 'PostCtrl as controller',
                 navItem: 'blog',
@@ -57,19 +57,19 @@ app.config([
                 }
             })
             .state('edit', {
-                url: '/post/{slug}/edit',
+                url: '/post/{slug}/edit/',
                 templateUrl: '/templates/edit.html',
                 controller: 'EditPostCtrl as controller',
                 navItem: 'blog'
             })
             .state('add', {
-                url: '/add',
+                url: '/add/',
                 templateUrl: '/templates/add.html',
                 controller: 'EditPostCtrl as controller',
                 navItem: 'add'
             })
             .state('category', {
-                url: '/category/{name}',
+                url: '/category/{name}/',
                 templateUrl: '/templates/category.html',
                 controller: 'CategoryCtrl as controller',
                 navItem: 'overwritten-in-controller',
@@ -78,26 +78,29 @@ app.config([
                 }
             })
             .state('addCategory', {
-                url: '/add-category',
+                url: '/add-category/',
                 templateUrl: '/templates/add-category.html',
                 controller: 'AddCategoryCtrl as controller',
                 navItem: 'add'
             })
             .state('about', {
-                url: '/about',
+                url: '/about/',
                 templateUrl: '/templates/about.html',
-                controller: 'AboutCtrl as controller',
                 navItem: 'about',
                 css: 'stylesheets/about.css'
             })
+            .state('legal', {
+                url: '/legal/',
+                templateUrl: '/templates/legal.html'
+            })
             .state('login', {
-                url: '/login',
+                url: '/login/',
                 templateUrl: '/templates/login.html',
                 controller: 'AuthCtrl as controller',
                 onEnter: onEnterRestricted
             })
             .state('register', {
-                url: '/register',
+                url: '/register/',
                 templateUrl: '/templates/register.html',
                 controller: 'AuthCtrl as controller',
                 onEnter: onEnterRestricted
@@ -113,6 +116,7 @@ app.run(['$rootScope', '$window', '$location', 'AuthService',
     function ($rootScope, $window, $location, AuthService) {
     // Initialise GAnalytics
     if (typeof $window.ga === 'function' && !AuthService.isLoggedIn()) {
+        $window.ga('set', 'anonymizeIp', true);
         $window.ga('create', 'UA-70748485-2', 'auto');
     }
 
