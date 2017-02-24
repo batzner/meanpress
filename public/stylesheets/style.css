@@ -188,6 +188,10 @@ figcaption {
     color: inherit;
 }
 
+.no-wrap {
+    white-space: nowrap;
+}
+
 .wrapper, footer {
     margin-left: 220px;
 }
@@ -195,7 +199,7 @@ figcaption {
 .wrapper {
     position: relative;
     padding: 10px 10px 30px 10px;
-    min-height: 90%;
+    min-height: calc(100vh - 80px);
 }
 
 #content {
@@ -207,10 +211,11 @@ figcaption {
 }
 
 footer {
-    margin-bottom: 20px;
+    height: 80px;
     font-family: 'Source Sans Pro', sans-serif;
     text-align: center;
     font-size: 0.85em;
+    padding: 0 15px;
     color: #666;
 }
 
