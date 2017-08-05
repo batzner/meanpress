@@ -1,5 +1,5 @@
 # meanpress
-A very simple CMS based on the MEAN stack
+A very simple CMS based on the MEAN stack, written in ECMAScript 6.
 
 ## Installation
 1. Install `node (v6.9.2)` and `npm (v3.10.9)` by [downloading the installer](https://nodejs.org/en/download/).
