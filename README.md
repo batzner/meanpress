@@ -1,9 +1,6 @@
 # meanpress
 A very simple CMS based on the MEAN stack, written in ECMAScript 6.
 
-## Showcase:
-http://ec2-54-200-157-28.us-west-2.compute.amazonaws.com/ (online as of 2017-08-06)
-
 ## Installation
 1. Install `node (v6.9.2)` and `npm (v3.10.9)` by [downloading the installer](https://nodejs.org/en/download/).
 2. Install and run the [mongoDB community server](https://server.js.mongodb.com/download-center#community). Create a database.
